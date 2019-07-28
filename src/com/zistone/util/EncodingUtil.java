@@ -4,14 +4,10 @@ import java.io.UnsupportedEncodingException;
 
 public class EncodingUtil
 {
-    public static void main(String[] args) throws UnsupportedEncodingException
+    public static void main(String[] args)
     {
-        String gbkIsn = "B2E2CAD4";
-        String content = "。";
-        String result = GBKToUnicode(gbkIsn);
-        String isn = UnicodeToGBK(content);
-        System.out.println(result);
-        System.out.println(isn);
+        System.out.println("GBK转Unicode:" + GBKToUnicode("B2E2CAD4"));
+        System.out.println("Unicode转GBK:" + UnicodeToGBK("测试"));
     }
 
     /**

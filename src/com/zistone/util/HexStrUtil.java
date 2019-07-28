@@ -62,7 +62,7 @@ public class HexStrUtil
     }
 
     /**
-     * Str转16进制数字,适用于所有字符（包括中文）
+     * Str转16进制数字,适用于所有字符
      *
      * @param str
      * @return
