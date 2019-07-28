@@ -20,7 +20,8 @@ public class Main
         System.arraycopy(strArray, 1, strArray2, 0, strArray2.length);
         //消息ID
         String[] id = Arrays.copyOfRange(strArray2, 0, 2);
-        //TODO:根据消息ID判断消息类型
+        //根据消息ID判断消息类型
+
         //消息体属性
         String[] body = Arrays.copyOfRange(strArray2, 2, 4);
         //终端手机号
