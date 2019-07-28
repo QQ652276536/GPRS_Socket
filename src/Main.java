@@ -1,5 +1,7 @@
+import com.zistone.bean.MessageType;
 import com.zistone.util.HexStrUtil;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class Main
@@ -19,18 +21,21 @@ public class Main
         String[] strArray2 = new String[strArray.length - 2];
         System.arraycopy(strArray, 1, strArray2, 0, strArray2.length);
         //消息ID
-        String[] id = Arrays.copyOfRange(strArray2, 0, 2);
-        //根据消息ID判断消息类型
-
+        String[] idArray = Arrays.copyOfRange(strArray2, 0, 2);
+        String idStr = "0x" + idArray[0] + idArray[1];
         //消息体属性
         String[] body = Arrays.copyOfRange(strArray2, 2, 4);
         //终端手机号
         String[] phone = Arrays.copyOfRange(strArray2, 4, 10);
         //消息流水号
         String[] detail = Arrays.copyOfRange(strArray2, 10, 12);
-        //消息包封装项
-        String[] packageItem = Arrays.copyOfRange(strArray2, 12, strArray2.length);
-
+        //TODO:根据消息ID判断消息类型
+        int temp = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
+        if (MessageType.CLIENTREGISTER==temp)
+        {
+            //消息包封装项
+            String[] packageItem = Arrays.copyOfRange(strArray2, 12, strArray2.length);
+        }
 
         System.out.println("_____________________成功启动_____________________");
     }

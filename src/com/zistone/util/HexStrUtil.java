@@ -1,9 +1,12 @@
 package com.zistone.util;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 字符转换工具类
+ * 不支持特殊字符
  */
 public class HexStrUtil
 {
@@ -12,14 +15,11 @@ public class HexStrUtil
 
     public static void main(String[] args)
     {
-        String str = "李";
-        System.out.println("Str转16进制数字,适用于所有字符（包括中文）:" + EnCode("LiWei"));
-        System.out.println("16进制的Str转GBK编码:" + HexStrToGBK(BytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E})));
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.print("16进制的Str转byte[]:");
-        PrintHexStr(HexStrToBytes("E69D8E"));
-        System.out.println("byte[]转成16进制的Str:" + BytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
+        System.out.print("16进制的Str转16进制的byte[]:");
+        PrintHexStr(HexStrToHexBytes("E69D8E"));
+        System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("LiWei"));
@@ -62,12 +62,38 @@ public class HexStrUtil
     }
 
     /**
-     * Str转16进制数字,适用于所有字符
+     * 16进制的Str转普通Str
+     *
+     * @param hexStr
+     * @return
+     */
+    public static String HexStrToStr(String hexStr)
+    {
+        //能被16整除,肯定可以被2整除
+        byte[] array = new byte[hexStr.length() / 2];
+        try
+        {
+            for (int i = 0; i < array.length; i++)
+            {
+                array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
+            }
+            hexStr = new String(array, "UTF-8");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+        return hexStr;
+    }
+
+    /**
+     * 普通Str转16进制Str
      *
      * @param str
      * @return
      */
-    public static String EnCode(String str)
+    public static String StrToHexStr(String str)
     {
         //根据默认编码获取字节数组
         byte[] bytes = str.getBytes();
@@ -85,6 +111,60 @@ public class HexStrUtil
             }
         }
         return stringBuilder.toString();
+    }
+
+    /**
+     * 16进制的byte[]转16进制的Str
+     *
+     * @param array
+     * @return
+     */
+    public static String HexBytesToHexStr(byte[] array)
+    {
+        if (null == array || array.length <= 0)
+        {
+            return null;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < array.length; i++)
+        {
+            int temp = array[i] & 0xFF;
+            String tempHStr = Integer.toHexString(temp);
+            if (tempHStr.length() < 2)
+            {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(tempHStr);
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 16进制的Str转16进制的byte[]
+     *
+     * @param hexStr
+     * @return
+     */
+    public static byte[] HexStrToHexBytes(String hexStr)
+    {
+        if (null == hexStr || hexStr.equals(""))
+        {
+            return null;
+        }
+        if (hexStr.contains("0x"))
+        {
+            hexStr = hexStr.replaceAll("0x", "");
+        }
+        hexStr = hexStr.toUpperCase();
+        int length = hexStr.length() / 2;
+        char[] hexChars = hexStr.toCharArray();
+        byte[] array = new byte[length];
+        for (int i = 0; i < length; i++)
+        {
+            int temp = i * 2;
+            array[i] = (byte) (HEXSTRING.indexOf(hexStr.charAt(i)) << 4 | HEXSTRING.indexOf(hexChars[temp + 1]));
+        }
+        return array;
     }
 
     /**
@@ -169,95 +249,7 @@ public class HexStrUtil
     }
 
     /**
-     * 16进制的Str转GBK编码
-     *
-     * @param hexStr
-     * @return
-     */
-    public static String HexStrToGBK(String hexStr)
-    {
-        byte[] array = new byte[hexStr.length() / 2];
-        for (int i = 0; i < array.length; i++)
-        {
-            try
-            {
-                array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                return "";
-            }
-        }
-        try
-        {
-            //UTF-16LE:Not
-            hexStr = new String(array, "GBK");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return "";
-        }
-        return hexStr;
-    }
-
-    /**
-     * byte[]转成16进制的Str
-     *
-     * @param array
-     * @return
-     */
-    public static String BytesToHexStr(byte[] array)
-    {
-        if (null == array || array.length <= 0)
-        {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.length; i++)
-        {
-            int temp = array[i] & 0xFF;
-            String tempHStr = Integer.toHexString(temp);
-            if (tempHStr.length() < 2)
-            {
-                stringBuilder.append(0);
-            }
-            stringBuilder.append(tempHStr);
-        }
-        return stringBuilder.toString();
-    }
-
-    /**
-     * 16进制的Str转byte[]
-     *
-     * @param hexStr
-     * @return
-     */
-    public static byte[] HexStrToBytes(String hexStr)
-    {
-        if (null == hexStr || hexStr.equals(""))
-        {
-            return null;
-        }
-        if (hexStr.contains("0x"))
-        {
-            hexStr = hexStr.replaceAll("0x", "");
-        }
-        hexStr = hexStr.toUpperCase();
-        int length = hexStr.length() / 2;
-        char[] hexChars = hexStr.toCharArray();
-        byte[] array = new byte[length];
-        for (int i = 0; i < length; i++)
-        {
-            int temp = i * 2;
-            array[i] = (byte) (HEXSTRING.indexOf(hexStr.charAt(i)) << 4 | HEXSTRING.indexOf(hexChars[temp + 1]));
-        }
-        return array;
-    }
-
-    /**
-     * 将byte[]以16进制打印至控制台
+     * 普通byte[]以16进制打印至控制台
      *
      * @param array
      */
