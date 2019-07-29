@@ -4,7 +4,7 @@ public class ASCIIUtil
 {
     public static void main(String[] args)
     {
-        System.out.println(ParseASCII(","));
+        System.out.println(ParseASCII(""));
     }
 
     private static String ToHexUtil(int number)
