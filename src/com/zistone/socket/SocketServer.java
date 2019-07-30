@@ -52,12 +52,15 @@ public class SocketServer
     {
         try
         {
-            System.out.println("_____________________服务启动_____________________");
+            System.out.println(">>>服务启动,等待客户端的连接<<<");
             ServerSocket server = new ServerSocket(8888);
+            int count = 0;
             while (true)
             {
                 //开启监听
                 Socket socket = server.accept();
+                count++;
+                System.out.println(">>>第" + count + "个客户端连接成功<<<");
                 ServerThread thread = new ServerThread(socket, content);
                 thread.start();
             }
