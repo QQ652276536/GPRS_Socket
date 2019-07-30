@@ -1,9 +1,4 @@
-import com.zistone.bean.MessageType;
 import com.zistone.message.MessageReceive;
-import com.zistone.util.HexStrUtil;
-
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Main
 {

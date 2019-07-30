@@ -40,6 +40,7 @@ public class ServerThread extends Thread
 
             outputStream = socket.getOutputStream();
             printWriter = new PrintWriter(outputStream);
+            Thread.sleep(10000);
             printWriter.write(content);
 
             printWriter.flush();

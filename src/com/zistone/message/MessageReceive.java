@@ -1,6 +1,7 @@
 package com.zistone.message;
 
 import com.zistone.bean.MessageType;
+import com.zistone.util.ConvertUtil;
 
 import java.util.Arrays;
 
@@ -37,7 +38,11 @@ public class MessageReceive
         String bodyPropertyStr = "0x" + bodyPropertyArray[0] + bodyPropertyArray[1];
         //终端手机号
         String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
-        String phoneStr = "0x" + phoneArray[0] + phoneArray[1];
+        String phoneStr = "";
+        for (String tempStr : phoneArray)
+        {
+            phoneStr += ConvertUtil.HexStrToStr(tempStr);
+        }
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
         String detailStr = "0x" + detailArray[0] + detailArray[1];
