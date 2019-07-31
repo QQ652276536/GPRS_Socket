@@ -61,7 +61,7 @@ public class SocketServer
                 Socket socket = server.accept();
                 count++;
                 System.out.println(">>>第" + count + "个客户端连接成功<<<");
-                ServerThread thread = new ServerThread(socket, content);
+                ServerThread thread = new ServerThread(socket);
                 thread.start();
             }
         }

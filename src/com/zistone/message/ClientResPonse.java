@@ -5,14 +5,14 @@ import java.util.Arrays;
 /**
  * 终端注册
  */
-public class ClientRegister
+public class ClientResPonse
 {
-    public ClientRegister(String[] hexStrArray)
+    public ClientResPonse(String[] hexStrArray)
     {
         RecevieHexStrArray(hexStrArray);
     }
 
-    public ClientRegister(String hexStr)
+    public ClientResPonse(String hexStr)
     {
         RecevieHexStr(hexStr);
     }
@@ -42,5 +42,5 @@ public class ClientRegister
     {
         return "-1";
     }
-
+    
 }

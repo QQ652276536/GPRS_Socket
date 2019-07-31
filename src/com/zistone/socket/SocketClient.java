@@ -16,9 +16,9 @@ public class SocketClient
             //将写入的字符编码成字节后写入一个字节流
             OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
             System.out.println("请输入数据:");
-            Scanner sc = new Scanner(System.in);
             while (true)
             {
+                Scanner sc = new Scanner(System.in);
                 String data = sc.nextLine();
                 writer.write(data);
                 //刷新缓冲

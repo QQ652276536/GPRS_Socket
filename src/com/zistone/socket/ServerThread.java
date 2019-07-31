@@ -1,17 +1,17 @@
 package com.zistone.socket;
 
+import com.zistone.message.MessageReceive;
+
 import java.io.*;
 import java.net.Socket;
 
 public class ServerThread extends Thread
 {
     private Socket m_socket;
-    private String m_content;
 
-    public ServerThread(Socket socket, String content)
+    public ServerThread(Socket socket)
     {
         this.m_socket = socket;
-        this.m_content = content;
     }
 
     @Override
@@ -35,12 +35,18 @@ public class ServerThread extends Thread
             }
             //关闭客户端的输入流(不关闭服务端的输出流),此时m_socket连接并没关闭
             m_socket.shutdownInput();
+            //解析客户端的信息
+            if (null != info && !"".equals(info))
+            {
+                new MessageReceive(info);
+            }
+            //模拟业务处理
+            //Thread.sleep(10000);
 
             outputStream = m_socket.getOutputStream();
             printWriter = new PrintWriter(outputStream);
-            Thread.sleep(10000);
-            printWriter.write(m_content);
 
+            printWriter.write("~~~");
             printWriter.flush();
         }
         catch (Exception e)
