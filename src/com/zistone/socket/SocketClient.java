@@ -32,7 +32,7 @@ public class SocketClient
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
                 //为输入流添加缓冲
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                System.out.println("客户端IP地址:" + socket.getInetAddress().getHostAddress());
+                System.out.println("终端IP地址:" + socket.getInetAddress().getHostAddress());
                 String info;
                 //输出服务器端响应数据
                 while ((info = bufferedReader.readLine()) != null)

@@ -50,7 +50,6 @@ public class SocketHttp
         String result = null;
         try
         {
-
             //根据IP地址和端口号创建套接字地址
             SocketAddress address = new InetSocketAddress(m_host, m_port);
             m_socket.connect(address);

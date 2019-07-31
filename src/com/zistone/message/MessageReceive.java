@@ -7,18 +7,13 @@ import java.util.Arrays;
 
 public class MessageReceive
 {
-    public MessageReceive(String hexStr)
-    {
-        RecevieHexStr(hexStr);
-    }
-
     /**
-     * 解析16进制的Str
+     * 解析终端发送过来的16进制的Str
      *
      * @param hexStr
      * @return
      */
-    private String RecevieHexStr(String hexStr)
+    public String RecevieHexStr(String hexStr)
     {
         String[] strArray = hexStr.split(" ");
         //前后两个标识位
@@ -50,15 +45,25 @@ public class MessageReceive
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
         int idValue = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
+        ClientRegister clientRegister = new ClientRegister();
         switch (idValue)
         {
             //终端注册
             case MessageType.CLIENTREGISTER:
-                new ClientRegister(bodyArray);
+                //有鉴权码则代表成功
+                String akCode = clientRegister.RecevieHexStrArray(bodyArray);
+                if (null != akCode)
+                {
+                    //终端注册应答
+                    return clientRegister.ResponseHexStr(detailArray, akCode);
+                }
+                break;
+            //位置信息汇报
+            case MessageType.LOCATIONREPORT:
                 break;
             default:
                 break;
         }
-        return "-1";
+        return "错误的消息ID";
     }
 }

@@ -31,22 +31,20 @@ public class ServerThread extends Thread
             String info;
             while ((info = bufferedReader.readLine()) != null)
             {
-                System.out.println("收到来自客户端的信息:" + info);
+                System.out.println("收到来自终端的信息:" + info);
             }
-            //关闭客户端的输入流(不关闭服务端的输出流),此时m_socket连接并没关闭
+            //关闭终端的输入流(不关闭服务端的输出流),此时m_socket连接并没关闭
             m_socket.shutdownInput();
-            //解析客户端的信息
+            //解析终端的信息
+            String responseStr = "Null...";
             if (null != info && !"".equals(info))
             {
-                new MessageReceive(info);
+                responseStr = new MessageReceive().RecevieHexStr(info);
             }
-            //模拟业务处理
-            //Thread.sleep(10000);
-
+            //模拟业务处理Thread.sleep(10000);
             outputStream = m_socket.getOutputStream();
             printWriter = new PrintWriter(outputStream);
-
-            printWriter.write("~~~");
+            printWriter.write(responseStr);
             printWriter.flush();
         }
         catch (Exception e)
