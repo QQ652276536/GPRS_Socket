@@ -17,19 +17,32 @@ public class SocketHttp
     private Socket m_socket;
     private BufferedReader m_bufferedReader;
     private BufferedWriter m_bufferedWriter;
-    private String m_path = "/Blowdown_Web/DeviceInfo/Insert";
+    private String m_path;
+    private String m_data;
 
     public static void main(String[] args)
     {
-        new SocketHttp("localhost", 8080);
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_deviceName("Socket");
+        deviceInfo.setM_type("SSS");
+        deviceInfo.setM_lat(1.111);
+        deviceInfo.setM_lot(2.222);
+        deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
+        JSONObject jsonObject = new JSONObject(deviceInfo);
+        new SocketHttp("localhost", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
     }
 
-    public SocketHttp(String host, int port)
+    public SocketHttp(String host, int port, String path, JSONObject jsonObject)
     {
-        m_socket = new Socket();
-        m_host = host;
-        m_port = port;
-        SendPost();
+        if (null != host && !"".equals(host) && 0 != port && null != path && !"".equals(path) && null != jsonObject)
+        {
+            m_socket = new Socket();
+            m_host = host;
+            m_port = port;
+            m_path = path;
+            m_data = jsonObject.toString();
+            SendPost();
+        }
     }
 
     public String SendPost()
@@ -37,13 +50,6 @@ public class SocketHttp
         String result = null;
         try
         {
-            DeviceInfo deviceInfo = new DeviceInfo();
-            deviceInfo.setM_deviceName("Socket");
-            deviceInfo.setM_type("SSS");
-            deviceInfo.setM_lat(1.111);
-            deviceInfo.setM_lot(2.222);
-            deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
-            JSONObject jsonObject = new JSONObject(deviceInfo);
 
             //根据IP地址和端口号创建套接字地址
             SocketAddress address = new InetSocketAddress(m_host, m_port);
@@ -54,13 +60,14 @@ public class SocketHttp
             m_bufferedWriter.write("POST " + m_path + " HTTP/1.1\r\n");
             //协议请求头
             m_bufferedWriter.write("Host: " + m_host + "\r\n");
-            m_bufferedWriter.write("Content-Length: " + jsonObject.toString().getBytes("UTF-8").length + "\r\n");
+            //经测试发现:如果是以JSON数据格式发送内容,这里使用getBytes().length来获取内容长度
+            m_bufferedWriter.write("Content-Length: " + m_data.getBytes("UTF-8").length + "\r\n");
             //JSON数据格式
             m_bufferedWriter.write("Content-Type: application/json\r\n");
             //关键,换行,表示消息头结束,否则服务器会一直等待
             m_bufferedWriter.write("\r\n");
             //发送的内容
-            m_bufferedWriter.write(jsonObject.toString());
+            m_bufferedWriter.write(m_data);
             m_bufferedWriter.flush();
             //服务器的返回
             //二进制字节流以UTF-8编码转换为字符流
@@ -71,6 +78,10 @@ public class SocketHttp
             while ((line = m_bufferedReader.readLine()) != null)
             {
                 System.out.println(line);
+                if ("设备添加成功".equals(line))
+                {
+                    result = line;
+                }
             }
             m_bufferedReader.close();
             m_bufferedWriter.close();
