@@ -45,7 +45,7 @@ public class ServerThread extends Thread
             //            //注意,readLine()方法如果没有读到报文结束符(换行)会一直阻塞
             //            while ((info = bufferedReader.readLine()) != null)
             //            {
-            //                System.out.println("收到来自终端的信息:" + info);
+            //                System.out.println(">>>线程" + this.getId() + "收到来自终端的信息:" + info);
             //            }
             /*************************如果终端发送的是16进制数据使用下面这段代码*************************/
             bufferedInputStream = new BufferedInputStream(inputStream);
