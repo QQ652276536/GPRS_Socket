@@ -7,6 +7,12 @@ import java.util.Arrays;
  */
 public class ClientRegister
 {
+    /**
+     * 解析终端注册的消息体
+     *
+     * @param hexStrArray 注册成功返回鉴权码
+     * @return
+     */
     public String RecevieHexStrArray(String[] hexStrArray)
     {
         String akCode = null;
@@ -36,7 +42,7 @@ public class ClientRegister
      * 终端注册应答
      *
      * @param detailArray 应答流水号,对应的终端注册消息的流水号
-     * @param akCode      鉴权码,只有在成功后才有该字段
+     * @param akCode      鉴权码,表示注册成功
      * @return
      */
     public String ResponseHexStr(String[] detailArray, String akCode)
