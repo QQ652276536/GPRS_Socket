@@ -52,7 +52,7 @@ public class SocketServer
     {
         try
         {
-            System.out.println(">>>服务启动,等待终端的连接");
+            System.out.println(">>>服务启动,等待终端的连接\n");
             ServerSocket server = new ServerSocket(8888);
             int count = 0;
             while (true)
