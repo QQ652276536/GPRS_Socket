@@ -15,8 +15,6 @@ public class ConvertUtil
     {
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.print("16进制的Str转16进制的byte[]:");
-        PrintHexStr(HexStrToHexBytes("E69D8E"));
         System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
@@ -464,22 +462,23 @@ public class ConvertUtil
     }
 
     /**
-     * 普通byte[]以16进制打印至控制台
+     * 普通byte[]转16进制Str
      *
      * @param array
      */
-    public static void PrintHexStr(byte[] array)
+    public static String ByteArrayToHexStr(byte[] array)
     {
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < array.length; i++)
         {
             String hex = Integer.toHexString(array[i] & 0xFF);
             if (hex.length() == 1)
             {
-                hex = '0' + hex;
+                stringBuilder.append("0");
             }
-            System.out.print(hex.toUpperCase());
+            stringBuilder.append(hex);
         }
-        System.out.println();
+        return stringBuilder.toString();
     }
 
 }
