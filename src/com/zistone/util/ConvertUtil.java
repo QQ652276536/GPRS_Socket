@@ -16,11 +16,11 @@ public class ConvertUtil
 
     public static void main(String[] args)
     {
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("23406021597019B0"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("0"));
 
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("Error"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("ErrorID"));
         System.out.println("16进制Str转普通Str:" + HexStrToStr("23406021597019"));
         System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");

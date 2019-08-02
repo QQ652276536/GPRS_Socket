@@ -39,7 +39,8 @@ public class SocketHttp
     {
         String data;
         Socket socket;
-        String result = null;
+        //服务器返回的内容
+        String line = "";
         if (null != host && !"".equals(host) && 0 != port && null != path && !"".equals(path) && null != jsonObject)
         {
             socket = new Socket();
@@ -68,15 +69,9 @@ public class SocketHttp
                 //二进制字节流以UTF-8编码转换为字符流
                 BufferedInputStream streamReader = new BufferedInputStream(socket.getInputStream());
                 m_bufferedReader = new BufferedReader(new InputStreamReader(streamReader, "UTF-8"));
-                //读取所有服务器返回的内容
-                String line;
                 while ((line = m_bufferedReader.readLine()) != null)
                 {
                     System.out.println(line);
-                    if ("设备添加成功".equals(line))
-                    {
-                        result = line;
-                    }
                 }
                 m_bufferedReader.close();
                 m_bufferedWriter.close();
@@ -85,9 +80,10 @@ public class SocketHttp
             catch (IOException | JSONPointerException e)
             {
                 e.printStackTrace();
+                return "-1";
             }
         }
-        return result;
+        return line;
     }
 
 }

@@ -65,6 +65,7 @@ public class MessageReceive
             default:
                 break;
         }
-        return "4572726F72";
+        //错误消息ID就返回空
+        return "";
     }
 }

@@ -1,6 +1,9 @@
 package com.zistone.message;
 
+import com.zistone.bean.DeviceInfo;
+import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -46,8 +49,14 @@ public class ClientRegister
         String[] carFlag1 = Arrays.copyOfRange(hexStrArray, 37, 39);
         String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
         //TODO:逻辑处理然后返回鉴权码,这里使用数据库生成的ID作为鉴权码
-
-        return akCode;
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_deviceName(idStr);
+        deviceInfo.setM_type(typeStr);
+        deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
+        JSONObject jsonObject = new JSONObject(deviceInfo);
+        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
+        System.out.println("注册后生成的鉴权码为:" + result);
+        return result;
     }
 
     /**
