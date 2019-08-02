@@ -1,5 +1,7 @@
 package com.zistone.message;
 
+import com.zistone.util.ConvertUtil;
+
 import java.util.Arrays;
 
 /**
@@ -26,14 +28,24 @@ public class ClientRegister
         String[] manufacture = Arrays.copyOfRange(hexStrArray, 4, 9);
         //终端型号
         String[] type = Arrays.copyOfRange(hexStrArray, 9, 29);
+        String typeStr = "";
+        for (String tempStr : type)
+        {
+            typeStr += tempStr;
+        }
         //终端ID
         String[] id = Arrays.copyOfRange(hexStrArray, 29, 36);
+        String idStr = "";
+        for (String tempStr : id)
+        {
+            idStr += tempStr;
+        }
         //车牌颜色
         String[] carColor = Arrays.copyOfRange(hexStrArray, 36, 37);
-        //车辆标识
-        String[] carFlag = Arrays.copyOfRange(hexStrArray, 37, hexStrArray.length);
-        //TODO:逻辑处理然后返回
-        //终端注册应答
+        //车辆标识(前两位为车牌归属地,后面为车牌号)
+        String[] carFlag1 = Arrays.copyOfRange(hexStrArray, 37, 39);
+        String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
+        //TODO:逻辑处理然后返回鉴权码,这里使用数据库生成的ID作为鉴权码
 
         return akCode;
     }

@@ -3,6 +3,7 @@ package com.zistone.message;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class MessageReceive
@@ -36,7 +37,7 @@ public class MessageReceive
         String phoneStr = "";
         for (String tempStr : phoneArray)
         {
-            phoneStr += ConvertUtil.HexStrToStr(tempStr);
+            phoneStr += new BigInteger(tempStr,16).toString();
         }
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
@@ -64,6 +65,6 @@ public class MessageReceive
             default:
                 break;
         }
-        return "错误的消息ID";
+        return "4572726F72";
     }
 }
