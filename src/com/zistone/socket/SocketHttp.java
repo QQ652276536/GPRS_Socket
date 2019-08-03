@@ -13,6 +13,7 @@ public class SocketHttp
 {
     private BufferedReader m_bufferedReader;
     private BufferedWriter m_bufferedWriter;
+    private Socket m_socket;
 
     public static void main(String[] args)
     {
@@ -38,19 +39,16 @@ public class SocketHttp
     public String SendPost(String host, int port, String path, JSONObject jsonObject)
     {
         String data;
-        Socket socket;
-        //服务器返回的内容
-        String line = "";
         if (null != host && !"".equals(host) && 0 != port && null != path && !"".equals(path) && null != jsonObject)
         {
-            socket = new Socket();
+            m_socket = new Socket();
             data = jsonObject.toString();
             try
             {
                 //根据IP地址和端口号创建套接字地址
                 SocketAddress address = new InetSocketAddress(host, port);
-                socket.connect(address);
-                OutputStreamWriter streamWriter = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+                m_socket.connect(address);
+                OutputStreamWriter streamWriter = new OutputStreamWriter(m_socket.getOutputStream(), "UTF-8");
                 m_bufferedWriter = new BufferedWriter(streamWriter);
                 //协议请求行
                 m_bufferedWriter.write("POST " + path + " HTTP/1.1\r\n");
@@ -64,26 +62,45 @@ public class SocketHttp
                 m_bufferedWriter.write("\r\n");
                 //发送的内容
                 m_bufferedWriter.write(data);
+                m_bufferedWriter.write("\r\n");
                 m_bufferedWriter.flush();
                 //服务器的返回
                 //二进制字节流以UTF-8编码转换为字符流
-                BufferedInputStream streamReader = new BufferedInputStream(socket.getInputStream());
-                m_bufferedReader = new BufferedReader(new InputStreamReader(streamReader, "UTF-8"));
+                BufferedInputStream bufferedInputStream = new BufferedInputStream(m_socket.getInputStream());
+                m_bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
+                String line;
                 while ((line = m_bufferedReader.readLine()) != null)
                 {
                     System.out.println(line);
+                    if (line.contains("<<<"))
+                    {
+                        return line.replace("<<<", "");
+                    }
                 }
-                m_bufferedReader.close();
-                m_bufferedWriter.close();
-                socket.close();
             }
             catch (IOException | JSONPointerException e)
             {
                 e.printStackTrace();
-                return "-1";
+                return "Exception...";
+            }
+            finally
+            {
+                try
+                {
+                    if (null != m_bufferedReader)
+                        m_bufferedReader.close();
+                    if (null != m_bufferedWriter)
+                        m_bufferedWriter.close();
+                    if (null != m_socket)
+                        m_socket.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
-        return line;
+        return "ParamError...";
     }
 
 }
