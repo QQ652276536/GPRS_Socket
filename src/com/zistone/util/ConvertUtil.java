@@ -1,5 +1,6 @@
 package com.zistone.util;
 
+import com.zistone.bean.MessageType;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
@@ -16,12 +17,12 @@ public class ConvertUtil
 
     public static void main(String[] args)
     {
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("0"));
-
+        System.out.println(ConvertUtil.HexStrToStr("7E"));
+        System.out.println(StrToHexStr(String.valueOf(33024)));
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("ErrorID"));
-        System.out.println("16进制Str转普通Str:" + HexStrToStr("23406021597019"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("33024"));
+        System.out.println("16进制Str转普通Str:" + HexStrToStr("3333303234"));
         System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
@@ -29,6 +30,76 @@ public class ConvertUtil
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("674E5C0F4F1F"));
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("004C0069005700650069"));
         System.out.println("____________________________________________________________________");
+    }
+
+    /**
+     * 10进制int转16进制Str
+     *
+     * @param value
+     * @return
+     */
+    private static String IntToHexStr(int value)
+    {
+        StringBuffer stringBuffer = new StringBuffer();
+        char[] charArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        while (value != 0)
+        {
+            stringBuffer = stringBuffer.append(charArray[value % 16]);
+            value = value / 16;
+        }
+        return stringBuffer.reverse().toString();
+    }
+
+    /**
+     * 16进制的Str转普通Str
+     *
+     * @param hexStr
+     * @return
+     */
+    public static String HexStrToStr(String hexStr)
+    {
+        //能被16整除,肯定可以被2整除
+        byte[] array = new byte[hexStr.length() / 2];
+        try
+        {
+            for (int i = 0; i < array.length; i++)
+            {
+                array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
+            }
+            hexStr = new String(array, "UTF-8");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+        return hexStr;
+    }
+
+    /**
+     * 普通Str转16进制Str
+     *
+     * @param str
+     * @return
+     */
+    public static String StrToHexStr(String str)
+    {
+        //根据默认编码获取字节数组
+        byte[] bytes = str.getBytes();
+        StringBuilder stringBuilder = new StringBuilder(bytes.length * 2);
+        //将字节数组中每个字节拆解成2位16进制整数
+        for (int i = 0; i < bytes.length; i++)
+        {
+            stringBuilder.append("0x");
+            stringBuilder.append(HEXSTRING.charAt((bytes[i] & 0xf0) >> 4));
+            stringBuilder.append(HEXSTRING.charAt((bytes[i] & 0x0f) >> 0));
+            //去掉末尾的逗号
+            if (i != bytes.length - 1)
+            {
+                stringBuilder.append(",");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     /**
@@ -278,58 +349,6 @@ public class ConvertUtil
         byte temp2 = Byte.decode("0x" + new String(new byte[]{byte2})).byteValue();
         byte resultByte = (byte) (temp1 ^ temp2);
         return resultByte;
-    }
-
-    /**
-     * 16进制的Str转普通Str
-     *
-     * @param hexStr
-     * @return
-     */
-    public static String HexStrToStr(String hexStr)
-    {
-        //能被16整除,肯定可以被2整除
-        byte[] array = new byte[hexStr.length() / 2];
-        try
-        {
-            for (int i = 0; i < array.length; i++)
-            {
-                array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
-            }
-            hexStr = new String(array, "UTF-8");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return "";
-        }
-        return hexStr;
-    }
-
-    /**
-     * 普通Str转16进制Str
-     *
-     * @param str
-     * @return
-     */
-    public static String StrToHexStr(String str)
-    {
-        //根据默认编码获取字节数组
-        byte[] bytes = str.getBytes();
-        StringBuilder stringBuilder = new StringBuilder(bytes.length * 2);
-        //将字节数组中每个字节拆解成2位16进制整数
-        for (int i = 0; i < bytes.length; i++)
-        {
-            stringBuilder.append("0x");
-            stringBuilder.append(HEXSTRING.charAt((bytes[i] & 0xf0) >> 4));
-            stringBuilder.append(HEXSTRING.charAt((bytes[i] & 0x0f) >> 0));
-            //去掉末尾的逗号
-            if (i != bytes.length - 1)
-            {
-                stringBuilder.append(",");
-            }
-        }
-        return stringBuilder.toString();
     }
 
     /**

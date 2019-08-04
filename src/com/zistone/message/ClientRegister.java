@@ -1,7 +1,9 @@
 package com.zistone.message;
 
 import com.zistone.bean.DeviceInfo;
+import com.zistone.bean.MessageType;
 import com.zistone.socket.SocketHttp;
+import com.zistone.util.ConvertUtil;
 import org.json.JSONObject;
 
 import java.util.Arrays;
@@ -35,6 +37,7 @@ public class ClientRegister
         {
             typeStr += tempStr;
         }
+        typeStr = ConvertUtil.HexStrToStr(typeStr);
         //终端ID
         String[] id = Arrays.copyOfRange(hexStrArray, 29, 36);
         String idStr = "";
@@ -61,15 +64,37 @@ public class ClientRegister
     /**
      * 终端注册应答
      *
-     * @param detailArray 应答流水号,对应的终端注册消息的流水号
-     * @param akCode      鉴权码,表示注册成功
+     * @param detail 应答流水号,对应的终端注册消息的流水号
+     * @param result 结果,这里的结果来自Web服务,需要再次判断
      * @return
      */
-    public String ResponseHexStr(String[] detailArray, String akCode)
+    public String ResponseHexStr(String detail, String result)
     {
+        String responseStr = ConvertUtil.HexStrToStr("7E");
+        //TODO:消息ID
+        responseStr += "33024";
         //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
-        String[] result = new String[]{"1"};
-        return "7E 81 00 00 07 55 10 30 00 63 34 12 34 12 34 00 47 41 42 44 A4 7E";
+        switch (result)
+        {
+            //设备添加失败,该设备名已存在
+            case "-1":
+                responseStr += "3";
+                break;
+            //设备添加失败,未知错误
+            case "-2":
+                responseStr += "4";
+                break;
+            default:
+                responseStr += "0";
+                break;
+        }
+        //鉴权码
+        responseStr += "success";
+        responseStr += ConvertUtil.HexStrToStr("7E");
+        String ooo = "~330240success~";
+        System.out.println(ooo);
+        return responseStr;
+        //7E8100000D2340602159701A0B1A0A006A616D65732D64656D6FD87E
     }
 
 }

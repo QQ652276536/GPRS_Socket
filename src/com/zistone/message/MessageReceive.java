@@ -29,6 +29,7 @@ public class MessageReceive
         //消息ID
         String[] idArray = Arrays.copyOfRange(headArray, 0, 2);
         String idStr = "0x" + idArray[0] + idArray[1];
+        int idValue = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
         //消息体属性
         String[] bodyPropertyArray = Arrays.copyOfRange(headArray, 2, 4);
         String bodyPropertyStr = "0x" + bodyPropertyArray[0] + bodyPropertyArray[1];
@@ -37,7 +38,7 @@ public class MessageReceive
         String phoneStr = "";
         for (String tempStr : phoneArray)
         {
-            phoneStr += new BigInteger(tempStr,16).toString();
+            phoneStr += new BigInteger(tempStr, 16).toString();
         }
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
@@ -45,20 +46,14 @@ public class MessageReceive
         //消息体,不同消息ID对应不同的消息体结构
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
-        int idValue = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
         ClientRegister clientRegister = new ClientRegister();
         switch (idValue)
         {
             //终端注册
             case MessageType.CLIENTREGISTER:
-                //有鉴权码则代表成功
-                String akCode = clientRegister.RecevieHexStrArray(bodyArray);
-                if (null != akCode)
-                {
-                    //终端注册应答
-                    return clientRegister.ResponseHexStr(detailArray, akCode);
-                }
-                break;
+                String result = clientRegister.RecevieHexStrArray(bodyArray);
+                //终端注册应答
+                return clientRegister.ResponseHexStr(detailStr, result);
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
                 break;
