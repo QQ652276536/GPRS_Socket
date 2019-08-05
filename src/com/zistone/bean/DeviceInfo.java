@@ -99,6 +99,21 @@ public class DeviceInfo
     }
 
     /**
+     * 海拔
+     */
+    private double m_height;
+
+    public double getM_height()
+    {
+        return m_height;
+    }
+
+    public void setM_height(double m_height)
+    {
+        this.m_height = m_height;
+    }
+
+    /**
      * 创建时间
      */
     private Date m_craeteTime;

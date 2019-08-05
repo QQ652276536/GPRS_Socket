@@ -32,31 +32,23 @@ public class ClientRegister
         String[] manufacture = Arrays.copyOfRange(hexStrArray, 4, 9);
         //终端型号
         String[] type = Arrays.copyOfRange(hexStrArray, 9, 29);
-        String typeStr = "";
-        for (String tempStr : type)
-        {
-            typeStr += tempStr;
-        }
+        String typeStr = StrArrayToStr(type);
         typeStr = ConvertUtil.HexStrToStr(typeStr);
         //终端ID
         String[] id = Arrays.copyOfRange(hexStrArray, 29, 36);
-        String idStr = "";
-        for (String tempStr : id)
-        {
-            idStr += tempStr;
-        }
+        String idStr = StrArrayToStr(id);
         //车牌颜色
         String[] carColor = Arrays.copyOfRange(hexStrArray, 36, 37);
         //车辆标识(前两位为车牌归属地,后面为车牌号)
         String[] carFlag1 = Arrays.copyOfRange(hexStrArray, 37, 39);
         String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
-        //TODO:逻辑处理然后返回鉴权码,这里使用数据库生成的ID作为鉴权码
+        //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_deviceName("我零用");
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         JSONObject jsonObject = new JSONObject(deviceInfo);
-        String result = new SocketHttp().SendPost("192.168.1.7", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
+        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
         System.out.println(">>>终端注册后返回的内容:" + result);
         return result;
     }
@@ -91,10 +83,20 @@ public class ClientRegister
         //鉴权码
         responseStr += "success";
         responseStr += ConvertUtil.HexStrToStr("7E");
-        String ooo = "~330240success~";
-        System.out.println(ooo);
+        System.out.println(responseStr);
         return responseStr;
+        //~330240success~
         //7E8100000D2340602159701A0B1A0A006A616D65732D64656D6FD87E
+    }
+
+    public String StrArrayToStr(String[] strArray)
+    {
+        String str = "";
+        for (String tempStr : strArray)
+        {
+            str += tempStr;
+        }
+        return str;
     }
 
 }

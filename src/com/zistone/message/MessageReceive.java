@@ -47,16 +47,23 @@ public class MessageReceive
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
         ClientRegister clientRegister = new ClientRegister();
+        ClientLocation clientLocation = new ClientLocation();
         switch (idValue)
         {
             //终端注册
             case MessageType.CLIENTREGISTER:
+            {
                 String result = clientRegister.RecevieHexStrArray(bodyArray);
                 //终端注册应答
                 return clientRegister.ResponseHexStr(detailStr, result);
+            }
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
-                break;
+            {
+                String result = clientLocation.RecevieHexStrArray(bodyArray);
+                //位置汇报应答
+                return clientLocation.ResponseHexStr(detailStr, result);
+            }
             default:
                 break;
         }
