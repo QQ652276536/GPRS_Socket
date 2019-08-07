@@ -28,21 +28,17 @@ public class MessageReceive
         String[] headArray = Arrays.copyOfRange(tempArray, 0, 12);
         //消息ID
         String[] idArray = Arrays.copyOfRange(headArray, 0, 2);
-        String idStr = "0x" + idArray[0] + idArray[1];
+        String idStr = "0x" + StrArrayToStr(idArray);
         int idValue = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
         //消息体属性
         String[] bodyPropertyArray = Arrays.copyOfRange(headArray, 2, 4);
-        String bodyPropertyStr = "0x" + bodyPropertyArray[0] + bodyPropertyArray[1];
-        //终端手机号
+        String bodyPropertyStr = "0x" + StrArrayToStr(bodyPropertyArray);
+        //终端手机号(根据对应的测试工具测出来结果为终端ID)
         String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
-        String phoneStr = "";
-        for (String tempStr : phoneArray)
-        {
-            phoneStr += new BigInteger(tempStr, 16).toString();
-        }
+        String phoneStr = StrArrayToStr(phoneArray);
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
-        String detailStr = "0x" + detailArray[0] + detailArray[1];
+        String detailStr = "0x" + StrArrayToStr(detailArray);
         //消息体,不同消息ID对应不同的消息体结构
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
@@ -53,9 +49,9 @@ public class MessageReceive
             //终端注册
             case MessageType.CLIENTREGISTER:
             {
-                String result = clientRegister.RecevieHexStrArray(bodyArray);
+                String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
                 //终端注册应答
-                return clientRegister.ResponseHexStr(detailStr, result);
+                return clientRegister.ResponseHexStr(result);
             }
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
@@ -69,5 +65,15 @@ public class MessageReceive
         }
         //错误消息ID就返回空
         return "";
+    }
+
+    public String StrArrayToStr(String[] strArray)
+    {
+        String str = "";
+        for (String tempStr : strArray)
+        {
+            str += tempStr;
+        }
+        return str;
     }
 }

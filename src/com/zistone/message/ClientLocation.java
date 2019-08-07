@@ -28,10 +28,9 @@ public class ClientLocation
         String heightStr = StrArrayToStr(warningFlag);
         //由Web服务处理位置汇报
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceName(" ");
-        deviceInfo.setM_lat(111);
-        deviceInfo.setM_lot(222);
-        deviceInfo.setM_height(333);
+        deviceInfo.setM_lat(31.245105);
+        deviceInfo.setM_lot(121.506377);
+        deviceInfo.setM_height(100);
         JSONObject jsonObject = new JSONObject(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonObject);
         System.out.println(">>>位置汇报后返回的内容:" + result);

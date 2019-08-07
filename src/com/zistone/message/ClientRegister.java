@@ -1,7 +1,6 @@
 package com.zistone.message;
 
 import com.zistone.bean.DeviceInfo;
-import com.zistone.bean.MessageType;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
 import org.json.JSONObject;
@@ -16,10 +15,11 @@ public class ClientRegister
     /**
      * 解析终端注册的消息体
      *
-     * @param hexStrArray 注册成功返回鉴权码
+     * @param hexStrArray
+     * @param idStr       用终端ID作为设备名称
      * @return
      */
-    public String RecevieHexStrArray(String[] hexStrArray)
+    public String RecevieHexStrArray(String[] hexStrArray, String idStr)
     {
         String akCode = null;
         //省域代码
@@ -36,7 +36,8 @@ public class ClientRegister
         typeStr = ConvertUtil.HexStrToStr(typeStr);
         //终端ID
         String[] id = Arrays.copyOfRange(hexStrArray, 29, 36);
-        String idStr = StrArrayToStr(id);
+        String tempIdStr = StrArrayToStr(id);
+        tempIdStr = idStr;
         //车牌颜色
         String[] carColor = Arrays.copyOfRange(hexStrArray, 36, 37);
         //车辆标识(前两位为车牌归属地,后面为车牌号)
@@ -44,7 +45,7 @@ public class ClientRegister
         String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceName("我零用");
+        deviceInfo.setM_deviceName(tempIdStr);
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         JSONObject jsonObject = new JSONObject(deviceInfo);
@@ -56,14 +57,13 @@ public class ClientRegister
     /**
      * 终端注册应答
      *
-     * @param detail 应答流水号,对应的终端注册消息的流水号
      * @param result 结果,这里的结果来自Web服务,需要再次判断
      * @return
      */
-    public String ResponseHexStr(String detail, String result)
+    public String ResponseHexStr(String result)
     {
         String responseStr = ConvertUtil.HexStrToStr("7E");
-        //TODO:消息ID
+        //响应终端注册的消息ID的十进制
         responseStr += "33024";
         //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
         switch (result)
@@ -76,6 +76,7 @@ public class ClientRegister
             case "-2":
                 responseStr += "4";
                 break;
+            //注册成功
             default:
                 responseStr += "0";
                 break;
