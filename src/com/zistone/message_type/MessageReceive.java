@@ -1,5 +1,6 @@
 package com.zistone.message_type;
 
+import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
 
@@ -7,6 +8,8 @@ import java.util.Arrays;
 
 public class MessageReceive
 {
+    private DeviceInfo m_deviceInfo;
+
     /**
      * 解析终端发送过来的16进制的Str
      *
@@ -20,19 +23,19 @@ public class MessageReceive
         String flag1 = strArray[0];
         String flag2 = strArray[strArray.length - 1];
         //若校验码、消息头、消息体出现0x7e(~字符)则要进行转义处理,0x7e<--->0x7d0x02,0x7d<-->0x7d0x01
-        for (int i = 0; i < strArray.length; i++)
-        {
-            //前后两个标识不转义
-            if (i == 0 || i == strArray.length - 1)
-            {
-                continue;
-            }
-            else if (strArray[i].equals("7e"))
-            {
-                strArray[i] = "7d 02";
-                System.out.println(">>>消息中有需要转义的字符!!!");
-            }
-        }
+        //        for (int i = 0; i < strArray.length; i++)
+        //        {
+        //            //前后两个标识不转义
+        //            if (i == 0 || i == strArray.length - 1)
+        //            {
+        //                continue;
+        //            }
+        //            else if (strArray[i].equals("7e"))
+        //            {
+        //                strArray[i] = "7d 02";
+        //                System.out.println(">>>消息中有需要转义的字符!!!");
+        //            }
+        //        }
         //校验码
         String checkCode = strArray[strArray.length - 2];
         //消息头,包含消息ID、消息体属性、手机号、消息流水
@@ -57,34 +60,97 @@ public class MessageReceive
         //根据消息ID判断消息类型
         switch (idValue)
         {
-            //终端心跳,消息体为空
-            case MessageType.CLIENTHEARTBEAT:
+            //终端注册
+            case MessageType.CLIENTREGISTER:
             {
-                return "";
+                ClientRegister clientRegister = new ClientRegister();
+                String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
+                m_deviceInfo = clientRegister.ResponseHexStr(result);
+                //终端注册应答0x8100
+                String responseStr = ConvertUtil.HexStrToStr("7E");
+                //应答流水号,对应终端注册消息的流水号
+                responseStr += "33024";
+                if (null != m_deviceInfo)
+                {
+                    String akCode = m_deviceInfo.getM_akCode();
+                    //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
+                    if (null != akCode && !"".equals(akCode))
+                    {
+                        responseStr += "0";
+                    }
+                    else
+                    {
+                        responseStr += "3";
+                    }
+                    responseStr += akCode;
+                }
+                responseStr += ConvertUtil.HexStrToStr("7E");
+                System.out.println(">>>终端注册响应:" + responseStr);
+                return responseStr;
+            }
+            //位置信息汇报
+            case MessageType.LOCATIONREPORT:
+            {
+                //鉴权
+                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                {
+                    ClientLocation clientLocation = new ClientLocation();
+                    String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
+                    String line = clientLocation.ResponseHexStr(result);
+                    //平台通用应答0x8001
+                    String responseStr = ConvertUtil.HexStrToStr("7E");
+                    //应答ID,对应终端消息的ID
+                    responseStr += "32769";
+                    //应答流水号,对应终端消息的流水号
+                    responseStr += detailStr;
+                    //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+                    if ("1".equals(line))
+                    {
+                        responseStr += "0";
+                    }
+                    else
+                    {
+                        responseStr += "1";
+                    }
+                    responseStr += ConvertUtil.HexStrToStr("7E");
+                    System.out.println(">>>终端鉴权响应:" + responseStr);
+                    return responseStr;
+                }
+                else
+                {
+                    System.out.println(">>>鉴权失败,请确认鉴权无误!");
+                    break;
+                }
             }
             //终端鉴权
             case MessageType.CLIENTAK:
             {
                 ClientAuthentication clientAuthentication = new ClientAuthentication();
                 String result = clientAuthentication.RecevieHexStrArray(bodyArray);
-                //平台通用应答
-                return clientAuthentication.ResponseHexStr(detailStr, result);
+                String akCode = clientAuthentication.ResponseHexStr(detailStr, result);
+                //平台通用应答0x8001
+                String responseStr = ConvertUtil.HexStrToStr("7E");
+                //应答ID,对应终端消息的ID
+                responseStr += "32769";
+                //应答流水号,对应终端消息的流水号
+                responseStr += detailStr;
+                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+                if (null != m_deviceInfo && m_deviceInfo.getM_akCode() == akCode)
+                {
+                    responseStr += "0";
+                }
+                else
+                {
+                    responseStr += "1";
+                }
+                responseStr += ConvertUtil.HexStrToStr("7E");
+                System.out.println(">>>终端鉴权响应:" + responseStr);
+                return responseStr;
             }
-            //终端注册
-            case MessageType.CLIENTREGISTER:
+            //终端心跳,消息体为空
+            case MessageType.CLIENTHEARTBEAT:
             {
-                ClientRegister clientRegister = new ClientRegister();
-                String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
-                //终端注册应答
-                return clientRegister.ResponseHexStr(result);
-            }
-            //位置信息汇报
-            case MessageType.LOCATIONREPORT:
-            {
-                ClientLocation clientLocation = new ClientLocation();
-                String result = clientLocation.RecevieHexStrArray(bodyArray);
-                //位置汇报应答
-                return clientLocation.ResponseHexStr(detailStr, result);
+                return "";
             }
             default:
                 break;

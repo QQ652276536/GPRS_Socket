@@ -64,7 +64,7 @@ public class ClientRegister
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
-        System.out.println(">>>终端注册返回的内容:" + result);
+        System.out.println(">>>终端注册返回:" + result);
         return result;
     }
 
@@ -74,30 +74,13 @@ public class ClientRegister
      * @param result 结果,这里的结果来自Web服务,需要再次判断
      * @return
      */
-    public String ResponseHexStr(String result)
+    public DeviceInfo ResponseHexStr(String result)
     {
         int beginIndex = result.indexOf("{");
         int endIndex = result.indexOf("}") + 1;
         result = result.substring(beginIndex, endIndex);
         DeviceInfo deviceInfo = JSON.parseObject(result,DeviceInfo.class);
-        String akCode = deviceInfo.getM_akCode();
-        String responseStr = ConvertUtil.HexStrToStr("7E");
-        //应答流水号,对应终端注册消息的流水号
-        responseStr += "33024";
-        //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
-        if (null != akCode && !"".equals(akCode))
-        {
-            responseStr += "0";
-        }
-        else
-        {
-            responseStr += "3";
-        }
-        //鉴权码
-        responseStr += akCode;
-        responseStr += ConvertUtil.HexStrToStr("7E");
-        System.out.println(">>>终端注册响应的内容:" + responseStr);
-        return responseStr;
+        return deviceInfo;
     }
 
 }

@@ -25,7 +25,7 @@ public class ClientAuthentication
         deviceInfo.setM_akCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/FindAKCode", jsonStr);
-        System.out.println(">>>终端鉴权返回的内容:" + result);
+        System.out.println(">>>终端鉴权返回:" + result);
         return result;
     }
 
@@ -34,32 +34,13 @@ public class ClientAuthentication
      *
      * @param detailStr 消息流水
      * @param result
-     * @return
+     * @return 鉴权码
      */
     public String ResponseHexStr(String detailStr, String result)
     {
-        String responseStr = ConvertUtil.HexStrToStr("7E");
-        //应答ID,对应终端消息的ID
-        responseStr += "258";
-        //应答流水号,对应终端消息的流水号
-        responseStr += detailStr;
         int beginIndex = result.indexOf("GMT");
         int endIndex = result.indexOf("}");
         result = result.substring(beginIndex + 3, endIndex);
-        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-        switch (result)
-        {
-            //成功
-            case "1":
-                responseStr += "0";
-                break;
-            //失败
-            default:
-                responseStr += "1";
-                break;
-        }
-        responseStr += ConvertUtil.HexStrToStr("7E");
-        System.out.println(">>>终端鉴权响应的内容:" + responseStr);
-        return responseStr;
+        return result;
     }
 }

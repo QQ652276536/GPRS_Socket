@@ -15,10 +15,11 @@ public class ClientLocation
     /**
      * 解析消息体
      *
+     * @param deviceInfo
      * @param hexStrArray
      * @return
      */
-    public String RecevieHexStrArray(String[] hexStrArray)
+    public String RecevieHexStrArray(DeviceInfo deviceInfo, String[] hexStrArray)
     {
         //报警标志
         String[] warningFlag = Arrays.copyOfRange(hexStrArray, 0, 4);
@@ -36,26 +37,26 @@ public class ClientLocation
         String[] height = Arrays.copyOfRange(hexStrArray, 16, 18);
         String heightStr = ConvertUtil.StrArrayToStr(warningFlag);
         //由Web服务处理位置汇报
-        DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_lat(31.245105);
         deviceInfo.setM_lot(121.506377);
         deviceInfo.setM_height(100);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonStr);
-        System.out.println(">>>位置汇报返回的内容:" + result);
+        System.out.println(">>>位置汇报返回:" + result);
         return result;
     }
 
     /**
      * 生成响应内容
      *
-     * @param detailStr 消息流水
      * @param result
-     * @return
+     * @return 受影响行数
      */
-    public String ResponseHexStr(String detailStr, String result)
+    public String ResponseHexStr(String result)
     {
-        System.out.println(">>>位置汇报返回的内容:");
-        return "~success~";
+        int beginIndex = result.indexOf("GMT");
+        int endIndex = result.indexOf("}");
+        result = result.substring(beginIndex + 3, endIndex);
+        return result;
     }
 }
