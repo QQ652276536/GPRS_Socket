@@ -1,11 +1,12 @@
-package com.zistone.message;
+package com.zistone.message_type;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
-import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * 终端注册
@@ -13,7 +14,7 @@ import java.util.Arrays;
 public class ClientRegister
 {
     /**
-     * 解析终端注册的消息体
+     * 解析消息体
      *
      * @param hexStrArray
      * @param idStr       用终端ID作为设备名称
@@ -32,11 +33,19 @@ public class ClientRegister
         String[] manufacture = Arrays.copyOfRange(hexStrArray, 4, 9);
         //终端型号
         String[] type = Arrays.copyOfRange(hexStrArray, 9, 29);
-        String typeStr = StrArrayToStr(type);
+        String typeStr = "";
+        //去除补位的零
+        for (String tempStr : type)
+        {
+            if (!"00".equals(tempStr))
+            {
+                typeStr += tempStr;
+            }
+        }
         typeStr = ConvertUtil.HexStrToStr(typeStr);
         //终端ID
         String[] id = Arrays.copyOfRange(hexStrArray, 29, 36);
-        String tempIdStr = StrArrayToStr(id);
+        String tempIdStr = ConvertUtil.StrArrayToStr(id);
         tempIdStr = idStr;
         //车牌颜色
         String[] carColor = Arrays.copyOfRange(hexStrArray, 36, 37);
@@ -45,59 +54,53 @@ public class ClientRegister
         String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceName(tempIdStr);
+
+        //测试用
+        Random random = new Random();
+        int randNum = random.nextInt(101);
+
+        deviceInfo.setM_name(tempIdStr + randNum);
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
-        JSONObject jsonObject = new JSONObject(deviceInfo);
-        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
-        System.out.println(">>>终端注册后返回的内容:" + result);
+        String jsonStr = JSON.toJSONString(deviceInfo);
+        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
+        System.out.println(">>>终端注册返回的内容:" + result);
         return result;
     }
 
     /**
-     * 终端注册应答
+     * 生成响应内容
      *
      * @param result 结果,这里的结果来自Web服务,需要再次判断
      * @return
      */
     public String ResponseHexStr(String result)
     {
+        int beginIndex = result.indexOf("{");
+        int endIndex = result.indexOf("}") + 1;
+        result = result.substring(beginIndex, endIndex);
+
+        DeviceInfo deviceInfo = (DeviceInfo) JSON.parseObject(result,DeviceInfo.class);
+        String akCode = deviceInfo.getM_akCode();
         String responseStr = ConvertUtil.HexStrToStr("7E");
-        //响应终端注册的消息ID的十进制
+        //应答流水号,对应终端注册消息的流水号
         responseStr += "33024";
         //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
-        switch (result)
+        if (null != akCode && !"".equals(akCode))
         {
-            //设备添加失败,该设备名已存在
-            case "-1":
-                responseStr += "3";
-                break;
-            //设备添加失败,未知错误
-            case "-2":
-                responseStr += "4";
-                break;
-            //注册成功
-            default:
-                responseStr += "0";
-                break;
+            responseStr += "0";
+        }
+        else
+        {
+            responseStr += "3";
         }
         //鉴权码
-        responseStr += "success";
+        responseStr += akCode;
         responseStr += ConvertUtil.HexStrToStr("7E");
-        System.out.println(responseStr);
+        System.out.println(">>>终端注册响应的内容:" + responseStr);
         return responseStr;
         //~330240success~
         //7E8100000D2340602159701A0B1A0A006A616D65732D64656D6FD87E
-    }
-
-    public String StrArrayToStr(String[] strArray)
-    {
-        String str = "";
-        for (String tempStr : strArray)
-        {
-            str += tempStr;
-        }
-        return str;
     }
 
 }

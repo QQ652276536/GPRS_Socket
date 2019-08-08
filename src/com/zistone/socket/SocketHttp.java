@@ -1,8 +1,7 @@
 package com.zistone.socket;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
-import org.json.JSONObject;
-import org.json.JSONPointerException;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -18,29 +17,27 @@ public class SocketHttp
     public static void main(String[] args)
     {
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceName("Socket");
+        deviceInfo.setM_name("Socket");
         deviceInfo.setM_type("SSS");
         deviceInfo.setM_lat(1.111);
         deviceInfo.setM_lot(2.222);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
-        JSONObject jsonObject = new JSONObject(deviceInfo);
-        new SocketHttp().SendPost("localhost", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonObject);
+        String jsonStr = JSON.toJSONString(deviceInfo);
+        new SocketHttp().SendPost("localhost", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
     }
 
     /**
      * Post请求
      *
-     * @param host       IP地址
-     * @param port       端口
-     * @param path       路径
-     * @param jsonObject 内容
+     * @param host IP地址
+     * @param port 端口
+     * @param path 路径
+     * @param data 数据
      * @return
      */
-    public String SendPost(String host, int port, String path, JSONObject jsonObject)
+    public String SendPost(String host, int port, String path, String data)
     {
-        String data;
         m_socket = new Socket();
-        data = jsonObject.toString();
         try
         {
             //根据IP地址和端口号创建套接字地址
@@ -63,20 +60,21 @@ public class SocketHttp
             m_bufferedWriter.write("\r\n");
             m_bufferedWriter.flush();
             //服务器的返回
-            //二进制字节流以UTF-8编码转换为字符流
+            //字节流以UTF-8编码转换为字符流
             BufferedInputStream bufferedInputStream = new BufferedInputStream(m_socket.getInputStream());
             m_bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
             String line;
+            String result = "";
             while ((line = m_bufferedReader.readLine()) != null)
             {
-                System.out.println(line);
-                if (line.contains("<<<"))
+                result += line;
+                if (line.endsWith("}"))
                 {
-                    return line.replace("<<<", "");
+                    return result;
                 }
             }
         }
-        catch (IOException | JSONPointerException e)
+        catch (IOException e)
         {
             e.printStackTrace();
             return "Exception...";

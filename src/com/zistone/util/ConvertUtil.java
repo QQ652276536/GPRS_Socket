@@ -1,11 +1,5 @@
 package com.zistone.util;
 
-import com.zistone.bean.MessageType;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-
-import java.io.UnsupportedEncodingException;
-
 /**
  * 字符转换工具类
  * 不支持特殊字符
@@ -21,8 +15,8 @@ public class ConvertUtil
         System.out.println(StrToHexStr(String.valueOf(33024)));
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("33024"));
-        System.out.println("16进制Str转普通Str:" + HexStrToStr("3333303234"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("james-demo"));
+        System.out.println("16进制Str转普通Str:" + HexStrToStr("DB"));
         System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
@@ -30,6 +24,22 @@ public class ConvertUtil
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("674E5C0F4F1F"));
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("004C0069005700650069"));
         System.out.println("____________________________________________________________________");
+    }
+
+    /**
+     * Str[]的每个元素拼接成Str
+     *
+     * @param strArray
+     * @return
+     */
+    public static String StrArrayToStr(String[] strArray)
+    {
+        String str = "";
+        for (String tempStr : strArray)
+        {
+            str += tempStr;
+        }
+        return str;
     }
 
     /**

@@ -1,21 +1,42 @@
 package com.zistone.socket;
 
-import com.zistone.message.MessageReceive;
+import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
 
 import java.io.*;
 import java.net.Socket;
 
 /**
- * 短连接
+ * 长连接
  */
 public class ServerThread extends Thread
 {
+    //心跳超时时间
+    private static final int TIMEOUT = 60 * 1000;
     private Socket m_socket;
+    //接收到数据的最新时间
+    private long m_lastReceiveTime = System.currentTimeMillis();
+    //该线程是否正在运行
+    private boolean m_isRuning = false;
 
     public ServerThread(Socket socket)
     {
         this.m_socket = socket;
+    }
+
+    @Override
+    public void start()
+    {
+        if (m_isRuning)
+        {
+            System.out.println(">>>线程" + this.getId() + "启动失败,该线程正在执行");
+            return;
+        }
+        else
+        {
+            m_isRuning = true;
+            super.start();
+        }
     }
 
     @Override
@@ -27,57 +48,59 @@ public class ServerThread extends Thread
         OutputStream outputStream = null;
         //字节输入流到字符输入流的转换
         InputStreamReader inputStreamReader = null;
-        //加快字符读取速度
+        //加快字符读写速度
         BufferedReader bufferedReader = null;
+        BufferedWriter bufferedWriter = null;
         //缓冲输入流
         BufferedInputStream bufferedInputStream = null;
         //数据输入流
         DataInputStream dataInputStream = null;
-        //
-        PrintWriter printWriter = null;
         try
         {
             inputStream = m_socket.getInputStream();
-            String info = "";
-            /***************************如果终端发送的是字符串使用下面这段代码***************************/
-            //            inputStreamReader = new InputStreamReader(inputStream);
-            //            bufferedReader = new BufferedReader(inputStreamReader);
-            //            //注意,readLine()方法如果没有读到报文结束符(换行)会一直阻塞
-            //            while ((info = bufferedReader.readLine()) != null)
-            //            {
-            //                System.out.println(">>>线程" + this.getId() + "收到来自终端的信息:" + info);
-            //            }
-            /*************************如果终端发送的是16进制数据使用下面这段代码*************************/
+            outputStream = m_socket.getOutputStream();
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
             bufferedInputStream = new BufferedInputStream(inputStream);
             dataInputStream = new DataInputStream(bufferedInputStream);
+            String info = "";
             //一次读取一个byte
             byte[] bytes = new byte[1];
-            //注意,read()方法如果没有数据会一直阻塞,也就是永远不会等于-1,除非客户端调用close(),如果想在while循环外部获取数据则需要设定跳出条件
-            while ((dataInputStream.read(bytes)) != -1)
+            while (m_isRuning)
             {
-                String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
-                info += tempStr;
-                //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-                if (dataInputStream.available() == 0)
+                //检测心跳
+                if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
                 {
-                    System.out.println(">>>终端信息读取完毕,最后一位:" + tempStr);
+                    m_isRuning = false;
+                    //跳出执行finally块
                     break;
                 }
+                //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+                if (dataInputStream.available() > 0)
+                {
+                    //重置接收到数据的最新时间
+                    m_lastReceiveTime = System.currentTimeMillis();
+                    dataInputStream.read(bytes);
+                    String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
+                    info += tempStr;
+                    //已经读完
+                    if (dataInputStream.available() == 0)
+                    {
+                        System.out.println(">>>线程" + this.getId() + "接收到:" + info);
+                        //模拟业务处理Thread.sleep(10000);
+                        String responseStr = "";
+                        if (!"".equals(info))
+                        {
+                            //解析接收到的信息
+                            responseStr = new MessageReceive().RecevieHexStr(info);
+                        }
+                        //响应内容
+                        bufferedWriter.write(responseStr);
+                        bufferedWriter.flush();
+                        //重置接收的数据
+                        info = "";
+                    }
+                }
             }
-            System.out.println(">>>线程" + this.getId() + "收到来自终端的信息:" + info);
-            //关闭终端的输入流(不关闭服务端的输出流),此时m_socket虽然没有关闭,但是客户端已经不能再发送消息
-            m_socket.shutdownInput();
-            //解析终端的信息
-            String responseStr = "Null...";
-            if (null != info && !"".equals(info))
-            {
-                responseStr = new MessageReceive().RecevieHexStr(info);
-            }
-            //模拟业务处理Thread.sleep(10000);
-            outputStream = m_socket.getOutputStream();
-            printWriter = new PrintWriter(outputStream);
-            printWriter.write(responseStr);
-            printWriter.flush();
         }
         catch (Exception e)
         {
@@ -86,11 +109,11 @@ public class ServerThread extends Thread
         //关闭资源
         finally
         {
-            System.out.println(">>>本次连接已断开\n");
+            System.out.println(">>>线程" + this.getId() + "的连接已断开\n");
             try
             {
-                if (printWriter != null)
-                    printWriter.close();
+                if (bufferedWriter != null)
+                    bufferedWriter.close();
                 if (outputStream != null)
                     outputStream.close();
                 if (bufferedReader != null)
@@ -101,6 +124,7 @@ public class ServerThread extends Thread
                     inputStream.close();
                 if (m_socket != null)
                     m_socket.close();
+                m_isRuning = false;
             }
             catch (IOException e)
             {

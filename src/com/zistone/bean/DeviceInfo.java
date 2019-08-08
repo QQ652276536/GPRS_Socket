@@ -4,8 +4,12 @@ import java.util.Date;
 
 public class DeviceInfo
 {
-    public DeviceInfo()
+    @Override
+    public String toString()
     {
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ","
+                + " m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_craeteTime=" + m_craeteTime + ", m_updateTime" +
+                "=" + m_updateTime + ", m_description='" + m_description + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
     }
 
     /**
@@ -26,16 +30,16 @@ public class DeviceInfo
     /**
      * 设备名
      */
-    private String m_deviceName;
+    private String m_name;
 
-    public String getM_deviceName()
+    public String getM_name()
     {
-        return m_deviceName;
+        return m_name;
     }
 
-    public void setM_deviceName(String m_deviceName)
+    public void setM_name(String m_name)
     {
-        this.m_deviceName = m_deviceName;
+        this.m_name = m_name;
     }
 
     /**
@@ -156,5 +160,20 @@ public class DeviceInfo
     public void setM_description(String m_description)
     {
         this.m_description = m_description;
+    }
+
+    /**
+     * 鉴权码,注册成功后才有,由Web服务随机生成
+     */
+    private String m_akCode;
+
+    public String getM_akCode()
+    {
+        return m_akCode;
+    }
+
+    public void setM_akCode(String m_akCode)
+    {
+        this.m_akCode = m_akCode;
     }
 }
