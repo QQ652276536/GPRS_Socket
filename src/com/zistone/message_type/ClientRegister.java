@@ -79,8 +79,7 @@ public class ClientRegister
         int beginIndex = result.indexOf("{");
         int endIndex = result.indexOf("}") + 1;
         result = result.substring(beginIndex, endIndex);
-
-        DeviceInfo deviceInfo = (DeviceInfo) JSON.parseObject(result,DeviceInfo.class);
+        DeviceInfo deviceInfo = JSON.parseObject(result,DeviceInfo.class);
         String akCode = deviceInfo.getM_akCode();
         String responseStr = ConvertUtil.HexStrToStr("7E");
         //应答流水号,对应终端注册消息的流水号
@@ -99,8 +98,6 @@ public class ClientRegister
         responseStr += ConvertUtil.HexStrToStr("7E");
         System.out.println(">>>终端注册响应的内容:" + responseStr);
         return responseStr;
-        //~330240success~
-        //7E8100000D2340602159701A0B1A0A006A616D65732D64656D6FD87E
     }
 
 }

@@ -68,7 +68,7 @@ public class MessageReceive
                 ClientAuthentication clientAuthentication = new ClientAuthentication();
                 String result = clientAuthentication.RecevieHexStrArray(bodyArray);
                 //平台通用应答
-                return clientAuthentication.ResponseHexStr(detailStr, idStr, result);
+                return clientAuthentication.ResponseHexStr(detailStr, result);
             }
             //终端注册
             case MessageType.CLIENTREGISTER:

@@ -33,17 +33,19 @@ public class ClientAuthentication
      * 生成响应内容
      *
      * @param detailStr 消息流水
-     * @param idStr     消息ID
      * @param result
      * @return
      */
-    public String ResponseHexStr(String detailStr, String idStr, String result)
+    public String ResponseHexStr(String detailStr, String result)
     {
         String responseStr = ConvertUtil.HexStrToStr("7E");
-        //应答流水号,对应终端消息的流水号
-        responseStr += "33024";
         //应答ID,对应终端消息的ID
-        responseStr += idStr;
+        responseStr += "258";
+        //应答流水号,对应终端消息的流水号
+        responseStr += detailStr;
+        int beginIndex = result.indexOf("GMT");
+        int endIndex = result.indexOf("}");
+        result = result.substring(beginIndex + 3, endIndex);
         //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
         switch (result)
         {
