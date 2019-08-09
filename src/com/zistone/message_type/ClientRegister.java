@@ -55,7 +55,7 @@ public class ClientRegister
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
 
-        //测试用
+        //TODO:测试用,上线的时候记得删掉
         Random random = new Random();
         int randNum = random.nextInt(101);
 

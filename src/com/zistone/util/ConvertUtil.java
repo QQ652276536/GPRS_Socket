@@ -11,13 +11,11 @@ public class ConvertUtil
 
     public static void main(String[] args)
     {
-        System.out.println(ConvertUtil.HexStrToStr("7E"));
-        System.out.println(StrToHexStr(String.valueOf(33024)));
+        System.out.println((double)ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15})/1000000);
         System.out.println("____________________________________________________________________");
         //测试通过
         System.out.println("普通Str转16进制Str:" + StrToHexStr("james-demo"));
         System.out.println("16进制Str转普通Str:" + HexStrToStr("1B041B03020000"));
-        System.out.println("byte[]转成16进制的Str:" + HexBytesToHexStr(new byte[]{(byte) 0xE6, (byte) 0x9D, (byte) 0x8E}));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("LiWei"));
@@ -51,7 +49,7 @@ public class ConvertUtil
     private static String IntToHexStr(int value)
     {
         StringBuffer stringBuffer = new StringBuffer();
-        char[] charArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        char[] charArray = HEXSTRING.toCharArray();
         while (value != 0)
         {
             stringBuffer = stringBuffer.append(charArray[value % 16]);
@@ -61,7 +59,7 @@ public class ConvertUtil
     }
 
     /**
-     * 16进制的Str转普通Str
+     * 16进制的Str转Str
      *
      * @param hexStr
      * @return
@@ -87,7 +85,7 @@ public class ConvertUtil
     }
 
     /**
-     * 普通Str转16进制Str
+     * Str转16进制Str
      *
      * @param str
      * @return
@@ -113,115 +111,7 @@ public class ConvertUtil
     }
 
     /**
-     * 10进制的Str转BCD
-     *
-     * @param str
-     * @return
-     */
-    public static byte[] StrToBCD(String str)
-    {
-        int len = str.length();
-        int mod = len % 2;
-        if (mod != 0)
-        {
-            str = "0" + str;
-            len = str.length();
-        }
-        byte byteArray1[];
-        if (len >= 2)
-        {
-            len = len / 2;
-        }
-        byte byteArray2[] = new byte[len];
-        byteArray1 = str.getBytes();
-        int j, k;
-        for (int p = 0; p < str.length() / 2; p++)
-        {
-            if ((byteArray1[2 * p] >= '0') && (byteArray1[2 * p] <= '9'))
-            {
-                j = byteArray1[2 * p] - '0';
-            }
-            else if ((byteArray1[2 * p] >= 'a') && (byteArray1[2 * p] <= 'z'))
-            {
-                j = byteArray1[2 * p] - 'a' + 0x0a;
-            }
-            else
-            {
-                j = byteArray1[2 * p] - 'A' + 0x0a;
-            }
-            if ((byteArray1[2 * p + 1] >= '0') && (byteArray1[2 * p + 1] <= '9'))
-            {
-                k = byteArray1[2 * p + 1] - '0';
-            }
-            else if ((byteArray1[2 * p + 1] >= 'a') && (byteArray1[2 * p + 1] <= 'z'))
-            {
-                k = byteArray1[2 * p + 1] - 'a' + 0x0a;
-            }
-            else
-            {
-                k = byteArray1[2 * p + 1] - 'A' + 0x0a;
-            }
-            int a = (j << 4) + k;
-            byte b = (byte) a;
-            byteArray2[p] = b;
-        }
-        return byteArray2;
-    }
-
-    /**
-     * BCD转10进制的Str
-     *
-     * @param array
-     * @return
-     */
-    public static String BCDTo10Str(byte[] array)
-    {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.length; i++)
-        {
-            stringBuilder.append((byte) ((array[i] & 0xf0) >>> 4));
-            stringBuilder.append((byte) (array[i] & 0x0f));
-        }
-        if (stringBuilder.toString().substring(0, 1).equalsIgnoreCase("0"))
-        {
-            return stringBuilder.toString().substring(1);
-        }
-        else
-        {
-            return stringBuilder.toString();
-        }
-    }
-
-    /**
-     * 将byte转换为一个长度为8的byte数组,数组每个值代表bit
-     *
-     * @param b
-     * @return
-     */
-    public static byte[] ByteTo8ByteArray(byte b)
-    {
-        byte[] array = new byte[8];
-        for (int i = 7; i >= 0; i--)
-        {
-            array[i] = (byte) (b & 1);
-            b = (byte) (b >> 1);
-        }
-        return array;
-    }
-
-    /**
-     * 把byte转为字符串的bit
-     *
-     * @param b
-     * @return
-     */
-    public static String ByteToBitStr(byte b)
-    {
-        return "" + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1) + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1) + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1) + (byte) ((b >> 1) & 0x1) + (byte) ((b >> 0) & 0x1);
-    }
-
-    /**
-     * 二进制字符串转byte
+     * 二进制Str转byte
      *
      * @param binaryStr
      * @return
@@ -261,178 +151,129 @@ public class ConvertUtil
     }
 
     /**
-     * short转byte[]
+     * long转byte[8]
      *
-     * @param number
-     * @return 两位字节的数组
+     * @param value
+     * @return
      */
-    public static byte[] ShortToBytes(short number)
+    public byte[] LongToByteArray8(long value)
     {
-        int temp = number;
-        byte[] array = new byte[2];
-        for (int i = 0; i < array.length; i++)
+        byte[] result = new byte[8];
+        int temp;
+        for (int i = 0; i < 8; i++)
         {
-            //将最低位保存在最低位
-            array[i] = new Integer(temp & 0xff).byteValue();
-            //向右移8位
-            temp = temp >> 8;
+            temp = (8 - 1 - i) * 8;
+            if (temp == 0)
+            {
+                result[i] += (value & 0x0ff);
+            }
+            else
+            {
+                result[i] += (value >>> temp) & 0x0ff;
+            }
         }
-        return array;
+        return result;
     }
 
     /**
-     * int转byte[]
+     * byte[4]转long
      *
-     * @param num
-     * @return 四位的字节数组
-     */
-    public static byte[] IntToBytes(int num)
-    {
-        byte[] b = new byte[4];
-        b[0] = (byte) (0xff & num);
-        b[1] = (byte) ((0xff00 & num) >> 8);
-        b[2] = (byte) ((0xff0000 & num) >> 16);
-        b[3] = (byte) ((0xff000000 & num) >> 24);
-        return b;
-    }
-
-    /**
-     * byte[]转int
-     *
-     * @param array 两位字节的数组
+     * @param byteArray 长度为4的字节数组
      * @return
      */
-    public static short BytesToShort(byte[] array)
+    public static long ByteArray4ToLong(byte[] byteArray)
     {
-        short s;
-        //最低位
-        short s0 = (short) (array[0] & 0xff);
-        short s1 = (short) (array[1] & 0xff);
-        s1 <<= 8;
-        s = (short) (s0 | s1);
-        return s;
+        int temp0 = byteArray[0] & 0xFF;
+        int temp1 = byteArray[1] & 0xFF;
+        int temp2 = byteArray[2] & 0xFF;
+        int temp3 = byteArray[3] & 0xFF;
+        return (((long) temp0 << 24) + (temp1 << 16) + (temp2 << 8) + temp3);
     }
 
     /**
-     * byte[]转int
+     * byte[4]转int
      *
-     * @param array 四位的字节数组
+     * @param byteArray 长度为4的字节数组
      * @return
      */
-    public static int BytesToInt(byte[] array)
+    public static int ByteArray4ToInt(byte[] byteArray)
     {
-        int num = array[0] & 0xFF;
-        num |= ((array[1] << 8) & 0xFF00);
-        num |= ((array[2] << 16) & 0xFF0000);
-        num |= ((array[3] << 24) & 0xFF000000);
-        return num;
+        int temp0 = byteArray[0] & 0xFF;
+        int temp1 = byteArray[1] & 0xFF;
+        int temp2 = byteArray[2] & 0xFF;
+        int temp3 = byteArray[3] & 0xFF;
+        return ((temp0 << 24) + (temp1 << 16) + (temp2 << 8) + temp3);
     }
 
     /**
-     * 分割16进制的Str,每两个字节分割,如:2B44EF->byte[]{0x2B, 0x44, 0xEF}
+     * byte[2]转int
+     *
+     * @param byteArray
+     * @return
+     */
+    public static int ByteArray2ToInt(byte[] byteArray)
+    {
+        int temp0 = byteArray[0] & 0xFF;
+        int temp1 = byteArray[1] & 0xFF;
+        return ((temp0 << 8) + temp1);
+    }
+
+    /**
+     * byte转int
+     *
+     * @param b
+     * @return
+     */
+    public static int ByteArray1ToInt(byte b)
+    {
+        return (int) b & 0xFF;
+    }
+
+    /**
+     * 16进制Str转byte[]
      *
      * @param hexStr
      * @return
      */
-    public static byte[] HexStrSplitToBytes(String hexStr)
+    public static byte[] HexStrToByteArray(String hexStr)
     {
-        byte[] array = new byte[8];
-        byte[] tmp = hexStr.getBytes();
-        for (int i = 0; i < 4; i++)
-        {
-            array[i] = MergehexStrII(tmp[i * 2], tmp[i * 2 + 1]);
-        }
-        return array;
-    }
-
-    /**
-     * 将两个hexStrII字节合并为一个字符,如:0xEF->EF
-     *
-     * @param byte1
-     * @param byte2
-     * @return
-     */
-    public static byte MergehexStrII(byte byte1, byte byte2)
-    {
-        byte temp1 = Byte.decode("0x" + new String(new byte[]{byte1})).byteValue();
-        temp1 = (byte) (temp1 << 4);
-        byte temp2 = Byte.decode("0x" + new String(new byte[]{byte2})).byteValue();
-        byte resultByte = (byte) (temp1 ^ temp2);
-        return resultByte;
-    }
-
-    /**
-     * 16进制的byte[]转16进制的Str
-     *
-     * @param array
-     * @return
-     */
-    public static String HexBytesToHexStr(byte[] array)
-    {
-        if (null == array || array.length <= 0)
+        if (hexStr == null)
         {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.length; i++)
+        if (hexStr.length() == 0)
         {
-            int temp = array[i] & 0xFF;
-            String tempHStr = Integer.toHexString(temp);
-            if (tempHStr.length() < 2)
-            {
-                stringBuilder.append(0);
-            }
-            stringBuilder.append(tempHStr);
+            return new byte[0];
         }
-        return stringBuilder.toString();
+        byte[] byteArray = new byte[hexStr.length() / 2];
+        for (int i = 0; i < byteArray.length; i++)
+        {
+            String subStr = hexStr.substring(2 * i, 2 * i + 2);
+            byteArray[i] = ((byte) Integer.parseInt(subStr, 16));
+        }
+        return byteArray;
     }
 
     /**
-     * 普通byte[]转16进制Str
+     * byte[]转16进制Str
      *
-     * @param array
+     * @param byteArray
      */
-    public static String ByteArrayToHexStr(byte[] array)
+    public static String ByteArrayToHexStr(byte[] byteArray)
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < array.length; i++)
-        {
-            String hex = Integer.toHexString(array[i] & 0xFF);
-            if (hex.length() == 1)
-            {
-                stringBuilder.append("0");
-            }
-            stringBuilder.append(hex);
-        }
-        return stringBuilder.toString();
-    }
-
-    /**
-     * 16进制的Str转16进制的byte[]
-     *
-     * @param hexStr
-     * @return
-     */
-    public static byte[] HexStrToHexBytes(String hexStr)
-    {
-        if (null == hexStr || hexStr.equals(""))
+        if (byteArray == null)
         {
             return null;
         }
-        if (hexStr.contains("0x"))
+        char[] hexArray = HEXSTRING.toCharArray();
+        char[] hexChars = new char[byteArray.length * 2];
+        for (int i = 0; i < byteArray.length; i++)
         {
-            hexStr = hexStr.replaceAll("0x", "");
+            int temp = byteArray[i] & 0xFF;
+            hexChars[i * 2] = hexArray[temp >>> 4];
+            hexChars[i * 2 + 1] = hexArray[temp & 0x0F];
         }
-        hexStr = hexStr.toUpperCase();
-        int length = hexStr.length() / 2;
-        char[] hexChars = hexStr.toCharArray();
-        byte[] array = new byte[length];
-        for (int i = 0; i < length; i++)
-        {
-            int temp = i * 2;
-            array[i] = (byte) (HEXSTRING.indexOf(hexStr.charAt(i)) << 4 | HEXSTRING.indexOf(hexChars[temp + 1]));
-        }
-        return array;
+        return new String(hexChars);
     }
 
     /**

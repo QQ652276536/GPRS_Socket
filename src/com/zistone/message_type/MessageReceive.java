@@ -91,7 +91,7 @@ public class MessageReceive
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
             {
-                //鉴权
+                //需要先鉴权,即判断设备
                 if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
                     ClientLocation clientLocation = new ClientLocation();

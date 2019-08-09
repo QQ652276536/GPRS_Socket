@@ -1,6 +1,5 @@
 package com.zistone.socket;
 
-import com.zistone.bean.DeviceInfo;
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
 
@@ -12,7 +11,6 @@ import java.net.Socket;
  */
 public class ServerThread extends Thread
 {
-    DeviceInfo m_deviceInfo;
     //心跳超时时间
     private static final int TIMEOUT = 60 * 1000;
     private Socket m_socket;
@@ -65,7 +63,7 @@ public class ServerThread extends Thread
             bufferedInputStream = new BufferedInputStream(inputStream);
             dataInputStream = new DataInputStream(bufferedInputStream);
             String info = "";
-            //一次读取一个byte
+            //按byte读
             byte[] bytes = new byte[1];
             MessageReceive messageReceive = new MessageReceive();
             while (m_isRuning)

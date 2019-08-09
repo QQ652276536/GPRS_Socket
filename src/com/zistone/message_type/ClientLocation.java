@@ -26,20 +26,26 @@ public class ClientLocation
         String warningStr = ConvertUtil.StrArrayToStr(warningFlag);
         //状态
         String[] state = Arrays.copyOfRange(hexStrArray, 4, 8);
-        String stateStr = ConvertUtil.StrArrayToStr(warningFlag);
+        String stateStr = ConvertUtil.StrArrayToStr(state);
         //纬度
         String[] lat = Arrays.copyOfRange(hexStrArray, 8, 12);
-        String latStr = ConvertUtil.StrArrayToStr(warningFlag);
+        String latStr = ConvertUtil.StrArrayToStr(lat);
+        byte[] latBytes = ConvertUtil.HexStrToByteArray(latStr);
+        double latNum = ConvertUtil.ByteArray4ToLong(latBytes) / 10000000;
         //经度
         String[] lot = Arrays.copyOfRange(hexStrArray, 12, 16);
-        String lotStr = ConvertUtil.StrArrayToStr(warningFlag);
+        String lotStr = ConvertUtil.StrArrayToStr(lot);
+        byte[] lotBytes = ConvertUtil.HexStrToByteArray(lotStr);
+        double lotNum = ConvertUtil.ByteArray4ToLong(lotBytes) / 10000000;
         //海拔
         String[] height = Arrays.copyOfRange(hexStrArray, 16, 18);
-        String heightStr = ConvertUtil.StrArrayToStr(warningFlag);
+        String heightStr = ConvertUtil.StrArrayToStr(height);
+        byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
+        double heightNum = ConvertUtil.ByteArray4ToInt(heightBytes);
         //由Web服务处理位置汇报
-        deviceInfo.setM_lat(31.245105);
-        deviceInfo.setM_lot(121.506377);
-        deviceInfo.setM_height(100);
+        deviceInfo.setM_lat(latNum);
+        deviceInfo.setM_lot(lotNum);
+        deviceInfo.setM_height(heightNum);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonStr);
         System.out.println(">>>位置汇报返回:" + result);
