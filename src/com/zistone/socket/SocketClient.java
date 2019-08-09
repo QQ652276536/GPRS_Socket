@@ -13,39 +13,43 @@ public class SocketClient
             Socket socket = new Socket("localhost", 8888);
             //得到一个输出流，用于向服务器发送数据
             OutputStream outputStream = socket.getOutputStream();
-            //将写入的字符编码成字节后写入一个字节流
-            OutputStreamWriter writer = new OutputStreamWriter(outputStream, "UTF-8");
-            System.out.println("请输入数据:");
+            System.out.println("请输入16进制数据:");
+            Scanner sc = new Scanner(System.in);
             while (true)
             {
-                Scanner sc = new Scanner(System.in);
                 String data = sc.nextLine();
-                writer.write(data);
+                if ("exit".equals(data))
+                {
+                    return;
+                }
+                byte[] byteArray = hexStringToByteArray(data);
+                outputStream.write(byteArray);
                 //刷新缓冲
-                writer.flush();
-                //只关闭输出流而不关闭连接
-                socket.shutdownOutput();
+                outputStream.flush();
+
+
                 //获取服务器端的响应数据
                 //得到一个输入流，用于接收服务器响应的数据
                 InputStream inputStream = socket.getInputStream();
-                //将一个字节流中的字节解码成字符
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-                //为输入流添加缓冲
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                System.out.println("终端IP地址:" + socket.getInetAddress().getHostAddress());
-                String info;
-                //输出服务器端响应数据
-                while ((info = bufferedReader.readLine()) != null)
+                BufferedInputStream bis = new BufferedInputStream(inputStream);
+                DataInputStream dataInputStream = new DataInputStream(bis);
+                byte[] bytes = new byte[1]; // 一次读取一个byte
+                String info = "";
+                while (true)
                 {
-                    System.out.println("收到来自服务端的信息:" + info);
+                    if (dataInputStream.available() > 0)
+                    {
+                        dataInputStream.read(bytes);
+                        String tempStr = new String(bytes);
+                        info += tempStr;
+                        //已经读完
+                        if (dataInputStream.available() == 0)
+                        {
+                            System.out.println("收到来自服务端的信息:" + info);
+                            break;
+                        }
+                    }
                 }
-                //关闭资源
-                bufferedReader.close();
-                inputStreamReader.close();
-                inputStream.close();
-                writer.close();
-                outputStream.close();
-                socket.close();
             }
         }
         catch (IOException e)
@@ -53,4 +57,24 @@ public class SocketClient
             e.printStackTrace();
         }
     }
+
+    /**
+     * 16进制表示的字符串转换为字节数组
+     *
+     * @param hexString 16进制表示的字符串
+     * @return byte[] 字节数组
+     */
+    public static byte[] hexStringToByteArray(String hexString)
+    {
+        hexString = hexString.replaceAll(" ", "");
+        int len = hexString.length();
+        byte[] bytes = new byte[len / 2];
+        for (int i = 0; i < len; i += 2)
+        {
+            // 两位一组，表示一个字节,把这样表示的16进制字符串，还原成一个字节
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return bytes;
+    }
+
 }

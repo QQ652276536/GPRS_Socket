@@ -11,6 +11,7 @@ public class ConvertUtil
 
     public static void main(String[] args)
     {
+        System.out.println(ByteArrayToHexStr(new byte[]{(byte) 2, (byte) 97, (byte) 51, (byte) 52}));
         System.out.println((double)ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15})/1000000);
         System.out.println("____________________________________________________________________");
         //测试通过

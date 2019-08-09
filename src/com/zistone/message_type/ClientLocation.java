@@ -31,17 +31,17 @@ public class ClientLocation
         String[] lat = Arrays.copyOfRange(hexStrArray, 8, 12);
         String latStr = ConvertUtil.StrArrayToStr(lat);
         byte[] latBytes = ConvertUtil.HexStrToByteArray(latStr);
-        double latNum = ConvertUtil.ByteArray4ToLong(latBytes) / 10000000;
+        double latNum = (double) ConvertUtil.ByteArray4ToLong(latBytes) / 1000000;
         //经度
         String[] lot = Arrays.copyOfRange(hexStrArray, 12, 16);
         String lotStr = ConvertUtil.StrArrayToStr(lot);
         byte[] lotBytes = ConvertUtil.HexStrToByteArray(lotStr);
-        double lotNum = ConvertUtil.ByteArray4ToLong(lotBytes) / 10000000;
+        double lotNum = (double) ConvertUtil.ByteArray4ToLong(lotBytes) / 1000000;
         //海拔
         String[] height = Arrays.copyOfRange(hexStrArray, 16, 18);
         String heightStr = ConvertUtil.StrArrayToStr(height);
         byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
-        double heightNum = ConvertUtil.ByteArray4ToInt(heightBytes);
+        double heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
         //由Web服务处理位置汇报
         deviceInfo.setM_lat(latNum);
         deviceInfo.setM_lot(lotNum);
