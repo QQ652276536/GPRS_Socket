@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class MessageReceive
 {
     private static Logger LOG = Logger.getLogger(MessageReceive.class);
-    
+
     private DeviceInfo m_deviceInfo;
 
     /**
@@ -69,25 +69,25 @@ public class MessageReceive
                 ClientRegister clientRegister = new ClientRegister();
                 String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
                 m_deviceInfo = clientRegister.ResponseHexStr(result);
-                //终端注册应答0x8100
-                String responseStr = ConvertUtil.HexStrToStr("7E");
+                //终端注册应答（0x8100）
+                String responseStr = "7E";
                 //应答流水号,对应终端注册消息的流水号
-                responseStr += "33024";
+                responseStr += "8100";
                 if (null != m_deviceInfo)
                 {
                     String akCode = m_deviceInfo.getM_akCode();
                     //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
                     if (null != akCode && !"".equals(akCode))
                     {
-                        responseStr += "0";
+                        responseStr += "00";
                     }
                     else
                     {
-                        responseStr += "3";
+                        responseStr += "03";
                     }
-                    responseStr += akCode;
+                    responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0x|0X|,", "");
                 }
-                responseStr += ConvertUtil.HexStrToStr("7E");
+                responseStr += "7E";
                 LOG.debug(">>>终端注册响应:" + responseStr);
                 return responseStr;
             }
@@ -100,22 +100,22 @@ public class MessageReceive
                     ClientLocation clientLocation = new ClientLocation();
                     String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
                     String line = clientLocation.ResponseHexStr(result);
-                    //平台通用应答0x8001
-                    String responseStr = ConvertUtil.HexStrToStr("7E");
+                    //平台通用应答(0x8001)
+                    String responseStr = "7E";
                     //应答ID,对应终端消息的ID
-                    responseStr += "32769";
+                    responseStr += "8001";
                     //应答流水号,对应终端消息的流水号
                     responseStr += detailStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
                     if ("1".equals(line))
                     {
-                        responseStr += "0";
+                        responseStr += "00";
                     }
                     else
                     {
-                        responseStr += "1";
+                        responseStr += "01";
                     }
-                    responseStr += ConvertUtil.HexStrToStr("7E");
+                    responseStr += "7E";
                     LOG.debug(">>>终端鉴权响应:" + responseStr);
                     return responseStr;
                 }
@@ -131,22 +131,22 @@ public class MessageReceive
                 ClientAuthentication clientAuthentication = new ClientAuthentication();
                 String result = clientAuthentication.RecevieHexStrArray(bodyArray);
                 String akCode = clientAuthentication.ResponseHexStr(detailStr, result);
-                //平台通用应答0x8001
-                String responseStr = ConvertUtil.HexStrToStr("7E");
+                //平台通用应答(0x8001)
+                String responseStr = "7E";
                 //应答ID,对应终端消息的ID
-                responseStr += "32769";
+                responseStr += "8001";
                 //应答流水号,对应终端消息的流水号
                 responseStr += detailStr;
                 //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
                 if (null != m_deviceInfo && m_deviceInfo.getM_akCode() == akCode)
                 {
-                    responseStr += "0";
+                    responseStr += "00";
                 }
                 else
                 {
-                    responseStr += "1";
+                    responseStr += "01";
                 }
-                responseStr += ConvertUtil.HexStrToStr("7E");
+                responseStr += "7E";
                 LOG.debug(">>>终端鉴权响应:" + responseStr);
                 return responseStr;
             }
