@@ -62,7 +62,7 @@ public class ClientRegister
         Random random = new Random();
         byte[] randomBytes = new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 0};
         random.nextBytes(randomBytes);
-        StringBuilder sb = new StringBuilder(10);
+        StringBuilder sb = new StringBuilder();
         for (byte b : randomBytes)
         {
             sb.append(Math.abs(Byte.valueOf(b).intValue()) % 10);
