@@ -57,9 +57,14 @@ public class ClientRegister
 
         //TODO:测试用,上线的时候记得删掉
         Random random = new Random();
-        int randNum = random.nextInt(101);
+        byte[] randomBytes = new byte[]{(byte)1,(byte)2,(byte)3,(byte)4,(byte)5,(byte)6,(byte)7,(byte)8,(byte)9,(byte)0};
+        random.nextBytes(randomBytes);
+        StringBuilder sb = new StringBuilder(10);
+        for (byte b : randomBytes) {
+            sb.append( Math.abs(Byte.valueOf(b).intValue())%10);
+        }
 
-        deviceInfo.setM_name(tempIdStr + randNum);
+        deviceInfo.setM_name(tempIdStr + sb.toString());
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);

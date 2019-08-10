@@ -74,10 +74,9 @@ public class SocketHttp
                 }
             }
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
-            return "Exception...";
         }
         finally
         {
@@ -93,7 +92,6 @@ public class SocketHttp
             catch (IOException e)
             {
                 e.printStackTrace();
-                return "FinallyException...";
             }
         }
         return "Null...";
