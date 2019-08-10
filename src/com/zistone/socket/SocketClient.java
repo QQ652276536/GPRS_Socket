@@ -28,19 +28,17 @@ public class SocketClient
                 outputStream.flush();
                 //得到一个输入流，用于接收服务器响应的数据
                 InputStream inputStream = socket.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(inputStream);
-                DataInputStream dataInputStream = new DataInputStream(bis);
                 byte[] bytes = new byte[1]; // 一次读取一个byte
                 String info = "";
                 while (true)
                 {
-                    if (dataInputStream.available() > 0)
+                    if (inputStream.available() > 0)
                     {
-                        dataInputStream.read(bytes);
+                        inputStream.read(bytes);
                         String hexStr = ByteArrayToHexStr(bytes);
                         info += HexStrToStr(hexStr);
                         //已经读完
-                        if (dataInputStream.available() == 0)
+                        if (inputStream.available() == 0)
                         {
                             System.out.println("收到来自服务端的信息:" + info);
                             break;
