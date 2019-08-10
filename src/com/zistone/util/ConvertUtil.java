@@ -12,7 +12,7 @@ public class ConvertUtil
     public static void main(String[] args)
     {
         System.out.println(ByteArrayToHexStr(new byte[]{(byte) 2, (byte) 97, (byte) 51, (byte) 52}));
-        System.out.println((double)ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15})/1000000);
+        System.out.println((double) ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15}) / 1000000);
         System.out.println("____________________________________________________________________");
         //测试通过
         System.out.println("普通Str转16进制Str:" + StrToHexStr("james-demo"));
@@ -233,19 +233,11 @@ public class ConvertUtil
     /**
      * 16进制Str转byte[]
      *
-     * @param hexStr
+     * @param hexStr 不带空格、不带0x、不带逗号的16进制Str,如:06EEF7F1
      * @return
      */
     public static byte[] HexStrToByteArray(String hexStr)
     {
-        if (hexStr == null)
-        {
-            return null;
-        }
-        if (hexStr.length() == 0)
-        {
-            return new byte[0];
-        }
         byte[] byteArray = new byte[hexStr.length() / 2];
         for (int i = 0; i < byteArray.length; i++)
         {
