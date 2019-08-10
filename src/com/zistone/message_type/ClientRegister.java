@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -13,6 +14,8 @@ import java.util.Random;
  */
 public class ClientRegister
 {
+    private static Logger LOG = Logger.getLogger(ClientRegister.class);
+
     /**
      * 解析消息体
      *
@@ -57,19 +60,21 @@ public class ClientRegister
 
         //TODO:测试用,上线的时候记得删掉
         Random random = new Random();
-        byte[] randomBytes = new byte[]{(byte)1,(byte)2,(byte)3,(byte)4,(byte)5,(byte)6,(byte)7,(byte)8,(byte)9,(byte)0};
+        byte[] randomBytes = new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 0};
         random.nextBytes(randomBytes);
         StringBuilder sb = new StringBuilder(10);
-        for (byte b : randomBytes) {
-            sb.append( Math.abs(Byte.valueOf(b).intValue())%10);
+        for (byte b : randomBytes)
+        {
+            sb.append(Math.abs(Byte.valueOf(b).intValue()) % 10);
         }
+        LOG.debug(">>>随机生成的设备名的后缀是:" + sb.toString());
 
         deviceInfo.setM_name(tempIdStr + sb.toString());
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
-        System.out.println(">>>终端注册返回:" + result);
+        LOG.debug(">>>终端注册返回:" + result);
         return result;
     }
 
@@ -84,7 +89,7 @@ public class ClientRegister
         int beginIndex = result.indexOf("{");
         int endIndex = result.indexOf("}") + 1;
         result = result.substring(beginIndex, endIndex);
-        DeviceInfo deviceInfo = JSON.parseObject(result,DeviceInfo.class);
+        DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
         return deviceInfo;
     }
 

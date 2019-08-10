@@ -2,6 +2,7 @@ package com.zistone.socket;
 
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
@@ -11,6 +12,8 @@ import java.net.Socket;
  */
 public class ServerThread extends Thread
 {
+    private static Logger LOG = Logger.getLogger(ServerThread.class);
+    
     //心跳超时时间
     private static final int TIMEOUT = 60 * 1000;
     private Socket m_socket;
@@ -29,7 +32,7 @@ public class ServerThread extends Thread
     {
         if (m_isRuning)
         {
-            System.out.println(">>>线程" + this.getId() + "启动失败,该线程正在执行");
+            LOG.debug(">>>线程" + this.getId() + "启动失败,该线程正在执行");
             return;
         }
         else
@@ -86,7 +89,7 @@ public class ServerThread extends Thread
                     //已经读完
                     if (dataInputStream.available() == 0)
                     {
-                        System.out.println(">>>线程" + this.getId() + "接收到:" + info);
+                        LOG.debug(">>>线程" + this.getId() + "接收到:" + info);
                         //模拟业务处理Thread.sleep(10000);
                         String responseStr = "";
                         if (!"".equals(info))
@@ -110,7 +113,7 @@ public class ServerThread extends Thread
         //关闭资源
         finally
         {
-            System.out.println(">>>线程" + this.getId() + "的连接已断开\n");
+            LOG.debug(">>>线程" + this.getId() + "的连接已断开\n");
             try
             {
                 if (bufferedWriter != null)

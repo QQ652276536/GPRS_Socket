@@ -3,11 +3,14 @@ package com.zistone.message_type;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 
 public class MessageReceive
 {
+    private static Logger LOG = Logger.getLogger(MessageReceive.class);
+    
     private DeviceInfo m_deviceInfo;
 
     /**
@@ -33,7 +36,7 @@ public class MessageReceive
         //            else if (strArray[i].equals("7e"))
         //            {
         //                strArray[i] = "7d 02";
-        //                System.out.println(">>>消息中有需要转义的字符!!!");
+        //                Log.debug(">>>消息中有需要转义的字符!!!");
         //            }
         //        }
         //校验码
@@ -85,7 +88,7 @@ public class MessageReceive
                     responseStr += akCode;
                 }
                 responseStr += ConvertUtil.HexStrToStr("7E");
-                System.out.println(">>>终端注册响应:" + responseStr);
+                LOG.debug(">>>终端注册响应:" + responseStr);
                 return responseStr;
             }
             //位置信息汇报
@@ -113,12 +116,12 @@ public class MessageReceive
                         responseStr += "1";
                     }
                     responseStr += ConvertUtil.HexStrToStr("7E");
-                    System.out.println(">>>终端鉴权响应:" + responseStr);
+                    LOG.debug(">>>终端鉴权响应:" + responseStr);
                     return responseStr;
                 }
                 else
                 {
-                    System.out.println(">>>鉴权失败,请确认鉴权无误!");
+                    LOG.error(">>>鉴权失败,请确认鉴权无误!");
                     break;
                 }
             }
@@ -144,7 +147,7 @@ public class MessageReceive
                     responseStr += "1";
                 }
                 responseStr += ConvertUtil.HexStrToStr("7E");
-                System.out.println(">>>终端鉴权响应:" + responseStr);
+                LOG.debug(">>>终端鉴权响应:" + responseStr);
                 return responseStr;
             }
             //终端心跳,消息体为空

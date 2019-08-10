@@ -2,6 +2,7 @@ package com.zistone.socket;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -10,21 +11,11 @@ import java.net.SocketAddress;
 
 public class SocketHttp
 {
+    private static Logger LOG = Logger.getLogger(SocketHttp.class);
+
     private BufferedReader m_bufferedReader;
     private BufferedWriter m_bufferedWriter;
     private Socket m_socket;
-
-    public static void main(String[] args)
-    {
-        DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_name("Socket");
-        deviceInfo.setM_type("SSS");
-        deviceInfo.setM_lat(1.111);
-        deviceInfo.setM_lot(2.222);
-        deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
-        String jsonStr = JSON.toJSONString(deviceInfo);
-        new SocketHttp().SendPost("localhost", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
-    }
 
     /**
      * Post请求
@@ -67,9 +58,11 @@ public class SocketHttp
             String result = "";
             while ((line = m_bufferedReader.readLine()) != null)
             {
+                LOG.debug(line);
                 result += line;
                 if (line.endsWith("}"))
                 {
+                    LOG.debug(">>>内容读取完毕");
                     return result;
                 }
             }
@@ -92,6 +85,7 @@ public class SocketHttp
             catch (IOException e)
             {
                 e.printStackTrace();
+                LOG.error(">>>本次请求发生异常:", e);
             }
         }
         return "Null...";

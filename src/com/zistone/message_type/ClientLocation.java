@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 
@@ -12,6 +13,8 @@ import java.util.Arrays;
  */
 public class ClientLocation
 {
+    private static Logger LOG = Logger.getLogger(ClientLocation.class);
+
     /**
      * 解析消息体
      *
@@ -48,7 +51,7 @@ public class ClientLocation
         deviceInfo.setM_height(heightNum);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonStr);
-        System.out.println(">>>位置汇报返回:" + result);
+        LOG.debug(">>>位置汇报返回:" + result);
         return result;
     }
 
