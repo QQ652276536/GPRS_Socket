@@ -1,7 +1,5 @@
 package com.zistone.socket;
 
-import com.alibaba.fastjson.JSON;
-import com.zistone.bean.DeviceInfo;
 import org.apache.log4j.Logger;
 
 import java.io.*;

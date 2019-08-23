@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -15,6 +16,12 @@ import java.util.Random;
 public class ClientRegister
 {
     private static Logger LOG = Logger.getLogger(ClientRegister.class);
+    private static String IP;
+
+    public ClientRegister()
+    {
+        IP = PropertiesUtil.GetValueProperties().getProperty("IP");
+    }
 
     /**
      * 解析消息体
@@ -73,7 +80,7 @@ public class ClientRegister
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
+        String result = new SocketHttp().SendPost(IP, 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
         LOG.debug(">>>终端注册返回:" + result);
         return result;
     }

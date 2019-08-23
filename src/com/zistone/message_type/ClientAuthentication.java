@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 /**
@@ -12,6 +13,12 @@ import org.apache.log4j.Logger;
 public class ClientAuthentication
 {
     private static Logger LOG = Logger.getLogger(ClientAuthentication.class);
+    private static String IP;
+
+    public ClientAuthentication()
+    {
+        IP = PropertiesUtil.GetValueProperties().getProperty("IP");
+    }
 
     /**
      * 解析消息体
@@ -27,7 +34,7 @@ public class ClientAuthentication
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_akCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost("192.168.10.197", 8080, "/Blowdown_Web/DeviceInfo/FindAKCode", jsonStr);
+        String result = new SocketHttp().SendPost(IP, 8080, "/Blowdown_Web/DeviceInfo/FindAKCode", jsonStr);
         LOG.debug(">>>终端鉴权返回:" + result);
         return result;
     }
