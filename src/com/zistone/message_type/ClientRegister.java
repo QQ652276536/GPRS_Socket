@@ -66,6 +66,7 @@ public class ClientRegister
         String[] carFlag2 = Arrays.copyOfRange(hexStrArray, 39, hexStrArray.length);
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_state(1);
 
         //TODO:测试用,上线的时候记得删掉,因为设备名是唯一的
         Random random = new Random();

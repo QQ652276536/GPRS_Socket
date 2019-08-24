@@ -1,9 +1,9 @@
 package com.zistone.message_type;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
-import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -11,15 +11,16 @@ import java.util.Arrays;
 public class MessageReceive
 {
     private static Logger LOG = Logger.getLogger(MessageReceive.class);
-    private static String IP;
-    private static int PORT;
+
+    private String m_ip;
+    private int m_port;
 
     private DeviceInfo m_deviceInfo;
 
-    public MessageReceive()
+    public MessageReceive(String ip, int port)
     {
-        IP = PropertiesUtil.GetValueProperties().getProperty("IP");
-        PORT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT"));
+        m_ip = ip;
+        m_port = port;
     }
 
     /**
@@ -75,9 +76,11 @@ public class MessageReceive
             //终端注册
             case MessageType.CLIENTREGISTER:
             {
-                ClientRegister clientRegister = new ClientRegister(IP, PORT);
+                ClientRegister clientRegister = new ClientRegister(m_ip, m_port);
+                //响应结果=响应的报文+Json字符串
                 String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
-                m_deviceInfo = clientRegister.ResponseHexStr(result);
+                result = result.substring(result.indexOf("{"));
+                m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
                 //终端注册应答（0x8100）
                 String responseStr = "7E";
                 //应答流水号,对应终端注册消息的流水号
@@ -85,6 +88,7 @@ public class MessageReceive
                 if (null != m_deviceInfo)
                 {
                     String akCode = m_deviceInfo.getM_akCode();
+                    LOG.debug(">>>服务端生成的鉴权码:" + akCode);
                     //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
                     if (null != akCode && !"".equals(akCode))
                     {
@@ -94,7 +98,7 @@ public class MessageReceive
                     {
                         responseStr += "03";
                     }
-                    responseStr += ConvertUtil.StrToHexStr(akCode);
+                    responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                 }
                 responseStr += "7E";
                 LOG.debug(">>>终端注册响应:" + responseStr);
@@ -106,7 +110,7 @@ public class MessageReceive
                 //需要先鉴权,即判断设备
                 if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
-                    ClientLocation clientLocation = new ClientLocation(IP, PORT);
+                    ClientLocation clientLocation = new ClientLocation(m_ip, m_port);
                     String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
                     String line = clientLocation.ResponseHexStr(result);
                     //平台通用应答(0x8001)
@@ -137,7 +141,7 @@ public class MessageReceive
             //终端鉴权
             case MessageType.CLIENTAK:
             {
-                ClientAuthentication clientAuthentication = new ClientAuthentication(IP, PORT);
+                ClientAuthentication clientAuthentication = new ClientAuthentication(m_ip, m_port);
                 String result = clientAuthentication.RecevieHexStrArray(bodyArray);
                 String akCode = clientAuthentication.ResponseHexStr(detailStr, result);
                 //平台通用应答(0x8001)

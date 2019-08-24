@@ -2,6 +2,7 @@ package com.zistone.socket;
 
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -21,9 +22,14 @@ public class ServerThread extends Thread
     //该线程是否正在运行
     private boolean m_isRuning = false;
 
-    public ServerThread(Socket socket)
+    private String m_ip;
+    private int m_port;
+
+    public ServerThread(Socket socket, String ip, int port)
     {
         this.m_socket = socket;
+        m_ip = ip;
+        m_port = port;
     }
 
     @Override
@@ -55,13 +61,14 @@ public class ServerThread extends Thread
             String info = "";
             //按byte读
             byte[] bytes = new byte[1];
-            MessageReceive messageReceive = new MessageReceive();
+            MessageReceive messageReceive = new MessageReceive(m_ip, m_port);
             while (m_isRuning)
             {
                 //检测心跳
                 if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
                 {
                     m_isRuning = false;
+                    LOG.debug(">>>线程" + this.getId() + "的连接已超时");
                     //跳出,执行finally块
                     break;
                 }
