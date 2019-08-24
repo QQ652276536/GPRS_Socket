@@ -3,6 +3,7 @@ package com.zistone.message_type;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -10,8 +11,16 @@ import java.util.Arrays;
 public class MessageReceive
 {
     private static Logger LOG = Logger.getLogger(MessageReceive.class);
+    private static String IP;
+    private static int PORT;
 
     private DeviceInfo m_deviceInfo;
+
+    public MessageReceive()
+    {
+        IP = PropertiesUtil.GetValueProperties().getProperty("IP");
+        PORT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT"));
+    }
 
     /**
      * 解析终端发送过来的16进制的Str
@@ -47,17 +56,17 @@ public class MessageReceive
         String[] headArray = Arrays.copyOfRange(tempArray, 0, 12);
         //消息ID
         String[] idArray = Arrays.copyOfRange(headArray, 0, 2);
-        String idStr = "0x" + ConvertUtil.StrArrayToStr(idArray);
-        int idValue = Integer.parseInt(idStr.replaceAll("^0[x|X]", ""), 16);
+        String idStr = ConvertUtil.StrArrayToStr(idArray);
+        int idValue = Integer.parseInt(idStr.replaceAll("0[x|X]", ""), 16);
         //消息体属性
         String[] bodyPropertyArray = Arrays.copyOfRange(headArray, 2, 4);
-        String bodyPropertyStr = "0x" + ConvertUtil.StrArrayToStr(bodyPropertyArray);
+        String bodyPropertyStr = ConvertUtil.StrArrayToStr(bodyPropertyArray);
         //终端手机号(根据对应的测试工具测出来结果为终端ID)
         String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
         String phoneStr = ConvertUtil.StrArrayToStr(phoneArray);
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
-        String detailStr = "0x" + ConvertUtil.StrArrayToStr(detailArray);
+        String detailStr = ConvertUtil.StrArrayToStr(detailArray);
         //消息体,不同消息ID对应不同的消息体结构
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
@@ -66,7 +75,7 @@ public class MessageReceive
             //终端注册
             case MessageType.CLIENTREGISTER:
             {
-                ClientRegister clientRegister = new ClientRegister();
+                ClientRegister clientRegister = new ClientRegister(IP, PORT);
                 String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
                 m_deviceInfo = clientRegister.ResponseHexStr(result);
                 //终端注册应答（0x8100）
@@ -85,7 +94,7 @@ public class MessageReceive
                     {
                         responseStr += "03";
                     }
-                    responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0x|0X|,", "");
+                    responseStr += ConvertUtil.StrToHexStr(akCode);
                 }
                 responseStr += "7E";
                 LOG.debug(">>>终端注册响应:" + responseStr);
@@ -97,7 +106,7 @@ public class MessageReceive
                 //需要先鉴权,即判断设备
                 if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
-                    ClientLocation clientLocation = new ClientLocation();
+                    ClientLocation clientLocation = new ClientLocation(IP, PORT);
                     String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
                     String line = clientLocation.ResponseHexStr(result);
                     //平台通用应答(0x8001)
@@ -116,7 +125,7 @@ public class MessageReceive
                         responseStr += "01";
                     }
                     responseStr += "7E";
-                    LOG.debug(">>>终端鉴权响应:" + responseStr);
+                    LOG.debug(">>>位置信息汇报响应:" + responseStr);
                     return responseStr;
                 }
                 else
@@ -128,7 +137,7 @@ public class MessageReceive
             //终端鉴权
             case MessageType.CLIENTAK:
             {
-                ClientAuthentication clientAuthentication = new ClientAuthentication();
+                ClientAuthentication clientAuthentication = new ClientAuthentication(IP, PORT);
                 String result = clientAuthentication.RecevieHexStrArray(bodyArray);
                 String akCode = clientAuthentication.ResponseHexStr(detailStr, result);
                 //平台通用应答(0x8001)

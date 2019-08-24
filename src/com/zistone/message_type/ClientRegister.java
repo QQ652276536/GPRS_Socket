@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
-import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
@@ -16,11 +15,14 @@ import java.util.Random;
 public class ClientRegister
 {
     private static Logger LOG = Logger.getLogger(ClientRegister.class);
-    private static String IP;
 
-    public ClientRegister()
+    private String m_ip;
+    private int m_port;
+
+    public ClientRegister(String ip, int port)
     {
-        IP = PropertiesUtil.GetValueProperties().getProperty("IP");
+        m_ip = ip;
+        m_port = port;
     }
 
     /**
@@ -35,8 +37,8 @@ public class ClientRegister
         String akCode = null;
         //省域代码
         String[] capital = Arrays.copyOfRange(hexStrArray, 0, 2);
-        String provinceStr = "0x" + capital[0] + capital[1];
-        int provinceValue = Integer.parseInt(provinceStr.replaceAll("^0[x|X]", ""), 16);
+        String provinceStr = ConvertUtil.StrArrayToStr(capital);
+        int provinceValue = Integer.parseInt(provinceStr.replaceAll("0[x|X]", ""), 16);
         //市县代码
         String[] city = Arrays.copyOfRange(hexStrArray, 2, 4);
         //制造商
@@ -65,7 +67,7 @@ public class ClientRegister
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
 
-        //TODO:测试用,上线的时候记得删掉
+        //TODO:测试用,上线的时候记得删掉,因为设备名是唯一的
         Random random = new Random();
         byte[] randomBytes = new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 0};
         random.nextBytes(randomBytes);
@@ -80,7 +82,7 @@ public class ClientRegister
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost(IP, 8080, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
+        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
         LOG.debug(">>>终端注册返回:" + result);
         return result;
     }
