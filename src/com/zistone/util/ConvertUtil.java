@@ -93,6 +93,10 @@ public class ConvertUtil
      */
     public static String StrToHexStr(String str)
     {
+        if (null == str || "".equals(str))
+        {
+            return "";
+        }
         //根据默认编码获取字节数组
         byte[] bytes = str.getBytes();
         StringBuilder stringBuilder = new StringBuilder(bytes.length * 2);

@@ -12,7 +12,7 @@ import java.net.Socket;
  */
 public class ServerThread extends Thread
 {
-    private static Logger LOG = Logger.getLogger(ServerThread.class);
+    private Logger m_logger = Logger.getLogger(ServerThread.class);
     //心跳超时时间
     private static final int TIMEOUT = 60 * 1000;
     private Socket m_socket;
@@ -36,7 +36,7 @@ public class ServerThread extends Thread
     {
         if (m_isRuning)
         {
-            LOG.debug(">>>线程" + this.getId() + "启动失败,该线程正在执行");
+            m_logger.debug(">>>线程" + this.getId() + "启动失败,该线程正在执行");
             return;
         }
         else
@@ -67,7 +67,7 @@ public class ServerThread extends Thread
                 if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
                 {
                     m_isRuning = false;
-                    LOG.debug(">>>线程" + this.getId() + "的连接已超时");
+                    m_logger.debug(">>>线程" + this.getId() + "的连接已超时");
                     //跳出,执行finally块
                     break;
                 }
@@ -82,7 +82,7 @@ public class ServerThread extends Thread
                     //已经读完
                     if (inputStream.available() == 0)
                     {
-                        LOG.debug(">>>线程" + this.getId() + "接收到:" + info);
+                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info);
                         //模拟业务处理Thread.sleep(10000);
                         String responseStr = "";
                         if (!"".equals(info))
@@ -106,7 +106,7 @@ public class ServerThread extends Thread
         //关闭资源
         finally
         {
-            LOG.debug(">>>线程" + this.getId() + "的连接已断开\n");
+            m_logger.debug(">>>线程" + this.getId() + "的连接已断开\n");
             try
             {
                 if (outputStream != null)

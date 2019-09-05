@@ -9,7 +9,7 @@ import java.net.SocketAddress;
 
 public class SocketHttp
 {
-    private static Logger LOG = Logger.getLogger(SocketHttp.class);
+    private Logger m_logger = Logger.getLogger(SocketHttp.class);
 
     private BufferedReader m_bufferedReader;
     private BufferedWriter m_bufferedWriter;
@@ -56,11 +56,11 @@ public class SocketHttp
             String result = "";
             while ((line = m_bufferedReader.readLine()) != null)
             {
-                LOG.debug(line);
+                m_logger.debug(line);
                 result += line;
                 if (line.endsWith("}"))
                 {
-                    LOG.debug(">>>内容读取完毕");
+                    m_logger.debug(">>>内容读取完毕");
                     return result;
                 }
             }
@@ -83,7 +83,7 @@ public class SocketHttp
             catch (IOException e)
             {
                 e.printStackTrace();
-                LOG.error(">>>本次请求发生异常:", e);
+                m_logger.error(">>>本次请求发生异常:", e);
             }
         }
         return "Null...";

@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public class MessageReceive
 {
-    private static Logger LOG = Logger.getLogger(MessageReceive.class);
+    private Logger m_logger = Logger.getLogger(MessageReceive.class);
 
     private String m_ip;
     private int m_port;
@@ -88,7 +88,7 @@ public class MessageReceive
                 if (null != m_deviceInfo)
                 {
                     String akCode = m_deviceInfo.getM_akCode();
-                    LOG.debug(">>>服务端生成的鉴权码:" + akCode);
+                    m_logger.debug(">>>服务端生成的鉴权码:" + akCode);
                     //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
                     if (null != akCode && !"".equals(akCode))
                     {
@@ -101,7 +101,7 @@ public class MessageReceive
                     responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                 }
                 responseStr += "7E";
-                LOG.debug(">>>终端注册响应:" + responseStr);
+                m_logger.debug(">>>终端注册响应:" + responseStr);
                 return responseStr;
             }
             //位置信息汇报
@@ -129,12 +129,12 @@ public class MessageReceive
                         responseStr += "01";
                     }
                     responseStr += "7E";
-                    LOG.debug(">>>位置信息汇报响应:" + responseStr);
+                    m_logger.debug(">>>位置信息汇报响应:" + responseStr);
                     return responseStr;
                 }
                 else
                 {
-                    LOG.error(">>>鉴权失败,请确认鉴权无误!");
+                    m_logger.error(">>>鉴权失败,请确认鉴权无误!");
                     break;
                 }
             }
@@ -160,7 +160,7 @@ public class MessageReceive
                     responseStr += "01";
                 }
                 responseStr += "7E";
-                LOG.debug(">>>终端鉴权响应:" + responseStr);
+                m_logger.debug(">>>终端鉴权响应:" + responseStr);
                 return responseStr;
             }
             //终端心跳,消息体为空

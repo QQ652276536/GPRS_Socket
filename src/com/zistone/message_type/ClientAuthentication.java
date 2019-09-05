@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public class ClientAuthentication
 {
-    private static Logger LOG = Logger.getLogger(ClientAuthentication.class);
+    private Logger m_logger = Logger.getLogger(ClientAuthentication.class);
 
     private String m_ip;
     private int m_port;
@@ -37,7 +37,7 @@ public class ClientAuthentication
         deviceInfo.setM_akCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/FindAKCode", jsonStr);
-        LOG.debug(">>>终端鉴权返回:" + result);
+        m_logger.debug(">>>终端鉴权返回:" + result);
         return result;
     }
 

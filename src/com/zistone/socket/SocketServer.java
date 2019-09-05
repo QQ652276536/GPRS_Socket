@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class SocketServer
 {
-    private static Logger LOG = Logger.getLogger(SocketServer.class);
+    private Logger m_logger = Logger.getLogger(SocketServer.class);
 
     private static String SERVERIP;
     private static int SERVERPORT;
@@ -25,7 +25,7 @@ public class SocketServer
     {
         try
         {
-            LOG.debug(">>>服务启动,Socket端口:" + SOCKETPORT + "服务地址:" + SERVERIP + "服务端口:" + SERVERPORT + ",等待终端连接...\n");
+            m_logger.debug(">>>服务启动,Socket端口:" + SOCKETPORT + "Web服务地址:" + SERVERIP + "Web服务端口:" + SERVERPORT + ",等待终端连接...\n");
             ServerSocket server = new ServerSocket(SOCKETPORT);
             int count = 0;
             while (true)
@@ -33,7 +33,7 @@ public class SocketServer
                 //开启监听
                 Socket socket = server.accept();
                 count++;
-                LOG.debug(">>>开启第" + count + "次长连接");
+                m_logger.debug(">>>开启第" + count + "次长连接");
                 ServerThread thread = new ServerThread(socket, SERVERIP, SERVERPORT);
                 thread.start();
             }

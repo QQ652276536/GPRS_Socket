@@ -13,7 +13,7 @@ import java.util.Arrays;
  */
 public class ClientLocation
 {
-    private static Logger LOG = Logger.getLogger(ClientLocation.class);
+    private Logger m_logger = Logger.getLogger(ClientLocation.class);
 
     private String m_ip;
     private int m_port;
@@ -60,7 +60,7 @@ public class ClientLocation
         deviceInfo.setM_height(heightNum);
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonStr);
-        LOG.debug(">>>位置汇报返回:" + result);
+        m_logger.debug(">>>位置汇报返回:" + result);
         return result;
     }
 

@@ -28,6 +28,7 @@ out/
 /nbdist/
 /.nb-gradle/
 build/
+/META-INF/
 
 ### VS Code ###
 .vscode/

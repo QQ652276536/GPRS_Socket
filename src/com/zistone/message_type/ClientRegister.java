@@ -7,14 +7,13 @@ import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * 终端注册
  */
 public class ClientRegister
 {
-    private static Logger LOG = Logger.getLogger(ClientRegister.class);
+    private Logger m_logger = Logger.getLogger(ClientRegister.class);
 
     private String m_ip;
     private int m_port;
@@ -72,7 +71,7 @@ public class ClientRegister
         deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
-        LOG.debug(">>>终端注册返回:" + result);
+        m_logger.debug(">>>终端注册返回:" + result);
         return result;
     }
 
