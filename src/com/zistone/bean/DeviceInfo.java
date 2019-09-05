@@ -1,21 +1,84 @@
 package com.zistone.bean;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DeviceInfo
 {
+
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ","
-                + " m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_craeteTime=" + m_craeteTime + ", m_updateTime" +
-                "=" + m_updateTime + ", m_description='" + m_description + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name
+                + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height="
+                + m_height + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime) + ", m_updateTime="
+                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='"
+                + m_akCode + '\'' + '}';
     }
 
     /**
-     * 设备编号(由数据库生成)
+     * 自增主键(由数据库生成)
      */
     private int m_id;
+
+    /**
+     * 设备编号,设备自带
+     */
+    private String m_deviceId;
+
+    /**
+     * SIM卡号
+     */
+    private int m_sim;
+
+    /**
+     * 设备名
+     */
+    private String m_name;
+
+    /**
+     * 设备类型
+     */
+    public String m_type;
+
+    /**
+     * 设备状态:0离线1在线
+     */
+    private int m_state;
+
+    /**
+     * 纬度
+     */
+    private double m_lat;
+
+    /**
+     * 经度
+     */
+    private double m_lot;
+    /**
+     * 海拔
+     */
+    private double m_height;
+
+    /**
+     * 创建时间
+     */
+    private Date m_createTime;
+
+    /**
+     * 修改时间
+     */
+    private Date m_updateTime;
+
+    /**
+     * 备注
+     */
+    private String m_comment;
+
+    /**
+     * 鉴权码,注册成功后才有,由Web服务随机生成
+     */
+    private String m_akCode;
 
     public int getM_id()
     {
@@ -27,10 +90,25 @@ public class DeviceInfo
         this.m_id = m_id;
     }
 
-    /**
-     * 设备名
-     */
-    private String m_name;
+    public String getM_deviceId()
+    {
+        return m_deviceId;
+    }
+
+    public void setM_deviceId(String m_deviceId)
+    {
+        this.m_deviceId = m_deviceId;
+    }
+
+    public int getM_sim()
+    {
+        return m_sim;
+    }
+
+    public void setM_sim(int m_sim)
+    {
+        this.m_sim = m_sim;
+    }
 
     public String getM_name()
     {
@@ -42,11 +120,6 @@ public class DeviceInfo
         this.m_name = m_name;
     }
 
-    /**
-     * 设备类型
-     */
-    public String m_type;
-
     public String getM_type()
     {
         return m_type;
@@ -56,11 +129,6 @@ public class DeviceInfo
     {
         this.m_type = m_type;
     }
-
-    /**
-     * 设备状态
-     */
-    private int m_state;
 
     public int getM_state()
     {
@@ -72,11 +140,6 @@ public class DeviceInfo
         this.m_state = m_state;
     }
 
-    /**
-     * 纬度
-     */
-    private double m_lat;
-
     public double getM_lat()
     {
         return m_lat;
@@ -86,11 +149,6 @@ public class DeviceInfo
     {
         this.m_lat = m_lat;
     }
-
-    /**
-     * 经度
-     */
-    private double m_lot;
 
     public double getM_lot()
     {
@@ -102,11 +160,6 @@ public class DeviceInfo
         this.m_lot = m_lot;
     }
 
-    /**
-     * 海拔
-     */
-    private double m_height;
-
     public double getM_height()
     {
         return m_height;
@@ -117,25 +170,15 @@ public class DeviceInfo
         this.m_height = m_height;
     }
 
-    /**
-     * 创建时间
-     */
-    private Date m_craeteTime;
-
-    public Date getM_craeteTime()
+    public Date getM_createTime()
     {
-        return m_craeteTime;
+        return m_createTime;
     }
 
-    public void setM_craeteTime(Date m_craeteTime)
+    public void setM_createTime(Date m_createTime)
     {
-        this.m_craeteTime = m_craeteTime;
+        this.m_createTime = m_createTime;
     }
-
-    /**
-     * 修改时间
-     */
-    private Date m_updateTime;
 
     public Date getM_updateTime()
     {
@@ -147,25 +190,15 @@ public class DeviceInfo
         this.m_updateTime = m_updateTime;
     }
 
-    /**
-     * 描述
-     */
-    private String m_description;
-
-    public String getM_description()
+    public String getM_comment()
     {
-        return m_description;
+        return m_comment;
     }
 
-    public void setM_description(String m_description)
+    public void setM_comment(String m_comment)
     {
-        this.m_description = m_description;
+        this.m_comment = m_comment;
     }
-
-    /**
-     * 鉴权码,注册成功后才有,由Web服务随机生成
-     */
-    private String m_akCode;
 
     public String getM_akCode()
     {

@@ -29,7 +29,7 @@ public class ClientRegister
      * 解析消息体
      *
      * @param hexStrArray
-     * @param idStr       用终端ID作为设备名称
+     * @param idStr
      * @return
      */
     public String RecevieHexStrArray(String[] hexStrArray, String idStr)
@@ -67,21 +67,9 @@ public class ClientRegister
         //由Web服务处理终端注册
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_state(1);
-
-        //TODO:测试用,上线的时候记得删掉,因为设备名是唯一的
-        Random random = new Random();
-        byte[] randomBytes = new byte[]{(byte) 1, (byte) 2, (byte) 3, (byte) 4, (byte) 5, (byte) 6, (byte) 7, (byte) 8, (byte) 9, (byte) 0};
-        random.nextBytes(randomBytes);
-        StringBuilder sb = new StringBuilder();
-        for (byte b : randomBytes)
-        {
-            sb.append(Math.abs(Byte.valueOf(b).intValue()) % 10);
-        }
-        LOG.debug(">>>随机生成的设备名的后缀是:" + sb.toString());
-
-        deviceInfo.setM_name(tempIdStr + sb.toString());
+        deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_type(typeStr);
-        deviceInfo.setM_description("我是Socket模拟的Http请求发送过来的");
+        deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
         String jsonStr = JSON.toJSONString(deviceInfo);
         String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
         LOG.debug(">>>终端注册返回:" + result);

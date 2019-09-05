@@ -2,7 +2,6 @@ package com.zistone.socket;
 
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
-import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
