@@ -59,16 +59,14 @@ public class ClientLocation
         deviceInfo.setM_lot(lotNum);
         deviceInfo.setM_height(heightNum);
         String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/UpdateByName", jsonStr);
+        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/UpdateByDeviceId", jsonStr);
         m_logger.debug(">>>位置汇报返回:" + result);
         return result;
     }
 
     /**
-     * 生成响应内容
-     *
      * @param result
-     * @return 受影响行数
+     * @return
      */
     public String ResponseHexStr(String result)
     {

@@ -42,8 +42,6 @@ public class ClientAuthentication
     }
 
     /**
-     * 生成响应内容
-     *
      * @param detailStr 消息流水
      * @param result
      * @return 鉴权码

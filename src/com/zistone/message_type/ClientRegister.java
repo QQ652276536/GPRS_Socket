@@ -76,18 +76,13 @@ public class ClientRegister
     }
 
     /**
-     * 生成响应内容
-     *
-     * @param result 结果,这里的结果来自Web服务,需要再次判断
+     * @param result
      * @return
      */
     public DeviceInfo ResponseHexStr(String result)
     {
-        int beginIndex = result.indexOf("{");
-        int endIndex = result.indexOf("}") + 1;
-        result = result.substring(beginIndex, endIndex);
-        DeviceInfo deviceInfo = JSON.parseObject(result, DeviceInfo.class);
-        return deviceInfo;
+        result = result.substring(result.indexOf("{"));
+        return JSON.parseObject(result, DeviceInfo.class);
     }
 
 }

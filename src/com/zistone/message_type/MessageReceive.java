@@ -77,10 +77,8 @@ public class MessageReceive
             case MessageType.CLIENTREGISTER:
             {
                 ClientRegister clientRegister = new ClientRegister(m_ip, m_port);
-                //响应结果=响应的报文+Json字符串
                 String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
-                result = result.substring(result.indexOf("{"));
-                m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+                m_deviceInfo = clientRegister.ResponseHexStr(result);
                 //终端注册应答（0x8100）
                 String responseStr = "7E";
                 //应答流水号,对应终端注册消息的流水号
