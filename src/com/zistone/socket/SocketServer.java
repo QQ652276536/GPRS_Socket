@@ -25,7 +25,8 @@ public class SocketServer
     {
         try
         {
-            m_logger.debug(">>>服务启动,Socket端口:" + SOCKETPORT + "Web服务地址:" + SERVERIP + "Web服务端口:" + SERVERPORT + ",等待终端连接...\n");
+            m_logger.debug(">>>Socket服务启动,Socket端口:" + SOCKETPORT + "\nWeb服务地址:" + SERVERIP + ",Web服务端口:" + SERVERPORT + "\n等待终端连接..." +
+                    ".\n");
             ServerSocket server = new ServerSocket(SOCKETPORT);
             int count = 0;
             while (true)
