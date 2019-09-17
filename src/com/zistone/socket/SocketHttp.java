@@ -86,7 +86,7 @@ public class SocketHttp
                 m_logger.error(">>>本次请求发生异常:", e);
             }
         }
-        return "Null...";
+        return "Error...";
     }
 
 }

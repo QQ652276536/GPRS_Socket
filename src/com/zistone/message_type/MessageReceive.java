@@ -1,27 +1,28 @@
 package com.zistone.message_type;
 
-import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.util.Arrays;
 
 public class MessageReceive
 {
-    private Logger m_logger = Logger.getLogger(MessageReceive.class);
+    //Web服务IP
+    private static String IP_WEB;
+    //Web服务端口
+    private static int PORT_WEB;
 
-    private String m_ip;
-    private int m_port;
-
-    private DeviceInfo m_deviceInfo;
-
-    public MessageReceive(String ip, int port)
+    static
     {
-        m_ip = ip;
-        m_port = port;
+        IP_WEB = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        PORT_WEB = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
+
+    private Logger m_logger = Logger.getLogger(MessageReceive.class);
+    private DeviceInfo m_deviceInfo;
 
     /**
      * 解析终端发送过来的16进制的Str
@@ -76,7 +77,8 @@ public class MessageReceive
             //终端注册
             case MessageType.CLIENTREGISTER:
             {
-                ClientRegister clientRegister = new ClientRegister(m_ip, m_port);
+                m_logger.debug(">>>收到[终端注册]的消息");
+                ClientRegister clientRegister = new ClientRegister(IP_WEB, PORT_WEB);
                 String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
                 m_deviceInfo = clientRegister.ResponseHexStr(result);
                 //终端注册应答（0x8100）
@@ -90,26 +92,58 @@ public class MessageReceive
                     //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
                     if (null != akCode && !"".equals(akCode))
                     {
+                        m_logger.debug(">>>终端注册成功");
                         responseStr += "00";
                     }
                     else
                     {
+                        m_logger.debug(">>>终端注册失败");
                         responseStr += "03";
                     }
                     responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                 }
                 responseStr += "7E";
-                m_logger.debug(">>>终端注册响应:" + responseStr);
+                m_logger.debug(">>>生成的响应内容:" + responseStr);
+                return responseStr;
+            }
+            //终端鉴权
+            case MessageType.CLIENTAK:
+            {
+                m_logger.debug(">>>收到[终端鉴权]的消息");
+                ClientAuthentication clientAuthentication = new ClientAuthentication(IP_WEB, PORT_WEB);
+                String result = clientAuthentication.RecevieHexStrArray(bodyArray);
+                m_deviceInfo = clientAuthentication.ResponseHexStr(result);
+                //平台通用应答(0x8001)
+                String responseStr = "7E";
+                //应答ID,对应终端消息的ID
+                responseStr += "8001";
+                //应答流水号,对应终端消息的流水号
+                responseStr += detailStr;
+                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                {
+                    m_logger.debug(">>>终端鉴权成功");
+                    responseStr += "00";
+                }
+                else
+                {
+                    m_logger.debug(">>>终端鉴权失败");
+                    responseStr += "01";
+                }
+                responseStr += "7E";
+                m_logger.debug(">>>生成的响应内容:" + responseStr);
                 return responseStr;
             }
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
             {
-                //需要先鉴权,即判断设备
+                m_logger.debug(">>>收到[位置信息汇报]的消息");
+                //需要先鉴权,即判断设备是否注册成功或已经注册过
                 if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
-                    ClientLocation clientLocation = new ClientLocation(m_ip, m_port);
+                    ClientLocation clientLocation = new ClientLocation(IP_WEB, PORT_WEB);
                     String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
+                    //返回受影响的行数
                     String line = clientLocation.ResponseHexStr(result);
                     //平台通用应答(0x8001)
                     String responseStr = "7E";
@@ -118,52 +152,31 @@ public class MessageReceive
                     //应答流水号,对应终端消息的流水号
                     responseStr += detailStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+                    //受影响的行数为1
                     if ("1".equals(line))
                     {
+                        m_logger.debug(">>>位置信息汇报成功");
                         responseStr += "00";
                     }
                     else
                     {
+                        m_logger.debug(">>>位置信息汇报失败");
                         responseStr += "01";
                     }
                     responseStr += "7E";
-                    m_logger.debug(">>>位置信息汇报响应:" + responseStr);
+                    m_logger.debug(">>>生成的响应内容:" + responseStr);
                     return responseStr;
                 }
                 else
                 {
-                    m_logger.error(">>>鉴权失败,请确认鉴权无误!");
+                    m_logger.error(">>>位置信息汇报时鉴权失败,请确认鉴权无误!");
                     break;
                 }
-            }
-            //终端鉴权
-            case MessageType.CLIENTAK:
-            {
-                ClientAuthentication clientAuthentication = new ClientAuthentication(m_ip, m_port);
-                String result = clientAuthentication.RecevieHexStrArray(bodyArray);
-                String akCode = clientAuthentication.ResponseHexStr(detailStr, result);
-                //平台通用应答(0x8001)
-                String responseStr = "7E";
-                //应答ID,对应终端消息的ID
-                responseStr += "8001";
-                //应答流水号,对应终端消息的流水号
-                responseStr += detailStr;
-                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                if (null != m_deviceInfo && m_deviceInfo.getM_akCode() == akCode)
-                {
-                    responseStr += "00";
-                }
-                else
-                {
-                    responseStr += "01";
-                }
-                responseStr += "7E";
-                m_logger.debug(">>>终端鉴权响应:" + responseStr);
-                return responseStr;
             }
             //终端心跳,消息体为空
             case MessageType.CLIENTHEARTBEAT:
             {
+                m_logger.debug(">>>收到[终端心跳]的消息");
                 return "";
             }
             default:

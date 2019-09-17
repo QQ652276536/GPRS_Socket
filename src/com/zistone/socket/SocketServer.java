@@ -8,26 +8,21 @@ import java.net.Socket;
 
 public class SocketServer
 {
-    private Logger m_logger = Logger.getLogger(SocketServer.class);
-
-    private static String SERVERIP;
-    private static int SERVERPORT;
-    private static int SOCKETPORT;
+    private static int PORT_SOCKET;
 
     static
     {
-        SERVERIP = PropertiesUtil.GetValueProperties().getProperty("SERVERIP");
-        SERVERPORT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("SERVERPORT"));
-        SOCKETPORT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("SOCKETPORT"));
+        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET"));
     }
+
+    private Logger m_logger = Logger.getLogger(SocketServer.class);
 
     public SocketServer()
     {
         try
         {
-            m_logger.debug(">>>Socket服务启动,Socket端口:" + SOCKETPORT + "\nWeb服务地址:" + SERVERIP + ",Web服务端口:" + SERVERPORT + "\n等待终端连接..." +
-                    ".\n");
-            ServerSocket server = new ServerSocket(SOCKETPORT);
+            m_logger.debug(">>>Socket服务启动,端口:" + PORT_SOCKET + ",等待终端连接...\n");
+            ServerSocket server = new ServerSocket(PORT_SOCKET);
             int count = 0;
             while (true)
             {
@@ -35,7 +30,7 @@ public class SocketServer
                 Socket socket = server.accept();
                 count++;
                 m_logger.debug(">>>开启第" + count + "次长连接");
-                ServerThread thread = new ServerThread(socket, SERVERIP, SERVERPORT);
+                ServerThread thread = new ServerThread(socket);
                 thread.start();
             }
         }

@@ -10,7 +10,7 @@ public class SocketClient
     {
         try
         {
-            Socket socket = new Socket("localhost", 8888);
+            Socket socket = new Socket("129.204.165.206", 8065);
             //得到一个输出流，用于向服务器发送数据
             OutputStream outputStream = socket.getOutputStream();
             System.out.println("请输入16进制数据:");

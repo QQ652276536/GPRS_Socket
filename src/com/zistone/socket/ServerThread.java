@@ -2,6 +2,7 @@ package com.zistone.socket;
 
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
+import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -12,23 +13,24 @@ import java.net.Socket;
  */
 public class ServerThread extends Thread
 {
-    private Logger m_logger = Logger.getLogger(ServerThread.class);
     //心跳超时时间
-    private static final int TIMEOUT = 60 * 1000;
+    private static int TIMEOUT;
+
+    static
+    {
+        TIMEOUT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+    }
+
     private Socket m_socket;
+    private Logger m_logger = Logger.getLogger(ServerThread.class);
     //接收到数据的最新时间
     private long m_lastReceiveTime = System.currentTimeMillis();
     //该线程是否正在运行
     private boolean m_isRuning = false;
 
-    private String m_ip;
-    private int m_port;
-
-    public ServerThread(Socket socket, String ip, int port)
+    public ServerThread(Socket socket)
     {
         this.m_socket = socket;
-        m_ip = ip;
-        m_port = port;
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ServerThread extends Thread
             String info = "";
             //按byte读
             byte[] bytes = new byte[1];
-            MessageReceive messageReceive = new MessageReceive(m_ip, m_port);
+            MessageReceive messageReceive = new MessageReceive();
             while (m_isRuning)
             {
                 //检测心跳
@@ -82,7 +84,7 @@ public class ServerThread extends Thread
                     //已经读完
                     if (inputStream.available() == 0)
                     {
-                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info);
+                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info+"\n");
                         //模拟业务处理Thread.sleep(10000);
                         String responseStr = "";
                         if (!"".equals(info))

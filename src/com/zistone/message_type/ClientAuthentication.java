@@ -36,21 +36,18 @@ public class ClientAuthentication
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_akCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/FindAKCode", jsonStr);
+        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/FindByAKCode", jsonStr);
         m_logger.debug(">>>终端鉴权返回:" + result);
         return result;
     }
 
     /**
-     * @param detailStr 消息流水
      * @param result
      * @return 鉴权码
      */
-    public String ResponseHexStr(String detailStr, String result)
+    public DeviceInfo ResponseHexStr(String result)
     {
-        int beginIndex = result.indexOf("GMT");
-        int endIndex = result.indexOf("}");
-        result = result.substring(beginIndex + 3, endIndex);
-        return result;
+        result = result.substring(result.indexOf("{"));
+        return JSON.parseObject(result, DeviceInfo.class);
     }
 }
