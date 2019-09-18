@@ -32,6 +32,7 @@ public class MessageReceive
      */
     public String RecevieHexStr(String hexStr)
     {
+        CreateCheckCode(hexStr);
         String[] strArray = hexStr.split(" ");
         //前后两个标识位
         String flag1 = strArray[0];
@@ -63,13 +64,13 @@ public class MessageReceive
         //消息体属性
         String[] bodyPropertyArray = Arrays.copyOfRange(headArray, 2, 4);
         String bodyPropertyStr = ConvertUtil.StrArrayToStr(bodyPropertyArray);
-        //终端手机号(根据对应的测试工具测出来结果为终端ID)
+        //终端手机号或终端ID
         String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
         String phoneStr = ConvertUtil.StrArrayToStr(phoneArray);
         //消息流水号
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
         String detailStr = ConvertUtil.StrArrayToStr(detailArray);
-        //消息体,不同消息ID对应不同的消息体结构
+        //消息包封装项
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         //根据消息ID判断消息类型
         switch (idValue)
@@ -83,8 +84,10 @@ public class MessageReceive
                 m_deviceInfo = clientRegister.ResponseHexStr(result);
                 //终端注册应答（0x8100）
                 String responseStr = "7E";
-                //应答流水号,对应终端注册消息的流水号
-                responseStr += "8100";
+                //应答ID,对应终端消息的ID(终端注册应答不需要应答ID)
+                //responseStr += "8100";
+                //应答流水号,对应终端消息的流水号
+                responseStr += detailStr;
                 if (null != m_deviceInfo)
                 {
                     String akCode = m_deviceInfo.getM_akCode();
@@ -100,10 +103,11 @@ public class MessageReceive
                         m_logger.debug(">>>终端注册失败");
                         responseStr += "03";
                     }
+                    //鉴权码
                     responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                 }
                 responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr);
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
                 return responseStr;
             }
             //终端鉴权
@@ -115,10 +119,13 @@ public class MessageReceive
                 m_deviceInfo = clientAuthentication.ResponseHexStr(result);
                 //平台通用应答(0x8001)
                 String responseStr = "7E";
-                //应答ID,对应终端消息的ID
+                //应答ID
                 responseStr += "8001";
-                //应答流水号,对应终端消息的流水号
+                responseStr += bodyPropertyStr;
+                responseStr += phoneStr;
                 responseStr += detailStr;
+                responseStr += detailStr;
+                responseStr += idStr;
                 //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
                 if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
@@ -130,8 +137,9 @@ public class MessageReceive
                     m_logger.debug(">>>终端鉴权失败");
                     responseStr += "01";
                 }
+                responseStr += checkCode;
                 responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr);
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
                 return responseStr;
             }
             //位置信息汇报
@@ -139,20 +147,26 @@ public class MessageReceive
             {
                 m_logger.debug(">>>收到[位置信息汇报]的消息");
                 //需要先鉴权,即判断设备是否注册成功或已经注册过
-                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                if (true)
+                //if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
                     ClientLocation clientLocation = new ClientLocation(IP_WEB, PORT_WEB);
-                    String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
+                    //String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
                     //返回受影响的行数
-                    String line = clientLocation.ResponseHexStr(result);
+                    //String line = clientLocation.ResponseHexStr(result);
+                    String line = "1";
                     //平台通用应答(0x8001)
                     String responseStr = "7E";
-                    //应答ID,对应终端消息的ID
+                    //应答ID
                     responseStr += "8001";
-                    //应答流水号,对应终端消息的流水号
+                    //                    responseStr += bodyPropertyStr;
+                    responseStr += "0005";
+                    responseStr += phoneStr;
                     responseStr += detailStr;
+                    responseStr += detailStr;
+                    responseStr += idStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                    //受影响的行数为1
+                    //受影响的行数
                     if ("1".equals(line))
                     {
                         m_logger.debug(">>>位置信息汇报成功");
@@ -163,13 +177,15 @@ public class MessageReceive
                         m_logger.debug(">>>位置信息汇报失败");
                         responseStr += "01";
                     }
+                    responseStr += checkCode;
+                    //responseStr += "A4";
                     responseStr += "7E";
-                    m_logger.debug(">>>生成的响应内容:" + responseStr);
+                    m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
                     return responseStr;
                 }
                 else
                 {
-                    m_logger.error(">>>位置信息汇报时鉴权失败,请确认鉴权无误!");
+                    m_logger.error(">>>位置信息汇报失败,需要先鉴权!\n");
                     break;
                 }
             }
@@ -184,6 +200,49 @@ public class MessageReceive
         }
         //错误消息ID就返回空
         return "";
+    }
+
+    /**
+     * 生成校验码
+     * 将收到的消息还原转义后去除标识和校验位,然后按位异或得到的结果就是校验码
+     *
+     * @return
+     */
+    private String CreateCheckCode(String hexStr)
+    {
+        String[] strArray = hexStr.split(" ");
+        String[] strArray2 = new String[strArray.length - 3];
+        int j = 0;
+        for (int i = 0; i < strArray.length; i++)
+        {
+            if (i == 0 || i == strArray.length - 2 || i == strArray.length - 1)
+            {
+                continue;
+            }
+            else
+            {
+                strArray2[j] = strArray[i];
+                j++;
+            }
+        }
+        String result = "";
+        //转为2进制数进行异或运算
+        int binaryNum = 0;
+        for (int i = 0; i < strArray2.length; i++)
+        {
+            int tempHexNum = Integer.parseInt(strArray2[i], 16);
+            String tempBinaryStr = Integer.toBinaryString(tempHexNum);
+            int tempBinaryNum = Integer.parseInt(tempBinaryStr);
+            if (i == 0)
+            {
+                binaryNum = tempBinaryNum;
+            }
+            else
+            {
+                binaryNum ^= tempBinaryNum;
+            }
+        }
+        return result;
     }
 
 }

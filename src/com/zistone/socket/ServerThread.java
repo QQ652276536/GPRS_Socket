@@ -3,6 +3,7 @@ package com.zistone.socket;
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -84,7 +85,7 @@ public class ServerThread extends Thread
                     //已经读完
                     if (inputStream.available() == 0)
                     {
-                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info+"\n");
+                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info + "\n");
                         //模拟业务处理Thread.sleep(10000);
                         String responseStr = "";
                         if (!"".equals(info))
