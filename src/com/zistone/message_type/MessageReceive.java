@@ -1,6 +1,8 @@
 package com.zistone.message_type;
 
+import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
+import com.zistone.bean.LocationInfo;
 import com.zistone.bean.MessageType;
 import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
@@ -32,7 +34,7 @@ public class MessageReceive
      */
     public String RecevieHexStr(String hexStr)
     {
-        CreateCheckCode(hexStr);
+        //CreateCheckCode(hexStr);
         String[] strArray = hexStr.split(" ");
         //前后两个标识位
         String flag1 = strArray[0];
@@ -147,27 +149,25 @@ public class MessageReceive
             {
                 m_logger.debug(">>>收到[位置信息汇报]的消息");
                 //需要先鉴权,即判断设备是否注册成功或已经注册过
-                if (true)
-                //if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
                 {
                     ClientLocation clientLocation = new ClientLocation(IP_WEB, PORT_WEB);
-                    //String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
-                    //返回受影响的行数
-                    //String line = clientLocation.ResponseHexStr(result);
-                    String line = "1";
+                    String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
+                    result = clientLocation.ResponseHexStr(result);
+                    //返回插入成功的对象
+                    LocationInfo locationInfo = JSON.parseObject(result, LocationInfo.class);
                     //平台通用应答(0x8001)
                     String responseStr = "7E";
                     //应答ID
                     responseStr += "8001";
-                    //                    responseStr += bodyPropertyStr;
+                    //responseStr += bodyPropertyStr;
                     responseStr += "0005";
                     responseStr += phoneStr;
                     responseStr += detailStr;
                     responseStr += detailStr;
                     responseStr += idStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                    //受影响的行数
-                    if ("1".equals(line))
+                    if (null != locationInfo)
                     {
                         m_logger.debug(">>>位置信息汇报成功");
                         responseStr += "00";
@@ -177,8 +177,8 @@ public class MessageReceive
                         m_logger.debug(">>>位置信息汇报失败");
                         responseStr += "01";
                     }
-                    responseStr += checkCode;
-                    //responseStr += "A4";
+                    //responseStr += checkCode;
+                    responseStr += "A4";
                     responseStr += "7E";
                     m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
                     return responseStr;

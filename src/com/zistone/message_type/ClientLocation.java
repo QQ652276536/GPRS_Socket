@@ -2,6 +2,7 @@ package com.zistone.message_type;
 
 import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
+import com.zistone.bean.LocationInfo;
 import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
@@ -54,12 +55,33 @@ public class ClientLocation
         String heightStr = ConvertUtil.StrArrayToStr(height);
         byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
         double heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
+        //速度
+        String[] speed = Arrays.copyOfRange(hexStrArray, 18, 20);
+        String speedStr = ConvertUtil.StrArrayToStr(speed);
+        byte[] speedBytes = ConvertUtil.HexStrToByteArray(speedStr);
+        double speedNum = ConvertUtil.ByteArray2ToInt(speedBytes);
+        //方向
+        String[] dir = Arrays.copyOfRange(hexStrArray, 20, 22);
+        String dirStr = ConvertUtil.StrArrayToStr(dir);
+        byte[] dirBytes = ConvertUtil.HexStrToByteArray(dirStr);
+        int dirNum = ConvertUtil.ByteArray2ToInt(dirBytes);
+        //时间
+        String[] time = Arrays.copyOfRange(hexStrArray, 22, 28);
+        String year = "20" + time[0];
+        String month = String.valueOf(time[1]).replace("0", "");
+        String day = time[2];
+        String hour = time[3];
+        String minute = time[4];
+        String second = time[5];
+        String timeStr = year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
         //由Web服务处理位置汇报
-        deviceInfo.setM_lat(latNum);
-        deviceInfo.setM_lot(lotNum);
-        deviceInfo.setM_height(heightNum);
-        String jsonStr = JSON.toJSONString(deviceInfo);
-        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/DeviceInfo/UpdateByDeviceId", jsonStr);
+        LocationInfo locationInfo = new LocationInfo();
+        locationInfo.setM_deviceId(deviceInfo.getM_deviceId());
+        locationInfo.setM_lat(deviceInfo.getM_lat());
+        locationInfo.setM_lot(deviceInfo.getM_lot());
+        locationInfo.setM_createTime(timeStr);
+        String jsonStr = JSON.toJSONString(locationInfo);
+        String result = new SocketHttp().SendPost(m_ip, m_port, "/Blowdown_Web/LocationInfo/Insert", jsonStr);
         m_logger.debug(">>>位置汇报返回:" + result);
         return result;
     }
@@ -71,8 +93,9 @@ public class ClientLocation
     public String ResponseHexStr(String result)
     {
         int beginIndex = result.indexOf("GMT");
-        int endIndex = result.indexOf("}");
-        result = result.substring(beginIndex + 3, endIndex);
+        result = result.substring(beginIndex + 3);
+        beginIndex = result.indexOf("{");
+        result = result.substring(beginIndex);
         return result;
     }
 }

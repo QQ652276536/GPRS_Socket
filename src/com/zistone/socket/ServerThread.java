@@ -85,7 +85,7 @@ public class ServerThread extends Thread
                     //已经读完
                     if (inputStream.available() == 0)
                     {
-                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info + "\n");
+                        m_logger.debug(">>>线程" + this.getId() + "接收到:" + info);
                         //模拟业务处理Thread.sleep(10000);
                         String responseStr = "";
                         if (!"".equals(info))
