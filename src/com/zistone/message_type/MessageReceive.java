@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.bean.DeviceInfo;
 import com.zistone.bean.LocationInfo;
 import com.zistone.bean.MessageType;
+import com.zistone.socket.SocketHttp;
 import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
@@ -25,6 +26,165 @@ public class MessageReceive
 
     private Logger m_logger = Logger.getLogger(MessageReceive.class);
     private DeviceInfo m_deviceInfo;
+
+    /**
+     * 终端鉴权
+     *
+     * @param akCode          鉴权码
+     * @param bodyPropertyStr 消息体属性
+     * @param phoneStr        手机号或设备ID
+     * @param detailStr       消息流水
+     * @param idStr           消息ID
+     * @return
+     */
+    private String Authoration(String akCode, String bodyPropertyStr, String phoneStr, String detailStr, String idStr)
+    {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_akCode(akCode);
+        String jsonStr = JSON.toJSONString(deviceInfo);
+        //由Web服务处理终端鉴权
+        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/FindByAKCode", jsonStr);
+        int beginIndex = result.indexOf("{");
+        int endIndex = result.lastIndexOf("}");
+        result = result.substring(beginIndex, endIndex + 1);
+        m_logger.debug(">>>终端鉴权返回:" + result);
+        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+        //平台通用应答(0x8001)
+        String responseStr = "7E";
+        //应答ID
+        responseStr += "8001";
+        responseStr += bodyPropertyStr;
+        responseStr += phoneStr;
+        responseStr += detailStr;
+        responseStr += detailStr;
+        responseStr += idStr;
+        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+        {
+            m_logger.debug(">>>终端鉴权成功");
+            responseStr += "00";
+        }
+        else
+        {
+            m_logger.debug(">>>终端鉴权失败");
+            responseStr += "01";
+        }
+        //                responseStr += checkCode;
+        responseStr += "A4";
+        responseStr += "7E";
+        m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
+        return responseStr;
+    }
+
+    /**
+     * 终端注册
+     *
+     * @param tempIdStr 设备编号
+     * @param typeStr   设备类型
+     * @param phoneStr  手机号或设备ID
+     * @param detailStr 消息流水
+     * @return
+     */
+    private String Register(String tempIdStr, String typeStr, String phoneStr, String detailStr)
+    {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_state(1);
+        deviceInfo.setM_deviceId(tempIdStr);
+        deviceInfo.setM_type(typeStr);
+        deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
+        String jsonStr = JSON.toJSONString(deviceInfo);
+        //由Web服务处理终端注册
+        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/Insert", jsonStr);
+        m_logger.debug(">>>终端注册返回:" + result);
+        result = result.substring(result.indexOf("{"));
+        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+        //终端注册应答（0x8100）
+        String responseStr = "7E";
+        //应答ID,对应终端消息的ID
+        responseStr += "8100";
+        //应答流水号,对应终端消息的流水号
+        //                responseStr += detailStr;
+        responseStr += "0005";
+        responseStr += phoneStr;
+        responseStr += detailStr;
+        responseStr += detailStr;
+        //                responseStr += idStr;
+        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+        {
+            String akCode = m_deviceInfo.getM_akCode();
+            m_logger.debug(">>>服务端生成的鉴权码:" + akCode);
+            //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
+            if (null != akCode && !"".equals(akCode))
+            {
+                m_logger.debug(">>>终端注册成功");
+                responseStr += "00";
+                //鉴权码
+                responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
+            }
+            else
+            {
+                m_logger.debug(">>>终端注册失败");
+                responseStr += "03";
+            }
+        }
+        responseStr += "A4";
+        responseStr += "7E";
+        m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
+        return responseStr;
+    }
+
+    /**
+     * 位置信息汇报
+     *
+     * @param timeStr   汇报时间
+     * @param phoneStr  手机号或设备ID
+     * @param detailStr 消息流水
+     * @param idStr     消息ID
+     * @return
+     */
+    private String Location(String timeStr, String phoneStr, String detailStr, String idStr)
+    {
+        LocationInfo locationInfo = new LocationInfo();
+        locationInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
+        locationInfo.setM_lat(m_deviceInfo.getM_lat());
+        locationInfo.setM_lot(m_deviceInfo.getM_lot());
+        locationInfo.setM_createTime(timeStr);
+        String jsonStr = JSON.toJSONString(locationInfo);
+        //由Web服务处理位置汇报
+        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", jsonStr);
+        m_logger.debug(">>>位置汇报返回:" + result);
+        int beginIndex = result.indexOf("GMT");
+        result = result.substring(beginIndex + 3);
+        beginIndex = result.indexOf("{");
+        result = result.substring(beginIndex);
+        locationInfo = JSON.parseObject(result, LocationInfo.class);
+        //平台通用应答(0x8001)
+        String responseStr = "7E";
+        //应答ID
+        responseStr += "8001";
+        //                    responseStr += bodyPropertyStr;
+        responseStr += "0005";
+        responseStr += phoneStr;
+        responseStr += detailStr;
+        responseStr += detailStr;
+        responseStr += idStr;
+        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+        if (null != locationInfo && locationInfo.getM_id() != 0)
+        {
+            m_logger.debug(">>>位置信息汇报成功");
+            responseStr += "00";
+        }
+        else
+        {
+            m_logger.debug(">>>位置信息汇报失败");
+            responseStr += "01";
+        }
+        //                    responseStr += checkCode;
+        responseStr += "A4";
+        responseStr += "7E";
+        m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
+        return responseStr;
+    }
 
     /**
      * 解析终端发送过来的16进制的Str
@@ -69,100 +229,112 @@ public class MessageReceive
         //终端手机号或终端ID
         String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
         String phoneStr = ConvertUtil.StrArrayToStr(phoneArray);
-        //消息流水号
+        //消息流水
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
         String detailStr = ConvertUtil.StrArrayToStr(detailArray);
         //消息包封装项
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
+        m_logger.debug(">>>校验码:" + checkCode + ",消息ID:" + idStr + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + phoneStr + "," + "消息流水:" + detailStr);
         //根据消息ID判断消息类型
         switch (idValue)
         {
             //终端注册
             case MessageType.CLIENTREGISTER:
             {
-                m_logger.debug(">>>收到[终端注册]的消息");
-                ClientRegister clientRegister = new ClientRegister(IP_WEB, PORT_WEB);
-                String result = clientRegister.RecevieHexStrArray(bodyArray, phoneStr);
-                m_deviceInfo = clientRegister.ResponseHexStr(result);
-                //终端注册应答（0x8100）
-                String responseStr = "7E";
-                //应答ID,对应终端消息的ID
-                responseStr += "8100";
-                //应答流水号,对应终端消息的流水号
-                //                responseStr += detailStr;
-                responseStr += "0005";
-                responseStr += phoneStr;
-                responseStr += detailStr;
-                responseStr += detailStr;
-                //                responseStr += idStr;
-                if (null != m_deviceInfo)
+                //省域代码
+                String[] capital = Arrays.copyOfRange(bodyArray, 0, 2);
+                String provinceStr = ConvertUtil.StrArrayToStr(capital);
+                //市县代码
+                String[] city = Arrays.copyOfRange(bodyArray, 2, 4);
+                String cityStr = ConvertUtil.StrArrayToStr(city);
+                //制造商
+                String[] manufacture = Arrays.copyOfRange(bodyArray, 4, 9);
+                String manufactureStr = ConvertUtil.StrArrayToStr(manufacture);
+                //终端型号
+                String[] type = Arrays.copyOfRange(bodyArray, 9, 29);
+                String typeStr = "";
+                //去除补位的零
+                for (String tempStr : type)
                 {
-                    String akCode = m_deviceInfo.getM_akCode();
-                    m_logger.debug(">>>服务端生成的鉴权码:" + akCode);
-                    //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
-                    if (null != akCode && !"".equals(akCode))
+                    if (!"00".equals(tempStr))
                     {
-                        m_logger.debug(">>>终端注册成功");
-                        responseStr += "00";
-                        //鉴权码
-                        responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
-                    }
-                    else
-                    {
-                        m_logger.debug(">>>终端注册失败");
-                        responseStr += "03";
+                        typeStr += tempStr;
                     }
                 }
-                responseStr += "A4";
-                responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
-                return responseStr;
+                typeStr = ConvertUtil.HexStrToStr(typeStr);
+                //终端ID
+                String[] id = Arrays.copyOfRange(bodyArray, 29, 36);
+                String tempIdStr = ConvertUtil.StrArrayToStr(id);
+                tempIdStr = idStr;
+                //车牌颜色
+                String[] carColor = Arrays.copyOfRange(bodyArray, 36, 37);
+                String carColorStr = ConvertUtil.StrArrayToStr(carColor);
+                //车辆标识(前两位为车牌归属地,后面为车牌号)
+                String[] carFlag1 = Arrays.copyOfRange(bodyArray, 37, 39);
+                String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
+                String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
+                m_logger.debug(">>>收到[终端注册]的消息\r\n省域代码:" + provinceStr + ",市县代码:" + cityStr + ",制造商:" + manufactureStr + ",终端型号:" + typeStr + ",终端ID:" + tempIdStr + ",车牌颜色:" + carColorStr + ",车牌号:" + carFlag2Str);
+                return Register(tempIdStr, typeStr, phoneStr, detailStr);
             }
             //终端鉴权
             case MessageType.CLIENTAK:
             {
-                m_logger.debug(">>>收到[终端鉴权]的消息");
-                ClientAuthentication clientAuthentication = new ClientAuthentication(IP_WEB, PORT_WEB);
-                String result = clientAuthentication.RecevieHexStrArray(bodyArray);
-                m_deviceInfo = clientAuthentication.ResponseHexStr(result);
-                //平台通用应答(0x8001)
-                String responseStr = "7E";
-                //应答ID
-                responseStr += "8001";
-                responseStr += bodyPropertyStr;
-                responseStr += phoneStr;
-                responseStr += detailStr;
-                responseStr += detailStr;
-                responseStr += idStr;
-                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
-                {
-                    m_logger.debug(">>>终端鉴权成功");
-                    responseStr += "00";
-                }
-                else
-                {
-                    m_logger.debug(">>>终端鉴权失败");
-                    responseStr += "01";
-                }
-                //                responseStr += checkCode;
-                responseStr += "A4";
-                responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
-                return responseStr;
+                String hexAKCode = ConvertUtil.StrArrayToStr(bodyArray);
+                String akCode = ConvertUtil.HexStrToStr(hexAKCode);
+                m_logger.debug(">>>收到[终端鉴权]的消息\r\n鉴权码:" + akCode + "16进制(" + hexAKCode + ")");
+                return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr);
             }
             //位置信息汇报
             case MessageType.LOCATIONREPORT:
             {
-                m_logger.debug(">>>收到[位置信息汇报]的消息");
                 //需要先鉴权,即判断设备是否注册成功或已经注册过
                 if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                 {
-                    ClientLocation clientLocation = new ClientLocation(IP_WEB, PORT_WEB);
-                    String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
-                    //返回插入成功的对象
-                    LocationInfo locationInfo = clientLocation.ResponseHexStr(result);
-                    //平台通用应答(0x8001)
+                    //报警标志
+                    String[] warningFlag = Arrays.copyOfRange(bodyArray, 0, 4);
+                    String warningStr = ConvertUtil.StrArrayToStr(warningFlag);
+                    //状态
+                    String[] state = Arrays.copyOfRange(bodyArray, 4, 8);
+                    String stateStr = ConvertUtil.StrArrayToStr(state);
+                    //纬度
+                    String[] lat = Arrays.copyOfRange(bodyArray, 8, 12);
+                    String latStr = ConvertUtil.StrArrayToStr(lat);
+                    byte[] latBytes = ConvertUtil.HexStrToByteArray(latStr);
+                    double latNum = (double) ConvertUtil.ByteArray4ToLong(latBytes) / 1000000;
+                    //经度
+                    String[] lot = Arrays.copyOfRange(bodyArray, 12, 16);
+                    String lotStr = ConvertUtil.StrArrayToStr(lot);
+                    byte[] lotBytes = ConvertUtil.HexStrToByteArray(lotStr);
+                    double lotNum = (double) ConvertUtil.ByteArray4ToLong(lotBytes) / 1000000;
+                    //海拔
+                    String[] height = Arrays.copyOfRange(bodyArray, 16, 18);
+                    String heightStr = ConvertUtil.StrArrayToStr(height);
+                    byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
+                    double heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
+                    //速度
+                    String[] speed = Arrays.copyOfRange(bodyArray, 18, 20);
+                    String speedStr = ConvertUtil.StrArrayToStr(speed);
+                    byte[] speedBytes = ConvertUtil.HexStrToByteArray(speedStr);
+                    double speedNum = ConvertUtil.ByteArray2ToInt(speedBytes);
+                    //方向
+                    String[] dir = Arrays.copyOfRange(bodyArray, 20, 22);
+                    String dirStr = ConvertUtil.StrArrayToStr(dir);
+                    byte[] dirBytes = ConvertUtil.HexStrToByteArray(dirStr);
+                    int dirNum = ConvertUtil.ByteArray2ToInt(dirBytes);
+                    //时间
+                    String[] time = Arrays.copyOfRange(bodyArray, 22, 28);
+                    String year = "20" + time[0];
+                    String month = String.valueOf(time[1]).replace("0", "");
+                    String day = time[2];
+                    String hour = time[3];
+                    String minute = time[4];
+                    String second = time[5];
+                    String timeStr = year + "/" + month + "/" + day + " " + hour + ":" + minute + ":" + second;
+                    m_logger.debug(">>>收到[位置信息汇报]的消息\r\n报警标志:" + warningStr + ",状态:" + stateStr + ",纬度:" + latNum + ",经度:" + lotNum + "," + "海拨:" + heightNum + ",速度:" + speedNum + ",方向:" + dirNum + ",汇报时间:" + timeStr);
+                    return Location(timeStr, phoneStr, detailStr, idStr);
+                }
+                else
+                {
                     String responseStr = "7E";
                     //应答ID
                     responseStr += "8001";
@@ -173,26 +345,12 @@ public class MessageReceive
                     responseStr += detailStr;
                     responseStr += idStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                    if (null != locationInfo && locationInfo.getM_id() != 0)
-                    {
-                        m_logger.debug(">>>位置信息汇报成功");
-                        responseStr += "00";
-                    }
-                    else
-                    {
-                        m_logger.debug(">>>位置信息汇报失败");
-                        responseStr += "01";
-                    }
+                    responseStr += "01";
                     //                    responseStr += checkCode;
                     responseStr += "A4";
                     responseStr += "7E";
-                    m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
-                    return responseStr;
-                }
-                else
-                {
                     m_logger.error(">>>位置信息汇报失败,需要先鉴权!\r\n");
-                    break;
+                    return responseStr;
                 }
             }
             //终端心跳,消息体为空
