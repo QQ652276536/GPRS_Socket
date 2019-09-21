@@ -86,10 +86,15 @@ public class MessageReceive
                 m_deviceInfo = clientRegister.ResponseHexStr(result);
                 //终端注册应答（0x8100）
                 String responseStr = "7E";
-                //应答ID,对应终端消息的ID(终端注册应答不需要应答ID)
-                //responseStr += "8100";
+                //应答ID,对应终端消息的ID
+                responseStr += "8100";
                 //应答流水号,对应终端消息的流水号
+                //                responseStr += detailStr;
+                responseStr += "0005";
+                responseStr += phoneStr;
                 responseStr += detailStr;
+                responseStr += detailStr;
+                //                responseStr += idStr;
                 if (null != m_deviceInfo)
                 {
                     String akCode = m_deviceInfo.getM_akCode();
@@ -99,17 +104,18 @@ public class MessageReceive
                     {
                         m_logger.debug(">>>终端注册成功");
                         responseStr += "00";
+                        //鉴权码
+                        responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                     }
                     else
                     {
                         m_logger.debug(">>>终端注册失败");
                         responseStr += "03";
                     }
-                    //鉴权码
-                    responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
                 }
+                responseStr += "A4";
                 responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
                 return responseStr;
             }
             //终端鉴权
@@ -129,7 +135,7 @@ public class MessageReceive
                 responseStr += detailStr;
                 responseStr += idStr;
                 //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                 {
                     m_logger.debug(">>>终端鉴权成功");
                     responseStr += "00";
@@ -139,9 +145,10 @@ public class MessageReceive
                     m_logger.debug(">>>终端鉴权失败");
                     responseStr += "01";
                 }
-                responseStr += checkCode;
+                //                responseStr += checkCode;
+                responseStr += "A4";
                 responseStr += "7E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
                 return responseStr;
             }
             //位置信息汇报
@@ -149,25 +156,24 @@ public class MessageReceive
             {
                 m_logger.debug(">>>收到[位置信息汇报]的消息");
                 //需要先鉴权,即判断设备是否注册成功或已经注册过
-                if (null != m_deviceInfo && null != m_deviceInfo.getM_akCode() && !"".equals(m_deviceInfo.getM_akCode()))
+                if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                 {
                     ClientLocation clientLocation = new ClientLocation(IP_WEB, PORT_WEB);
                     String result = clientLocation.RecevieHexStrArray(m_deviceInfo, bodyArray);
-                    result = clientLocation.ResponseHexStr(result);
                     //返回插入成功的对象
-                    LocationInfo locationInfo = JSON.parseObject(result, LocationInfo.class);
+                    LocationInfo locationInfo = clientLocation.ResponseHexStr(result);
                     //平台通用应答(0x8001)
                     String responseStr = "7E";
                     //应答ID
                     responseStr += "8001";
-                    //responseStr += bodyPropertyStr;
+                    //                    responseStr += bodyPropertyStr;
                     responseStr += "0005";
                     responseStr += phoneStr;
                     responseStr += detailStr;
                     responseStr += detailStr;
                     responseStr += idStr;
                     //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                    if (null != locationInfo)
+                    if (null != locationInfo && locationInfo.getM_id() != 0)
                     {
                         m_logger.debug(">>>位置信息汇报成功");
                         responseStr += "00";
@@ -177,15 +183,15 @@ public class MessageReceive
                         m_logger.debug(">>>位置信息汇报失败");
                         responseStr += "01";
                     }
-                    //responseStr += checkCode;
+                    //                    responseStr += checkCode;
                     responseStr += "A4";
                     responseStr += "7E";
-                    m_logger.debug(">>>生成的响应内容:" + responseStr + "\n");
+                    m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
                     return responseStr;
                 }
                 else
                 {
-                    m_logger.error(">>>位置信息汇报失败,需要先鉴权!\n");
+                    m_logger.error(">>>位置信息汇报失败,需要先鉴权!\r\n");
                     break;
                 }
             }
@@ -193,7 +199,32 @@ public class MessageReceive
             case MessageType.CLIENTHEARTBEAT:
             {
                 m_logger.debug(">>>收到[终端心跳]的消息");
-                return "";
+                String responseStr = "7E8001007E";
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
+                return responseStr;
+            }
+            //终端通用应答
+            case MessageType.CLIENTRESPONSE:
+            {
+                m_logger.debug(">>>收到[终端通用应答]的消息");
+                //平台通用应答(0x8001)
+                String responseStr = "7E";
+                //应答ID
+                responseStr += "8001";
+                responseStr += bodyPropertyStr;
+                //                responseStr += "0009";
+                responseStr += phoneStr;
+                responseStr += detailStr;
+                responseStr += detailStr;
+                responseStr += idStr;
+                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+                responseStr += "00";
+                //                responseStr += checkCode;
+                responseStr += "A4";
+                responseStr += "7E";
+                responseStr = "7E8001" + detailStr + idStr + "007E";
+                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
+                return responseStr;
             }
             default:
                 break;

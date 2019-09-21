@@ -3,7 +3,6 @@ package com.zistone.socket;
 import com.zistone.message_type.MessageReceive;
 import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -16,6 +15,7 @@ public class ServerThread extends Thread
 {
     //心跳超时时间
     private static int TIMEOUT;
+    private static boolean m_isRunOnlyOne = false;
 
     static
     {
@@ -98,6 +98,15 @@ public class ServerThread extends Thread
                         outputStream.flush();
                         //重置接收的数据
                         info = "";
+                        if(m_isRunOnlyOne)
+                        {
+                            m_isRunOnlyOne=true;
+                            String aaa = "7E810300000001040000000A007E";
+                            byte[] byteArray2222 = ConvertUtil.HexStrToByteArray(aaa);
+                            outputStream.write(byteArray2222);
+                            outputStream.flush();
+                            m_logger.debug(">>>执行下发命令:"+aaa);
+                        }
                     }
                 }
             }
@@ -109,7 +118,7 @@ public class ServerThread extends Thread
         //关闭资源
         finally
         {
-            m_logger.debug(">>>线程" + this.getId() + "的连接已断开\n");
+            m_logger.debug(">>>线程" + this.getId() + "的连接已断开\r\n");
             try
             {
                 if (outputStream != null)

@@ -90,12 +90,12 @@ public class ClientLocation
      * @param result
      * @return
      */
-    public String ResponseHexStr(String result)
+    public LocationInfo ResponseHexStr(String result)
     {
         int beginIndex = result.indexOf("GMT");
         result = result.substring(beginIndex + 3);
         beginIndex = result.indexOf("{");
         result = result.substring(beginIndex);
-        return result;
+        return JSON.parseObject(result, LocationInfo.class);
     }
 }

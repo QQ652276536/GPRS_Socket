@@ -47,7 +47,21 @@ public class ClientAuthentication
      */
     public DeviceInfo ResponseHexStr(String result)
     {
-        result = result.substring(result.indexOf("{"));
-        return JSON.parseObject(result, DeviceInfo.class);
+        try
+        {
+            int beginIndex = result.indexOf("{");
+            int endIndex = result.lastIndexOf("}");
+            result = result.substring(beginIndex, endIndex + 1);
+            m_logger.debug(">>>鉴权返回的JSON字符串:" + result);
+            return JSON.parseObject(result, DeviceInfo.class);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            return null;
+        }
     }
 }

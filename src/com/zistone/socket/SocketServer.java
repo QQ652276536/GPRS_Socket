@@ -21,7 +21,7 @@ public class SocketServer
     {
         try
         {
-            m_logger.debug(">>>Socket服务启动,端口:" + PORT_SOCKET + ",等待终端连接...\n");
+            m_logger.debug(">>>Socket服务启动,端口:" + PORT_SOCKET + ",等待终端连接...\r\n");
             ServerSocket server = new ServerSocket(PORT_SOCKET);
             int count = 0;
             while (true)

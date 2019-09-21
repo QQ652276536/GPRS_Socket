@@ -16,7 +16,7 @@ public class ConvertUtil
         System.out.println("____________________________________________________________________");
         //测试通过
         System.out.println("普通Str转16进制Str:" + StrToHexStr("james-demo"));
-        System.out.println("16进制Str转普通Str:" + HexStrToStr("1B041B03020000"));
+        System.out.println("16进制Str转普通Str:" + HexStrToStr("3135713633314434"));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("LiWei"));

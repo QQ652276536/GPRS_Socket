@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.stream.Stream;
 
 public class SocketHttp
 {
@@ -54,16 +55,27 @@ public class SocketHttp
             m_bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
             String line;
             String result = "";
-            while ((line = m_bufferedReader.readLine()) != null)
+            //                        while ((line = m_bufferedReader.readLine()) != null)
+            //                        {
+            //                            m_logger.debug(line);
+            //                            result += line;
+            //                            if (line.endsWith("}"))
+            //                            {
+            //                                m_logger.debug(">>>内容读取完毕");
+            //                                return result;
+            //                            }
+            //                        }
+            Stream<String> streams = m_bufferedReader.lines();
+            Object[] array = streams.toArray();
+            int lineCount = array.length;
+            for (int i = 0; i < lineCount; i++)
             {
+                line = array[i].toString();
                 m_logger.debug(line);
                 result += line;
-                if (line.endsWith("}"))
-                {
-                    m_logger.debug(">>>内容读取完毕");
-                    return result;
-                }
             }
+            m_logger.debug(">>>内容读取完毕");
+            return result;
         }
         catch (Exception e)
         {
