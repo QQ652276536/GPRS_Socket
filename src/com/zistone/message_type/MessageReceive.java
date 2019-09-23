@@ -275,7 +275,7 @@ public class MessageReceive
                 //终端ID
                 String[] id = Arrays.copyOfRange(bodyArray, 29, 36);
                 String tempIdStr = ConvertUtil.StrArrayToStr(id);
-                tempIdStr = idStr;
+                tempIdStr = "Test" + idStr;
                 //车牌颜色
                 String[] carColor = Arrays.copyOfRange(bodyArray, 36, 37);
                 String carColorStr = ConvertUtil.StrArrayToStr(carColor);
@@ -303,7 +303,6 @@ public class MessageReceive
                 if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                 {
                     m_deviceInfo = new DeviceInfo();
-                    m_deviceInfo.setM_deviceId("0100");
                     //报警标志
                     String[] warningFlag = Arrays.copyOfRange(bodyArray, 0, 4);
                     String warningStr = ConvertUtil.StrArrayToStr(warningFlag);
