@@ -97,13 +97,15 @@ public class ServerThread extends Thread
                         outputStream.flush();
                         //重置接收的数据
                         info = "";
-                        if (messageReceive.m_isRunFlag)
+                        if (messageReceive.m_isRunFlag && 1 > 2)
                         {
                             messageReceive.m_isRunFlag = false;
                             String reponseStr = "7E8103";
+                            reponseStr += "00";
                             reponseStr += "01";
+                            reponseStr += "551030006334";
                             reponseStr += "000000010400000005";
-                            reponseStr += "007E";
+                            reponseStr += "7E";
                             byte[] tempByteArray = ConvertUtil.HexStrToByteArray(reponseStr);
                             outputStream.write(tempByteArray);
                             outputStream.flush();
