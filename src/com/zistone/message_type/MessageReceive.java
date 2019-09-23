@@ -302,7 +302,6 @@ public class MessageReceive
                 //需要先鉴权,即判断设备是否注册成功或已经注册过
                 if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                 {
-                    m_deviceInfo = new DeviceInfo();
                     //报警标志
                     String[] warningFlag = Arrays.copyOfRange(bodyArray, 0, 4);
                     String warningStr = ConvertUtil.StrArrayToStr(warningFlag);
