@@ -8,11 +8,9 @@ public class DeviceInfo
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name
-                + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height="
-                + m_height + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_createTime) + ", m_updateTime="
-                + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='"
-                + m_akCode + '\'' + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(m_createTime) + ", m_updateTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
     }
 
     /**

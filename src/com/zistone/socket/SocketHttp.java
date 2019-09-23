@@ -55,25 +55,27 @@ public class SocketHttp
             m_bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
             String line;
             String result = "";
-            //                        while ((line = m_bufferedReader.readLine()) != null)
-            //                        {
-            //                            m_logger.debug(line);
-            //                            result += line;
-            //                            if (line.endsWith("}"))
-            //                            {
-            //                                m_logger.debug(">>>内容读取完毕");
-            //                                return result;
-            //                            }
-            //                        }
-            Stream<String> streams = m_bufferedReader.lines();
-            Object[] array = streams.toArray();
-            int lineCount = array.length;
-            for (int i = 0; i < lineCount; i++)
+            while ((line = m_bufferedReader.readLine()) != null)
             {
-                line = array[i].toString();
                 m_logger.debug(line);
                 result += line;
+                //TODO:如果Web服务没有返回实体,那么这里将不会执行,直到超时
+                if (line.contains("}"))
+                {
+                    m_logger.debug(">>>内容读取完毕");
+                    break;
+                }
             }
+
+            //            Stream<String> streams = m_bufferedReader.lines();
+            //            Object[] array = streams.toArray();
+            //            int lineCount = array.length;
+            //            for (int i = 0; i < lineCount; i++)
+            //            {
+            //                line = array[i].toString();
+            //                m_logger.debug(line);
+            //                result += line;
+            //            }
             m_logger.debug(">>>内容读取完毕");
             return result;
         }
