@@ -15,7 +15,6 @@ public class ServerThread extends Thread
 {
     //心跳超时时间
     private static int TIMEOUT;
-    private static boolean m_isRunOnlyOne = false;
 
     static
     {
@@ -98,14 +97,17 @@ public class ServerThread extends Thread
                         outputStream.flush();
                         //重置接收的数据
                         info = "";
-                        if(m_isRunOnlyOne)
+                        if (messageReceive.m_isRunFlag)
                         {
-                            m_isRunOnlyOne=true;
-                            String aaa = "7E810300000001040000000A007E";
-                            byte[] byteArray2222 = ConvertUtil.HexStrToByteArray(aaa);
-                            outputStream.write(byteArray2222);
+                            messageReceive.m_isRunFlag = false;
+                            String reponseStr = "7E8103";
+                            reponseStr += "01";
+                            reponseStr += "000000010400000005";
+                            reponseStr += "007E";
+                            byte[] tempByteArray = ConvertUtil.HexStrToByteArray(reponseStr);
+                            outputStream.write(tempByteArray);
                             outputStream.flush();
-                            m_logger.debug(">>>执行下发命令:"+aaa);
+                            m_logger.debug("\r\n>>>位置信息汇报成功,执行下发命令:" + reponseStr + "\r\n");
                         }
                     }
                 }

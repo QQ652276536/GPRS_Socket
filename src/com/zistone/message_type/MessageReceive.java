@@ -18,6 +18,7 @@ public class MessageReceive
     private static String IP_WEB;
     //Web服务端口
     private static int PORT_WEB;
+    public boolean m_isRunFlag = false;
 
     static
     {
@@ -183,6 +184,7 @@ public class MessageReceive
         {
             m_logger.debug(">>>位置信息汇报成功");
             responseStr += "00";
+            m_isRunFlag = true;
         }
         else
         {
