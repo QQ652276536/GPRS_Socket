@@ -97,16 +97,36 @@ public class ServerThread extends Thread
                         outputStream.flush();
                         //重置接收的数据
                         info = "";
-                        if (messageReceive.m_isRunFlag && 1 > 2)
+                        if (messageReceive.m_isRunFlag)
                         {
                             messageReceive.m_isRunFlag = false;
-                            String reponseStr = "7E8103";
-                            reponseStr += "00";
-                            reponseStr += "01";
-                            reponseStr += "551030006334";
-                            reponseStr += "000000010400000005";
-                            reponseStr += "7E";
+                            String str = "81 03";
+                            //消息体属性
+                            str += " 00 0A";
+                            //手机号或设备ID
+                            str += " 55 10 30 00 63 34";
+                            //消息流水
+                            String temp0 = messageReceive.m_detailStr[0];
+                            String temp1 = messageReceive.m_detailStr[1];
+                            int temp2 = Integer.parseInt(temp1, 16) + 1;
+                            //不够两位前面补零
+                            String temp3 = Integer.toHexString(temp2);
+                            if (temp3.length() <= 1)
+                            {
+                                temp3 = "0" + temp3;
+                            }
+                            str += " " + temp0 + " " + temp3;
+                            m_logger.debug("生成新的流水号:" + temp0 + temp3);
+                            //str += " 1F FB";
+                            //参数总数
+                            str += " 01";
+                            //参数列表
+                            str += " 00 00 00 01 04 00 00 00 14";
+                            //校验码
+                            String checkCode = messageReceive.CreateCheckCode(str);
+                            String reponseStr = ("7E" + str + checkCode + "7E").replaceAll(" ", "");
                             byte[] tempByteArray = ConvertUtil.HexStrToByteArray(reponseStr);
+                            tempByteArray = ConvertUtil.HexStrToByteArray("7E8103000A55103000633419B501000000010400000014167E");
                             outputStream.write(tempByteArray);
                             outputStream.flush();
                             m_logger.debug("\r\n>>>位置信息汇报成功,执行下发命令:" + reponseStr + "\r\n");

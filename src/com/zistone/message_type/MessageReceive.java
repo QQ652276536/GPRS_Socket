@@ -19,6 +19,7 @@ public class MessageReceive
     //Web服务端口
     private static int PORT_WEB;
     public boolean m_isRunFlag = false;
+    public String[] m_detailStr;
 
     static
     {
@@ -206,7 +207,6 @@ public class MessageReceive
      */
     public String RecevieHexStr(String hexStr)
     {
-        //CreateCheckCode(hexStr);
         String[] strArray = hexStr.split(" ");
         //前后两个标识位
         String flag1 = strArray[0];
@@ -244,6 +244,7 @@ public class MessageReceive
         //消息流水
         String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
         String detailStr = ConvertUtil.StrArrayToStr(detailArray);
+        m_detailStr = detailArray;
         //消息包封装项
         String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
         m_logger.debug(">>>校验码:" + checkCode + ",消息ID:" + idStr + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + phoneStr + "," + "消息流水:" + detailStr);
@@ -409,43 +410,54 @@ public class MessageReceive
      * 生成校验码
      * 将收到的消息还原转义后去除标识和校验位,然后按位异或得到的结果就是校验码
      *
+     * @param hexStr 带空格不带0x的16进制字符串
      * @return
      */
-    private String CreateCheckCode(String hexStr)
+    public String CreateCheckCode(String hexStr)
     {
+        int binaryNum = 0;
         String[] strArray = hexStr.split(" ");
-        String[] strArray2 = new String[strArray.length - 3];
-        int j = 0;
         for (int i = 0; i < strArray.length; i++)
         {
-            if (i == 0 || i == strArray.length - 2 || i == strArray.length - 1)
-            {
-                continue;
-            }
-            else
-            {
-                strArray2[j] = strArray[i];
-                j++;
-            }
-        }
-        String result = "";
-        //转为2进制数进行异或运算
-        int binaryNum = 0;
-        for (int i = 0; i < strArray2.length; i++)
-        {
-            int tempHexNum = Integer.parseInt(strArray2[i], 16);
-            String tempBinaryStr = Integer.toBinaryString(tempHexNum);
-            int tempBinaryNum = Integer.parseInt(tempBinaryStr);
+            int tempHexNum = Integer.parseInt(strArray[i], 16);
             if (i == 0)
             {
-                binaryNum = tempBinaryNum;
+                binaryNum = tempHexNum;
             }
             else
             {
-                binaryNum ^= tempBinaryNum;
+                binaryNum ^= tempHexNum;
             }
         }
-        return result;
+        return Integer.toHexString(binaryNum);
+    }
+
+    public static void main(String[] args)
+    {
+        String str = "81 03";
+        //消息体属性
+        str += " 00 0A";
+        //手机号或设备ID
+        str += " 55 10 30 00 63 34";
+        //消息流水
+        String temp0 = "20";
+        String temp1 = "0A";
+        int temp2 = Integer.parseInt(temp1, 16) + 1;
+        //不够两位前面补零
+        String temp3 = Integer.toHexString(temp2);
+        if (temp3.length() <= 1)
+        {
+            temp3 = "0" + temp3;
+        }
+        str += " " + temp0 + " " + temp3;
+        //str += " 1F FB";
+        //参数总数
+        str += " 01";
+        //参数列表
+        str += " 00 00 00 01 04 00 00 00 14";
+        //        System.out.println(new MessageReceive().CreateCheckCode("81 03 00 0A 55 10 30 00 63 34 19 B5 01 00 00 00 01 04 00 00 00
+        //        14"));
+        System.out.println(new MessageReceive().CreateCheckCode(str));
     }
 
 }
