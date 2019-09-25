@@ -102,7 +102,7 @@ public class ServerThread extends Thread
                             messageReceive.m_isRunFlag = false;
                             String str = "81 03";
                             //消息体属性
-                            str += " 00 0A";
+                            str += " 00 29";
                             //手机号或设备ID
                             str += " 55 10 30 00 63 34";
                             //消息流水
@@ -119,17 +119,34 @@ public class ServerThread extends Thread
                             m_logger.debug("生成新的流水号:" + temp0 + temp3);
                             //str += " 1F FB";
                             //参数总数
-                            str += " 01";
+                            str += " 08";
                             //参数列表
-                            str += " 00 00 00 01 04 00 00 00 14";
+                            //终端心跳间隔(10秒)
+                            str += " 00 01 02 00 14";
+                            //TCP消息应答超时时间(30秒)
+                            str += " 00 02 02 00 1E";
+                            //TCP消息重传次数(3次)
+                            str += " 00 03 02 00 03";
+                            //UDP消息应答超时时间(30秒)
+                            str += " 00 04 02 00 1E";
+                            //UDP消息重传次数(3次)
+                            str += " 00 05 02 00 03";
+                            //位置汇报策略(0定时1定距2定时定距)
+                            str += " 00 20 02 00 00";
+                            //终端工作模式(跟踪)
+                            str += " 00 08 02 00 01";
+                            //跟踪模式有效时长(3600秒)
+                            str += " 00 0B 02 0E 10";
+                            //跟踪模式间隔(10秒)
+                            str += " 00 0B 02 00 0A";
                             //校验码
                             String checkCode = messageReceive.CreateCheckCode(str);
                             String reponseStr = ("7E" + str + checkCode + "7E").replaceAll(" ", "");
                             byte[] tempByteArray = ConvertUtil.HexStrToByteArray(reponseStr);
-                            tempByteArray = ConvertUtil.HexStrToByteArray("7E8103000A55103000633419B501000000010400000014167E");
+                            //tempByteArray = ConvertUtil.HexStrToByteArray("7E8103000A55103000633419B501000000010400000014167E");
                             outputStream.write(tempByteArray);
                             outputStream.flush();
-                            m_logger.debug("\r\n>>>位置信息汇报成功,执行下发命令:" + reponseStr + "\r\n");
+                            m_logger.debug("\r\n>>>执行下发命令:" + reponseStr + "\r\n");
                         }
                     }
                 }

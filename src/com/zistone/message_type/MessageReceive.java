@@ -133,6 +133,7 @@ public class MessageReceive
         {
             m_logger.debug(">>>终端鉴权成功");
             responseStr += "00";
+            m_isRunFlag = true;
         }
         else
         {
@@ -185,7 +186,6 @@ public class MessageReceive
         {
             m_logger.debug(">>>位置信息汇报成功");
             responseStr += "00";
-            m_isRunFlag = true;
         }
         else
         {
@@ -372,32 +372,13 @@ public class MessageReceive
             case MessageType.CLIENTHEARTBEAT:
             {
                 m_logger.debug(">>>收到[终端心跳]的消息");
-                String responseStr = "7E8001007E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
-                return responseStr;
+                break;
             }
             //终端通用应答
             case MessageType.CLIENTRESPONSE:
             {
                 m_logger.debug(">>>收到[终端通用应答]的消息");
-                //平台通用应答(0x8001)
-                String responseStr = "7E";
-                //应答ID
-                responseStr += "8001";
-                responseStr += bodyPropertyStr;
-                //                responseStr += "0009";
-                responseStr += phoneStr;
-                responseStr += detailStr;
-                responseStr += detailStr;
-                responseStr += idStr;
-                //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                responseStr += "00";
-                //                responseStr += checkCode;
-                responseStr += "A4";
-                responseStr += "7E";
-                responseStr = "7E8001" + detailStr + idStr + "007E";
-                m_logger.debug(">>>生成的响应内容:" + responseStr + "\r\n");
-                return responseStr;
+                break;
             }
             default:
                 break;
