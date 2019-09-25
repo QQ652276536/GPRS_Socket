@@ -439,6 +439,38 @@ public class MessageReceive
         //        System.out.println(new MessageReceive().CreateCheckCode("81 03 00 0A 55 10 30 00 63 34 19 B5 01 00 00 00 01 04 00 00 00
         //        14"));
         System.out.println(new MessageReceive().CreateCheckCode(str));
+
+
+        String paramStr = "09";
+        //参数列表
+        //终端心跳间隔(10秒)
+        paramStr += " 00 01 02 00 14";
+        //TCP消息应答超时时间(30秒)
+        paramStr += " 00 02 02 00 1E";
+        //TCP消息重传次数(3次)
+        paramStr += " 00 03 02 00 03";
+        //UDP消息应答超时时间(30秒)
+        paramStr += " 00 04 02 00 1E";
+        //UDP消息重传次数(3次)
+        paramStr += " 00 05 02 00 03";
+        //位置汇报策略(0定时1定距2定时定距)
+        paramStr += " 00 20 02 00 00";
+        //缺省时间汇报间隔
+        paramStr += " 00 29 02 00 14";
+        //终端工作模式(跟踪)
+        paramStr += " 00 08 02 00 01";
+        //跟踪模式有效时长(3600秒)
+        paramStr += " 00 0B 02 0E 10";
+        //跟踪模式间隔(10秒)
+        paramStr += " 00 0B 02 00 0A";
+        //消息体属性
+        int paramSize = paramStr.split(" ").length;
+        String hexParamSize = Integer.toHexString(paramSize);
+        if (hexParamSize.length() <= 1)
+        {
+            hexParamSize = "0" + hexParamSize;
+        }
+        System.out.println(hexParamSize);
     }
 
 }
