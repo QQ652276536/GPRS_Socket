@@ -1,9 +1,18 @@
-import com.zistone.socket.SocketServer;
+import com.zistone.socket.Server_GPRS;
+
+import java.io.IOException;
 
 public class Main
 {
     public static void main(String[] args)
     {
-        new SocketServer();
+        try
+        {
+            new Server_GPRS().start();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
