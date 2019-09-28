@@ -99,7 +99,7 @@ public class Server_GPRS extends Thread
                         //重置接收的数据
                         info = "";
                         m_logger.debug(">>>GPRS线程" + this.getId() + "生成的响应内容:" + responseStr);
-                        break;
+
                         //                        Thread.sleep(1000);
                         //                        TestSendComm(messageReceive_gprs,outputStream);
                     }
