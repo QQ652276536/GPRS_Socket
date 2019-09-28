@@ -6,7 +6,6 @@ import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -14,28 +13,24 @@ import java.net.Socket;
  */
 public class Server_GPRS extends Thread
 {
-    //Socket端口
-    private static int SOCKETPORT;
     //心跳超时时间
     private static int TIMEOUT;
 
     static
     {
-        SOCKETPORT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
         TIMEOUT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
     }
 
     private Socket m_socket;
-    private ServerSocket m_serverSocket;
     private Logger m_logger = Logger.getLogger(Server_GPRS.class);
     //接收到数据的最新时间
     private long m_lastReceiveTime = System.currentTimeMillis();
     //该线程是否正在运行
     private boolean m_isRuning = false;
 
-    public Server_GPRS() throws IOException
+    public Server_GPRS(Socket socket)
     {
-        m_serverSocket = new ServerSocket(SOCKETPORT);
+        m_socket = socket;
     }
 
     @Override
@@ -67,49 +62,46 @@ public class Server_GPRS extends Thread
             //按byte读
             byte[] bytes = new byte[1];
             MessageReceive_GPRS messageReceive_gprs = new MessageReceive_GPRS();
-            while (true)
+            inputStream = m_socket.getInputStream();
+            outputStream = m_socket.getOutputStream();
+            while (m_isRuning)
             {
-                m_socket = m_serverSocket.accept();
-                inputStream = m_socket.getInputStream();
-                outputStream = m_socket.getOutputStream();
-                while (m_isRuning)
+                //检测心跳
+                if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
                 {
-                    //检测心跳
-                    if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
+                    m_isRuning = false;
+                    m_logger.debug(">>>线程" + this.getId() + "的连接已超时");
+                    //跳出,执行finally块
+                    break;
+                }
+                //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+                if (inputStream.available() > 0)
+                {
+                    //重置接收到数据的最新时间
+                    m_lastReceiveTime = System.currentTimeMillis();
+                    inputStream.read(bytes);
+                    String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
+                    info += tempStr;
+                    //已经读完
+                    if (inputStream.available() == 0)
                     {
-                        m_isRuning = false;
-                        m_logger.debug(">>>线程" + this.getId() + "的连接已超时");
-                        //跳出,执行finally块
-                        break;
-                    }
-                    //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-                    if (inputStream.available() > 0)
-                    {
-                        //重置接收到数据的最新时间
-                        m_lastReceiveTime = System.currentTimeMillis();
-                        inputStream.read(bytes);
-                        String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
-                        info += tempStr;
-                        //已经读完
-                        if (inputStream.available() == 0)
+                        m_logger.debug(">>>GPRS线程" + this.getId() + "接收到:" + info);
+                        //模拟业务处理Thread.sleep(1000);
+                        String responseStr = "";
+                        if (!"".equals(info))
                         {
-                            m_logger.debug(">>>GPRS线程" + this.getId() + "接收到:" + info);
-                            //模拟业务处理Thread.sleep(1000);
-                            String responseStr = "";
-                            if (!"".equals(info))
-                            {
-                                //解析收到的内容并响应
-                                responseStr = messageReceive_gprs.RecevieHexStr(info);
-                            }
-                            byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
-                            outputStream.write(byteArray);
-                            outputStream.flush();
-                            //重置接收的数据
-                            info = "";
-                            m_logger.debug(">>>GPRS线程" + this.getId() + "生成的响应内容:" + responseStr);
-                            //                        Thread.sleep(1000);
-                            //                        TestSendComm(messageReceive_gprs,outputStream);
+                            //解析收到的内容并响应
+                            responseStr = messageReceive_gprs.RecevieHexStr(info);
                         }
+                        byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
+                        outputStream.write(byteArray);
+                        outputStream.flush();
+                        //重置接收的数据
+                        info = "";
+                        m_logger.debug(">>>GPRS线程" + this.getId() + "生成的响应内容:" + responseStr);
+                        break;
+                        //                        Thread.sleep(1000);
+                        //                        TestSendComm(messageReceive_gprs,outputStream);
                     }
                 }
             }
@@ -129,7 +121,9 @@ public class Server_GPRS extends Thread
                 if (inputStream != null)
                     inputStream.close();
                 if (m_socket != null)
+                {
                     m_socket.close();
+                }
                 m_isRuning = false;
             }
             catch (IOException e)
