@@ -5,9 +5,6 @@ import com.zistone.socket.Server_MO;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
-import java.net.ServerSocket;
-import java.net.Socket;
-
 public class Main
 {
     private static int PORT_SOCKET_GPRS;
@@ -25,16 +22,11 @@ public class Main
     {
         try
         {
-            ServerSocket server_gprs = new ServerSocket(PORT_SOCKET_GPRS);
-            m_logger.debug(">>>服务启动,等待终端连接...\r\n");
-            while (true)
-            {
-                //开启监听
-                Socket socket_gprs = server_gprs.accept();
-                Server_GPRS server_gprs_thread = new Server_GPRS(socket_gprs);
-                server_gprs_thread.start();
+            Server_GPRS server_gprs_thread = new Server_GPRS(PORT_SOCKET_GPRS);
+            server_gprs_thread.start();
 
-            }
+            Server_MO server_mo_thread = new Server_MO(PORT_SOCKET_MO);
+            server_mo_thread.start();
         }
         catch (Exception e)
         {
