@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Class-Path: log4j-1.2.17.jar commons-codec-1.12.jar fastjson-1.2.58.ja
  r
-Main-Class: Main
+Main-Class: com.zistone.Main
 

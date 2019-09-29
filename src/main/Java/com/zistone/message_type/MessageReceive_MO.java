@@ -28,7 +28,58 @@ public class MessageReceive_MO
     }
 
     private Logger m_logger = Logger.getLogger(MessageReceive_MO.class);
-    private DeviceInfo m_deviceInfo;
+
+    /**
+     * 位置信息汇报
+     *
+     * @param lat       纬度
+     * @param lot       经度
+     * @param tempIdStr 设备编号
+     * @param typeStr   设备类型
+     * @param timeStr   汇报时间
+     * @return
+     */
+    private String Location(double lat, double lot, String tempIdStr, String typeStr, String timeStr)
+    {
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setM_deviceId(tempIdStr);
+        deviceInfo.setM_lat(lat);
+        deviceInfo.setM_lot(lot);
+        deviceInfo.setM_createTime(new Date());
+        deviceInfo.setM_updateTime(new Date());
+        deviceInfo.setM_state(1);
+        deviceInfo.setM_type(typeStr);
+        deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
+        String deviceJsonStr = JSON.toJSONString(deviceInfo);
+        //由Web服务处理设备更新
+        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
+        int beginIndex = deviceResult.indexOf("{");
+        int endIndex = deviceResult.lastIndexOf("}");
+        deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
+        m_logger.debug(">>>汇报铱星网关位置的返回:" + deviceResult);
+        deviceInfo = JSON.parseObject(deviceResult, DeviceInfo.class);
+        if (deviceInfo == null)
+        {
+            return deviceResult;
+        }
+        else
+        {
+            LocationInfo locationInfo = new LocationInfo();
+            locationInfo.setM_deviceId(deviceInfo.getM_deviceId());
+            locationInfo.setM_lat(deviceInfo.getM_lat());
+            locationInfo.setM_lot(deviceInfo.getM_lot());
+            locationInfo.setM_createTime(timeStr);
+            String locationStr = JSON.toJSONString(locationInfo);
+            //由Web服务处理位置汇报
+            String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", locationStr);
+            int beginIndex2 = locationResult.indexOf("{");
+            int endIndex2 = locationResult.lastIndexOf("}");
+            locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
+            m_logger.debug(">>>汇报铱星网关位置的返回:" + locationResult);
+            locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
+            return deviceResult + "◎" + locationResult;
+        }
+    }
 
     /**
      * 解析终端发送过来的16进制的Str
@@ -96,10 +147,14 @@ public class MessageReceive_MO
             String warning = strArray[64] + strArray[65] + strArray[66] + strArray[67];
             //状态信息,例如:00000002
             String state = strArray[68] + strArray[69] + strArray[70] + strArray[71];
-            //经度,例如:0157EFBC
-            String lot = strArray[72] + strArray[73] + strArray[74] + strArray[75];
-            //纬度,例如:06CAA233
-            String lat = strArray[76] + strArray[77] + strArray[78] + strArray[79];
+            //纬度,例如:0157EFBC
+            String lat = strArray[72] + strArray[73] + strArray[74] + strArray[75];
+            byte[] latBytes = ConvertUtil.HexStrToByteArray(lat);
+            double latNum = (double) ConvertUtil.ByteArray4ToLong(latBytes) / 1000000;
+            //经度,例如:06CAA233
+            String lot = strArray[76] + strArray[77] + strArray[78] + strArray[79];
+            byte[] lotBytes = ConvertUtil.HexStrToByteArray(lot);
+            double lotNum = (double) ConvertUtil.ByteArray4ToLong(lotBytes) / 1000000;
             //高度,例如:000C
             String height = strArray[80] + strArray[81];
             //速度,例如:0000
@@ -108,29 +163,39 @@ public class MessageReceive_MO
             String dir = strArray[84] + strArray[85];
             //时间,例如:190103190852
             String time = strArray[86] + strArray[87] + strArray[88] + strArray[89] + strArray[90] + strArray[91];
+            String year = strArray[86].equals("00") ? "0000" : "20" + strArray[86];
+            String month = strArray[87].equals("00") ? "00" : strArray[87].replace("0", "");
+            String day = strArray[88];
+            String hour = strArray[89];
+            String minute = strArray[90];
+            String second = strArray[91];
+            String timeStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
             //附加消息:01040000000030024102310100F11000000000000000000000000000000000F2020000
             //检验标志,例如:EF
             String checkCode = strArray[strArray.length - 2];
             //标识,例如:7E
             String flag2 = strArray[strArray.length - 1];
             m_logger.debug(">>>校验码:" + checkCode + ",消息ID:" + messagId + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + imei_bcd + "," +
-                    "消息流水:" + detail);
-
+                    "消息流水:" + detail + ",告警信息:" + warning + ",状态信息:" + state + ",纬度:" + latNum + ",经度:" + lotNum);
+            String result = Location(latNum, lotNum, imei_bcd, "铱星设备", timeStr);
             //应用服务器发送MT给铱星网关确认收到MO的数据
             //01,版本
             //0004,总长度
             //05,MT_CONFIRMATION_ID
             //0001,长度
             //01,接收成功标志
-            return "01000405000101";
         }
         catch (Exception e)
         {
             m_logger.error(">>>解析内容时发生异常!");
             e.printStackTrace();
-            //返回"Error..."
-            return "4572726F722E2E2E";
         }
+        finally
+        {
+            return "01000405000101";
+        }
+        //返回"Error..."
+        //return "4572726F722E2E2E";
         //返回"Null..."
         //return "4E756C6C2E2E2E";
     }
