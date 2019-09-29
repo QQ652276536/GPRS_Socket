@@ -38,8 +38,6 @@ public class MessageReceive_MO
      */
     public String RecevieHexStr(String hexStr)
     {
-        //"解析出来是'Error...'"
-        String responseStr = "4572726F722E2E2E";
         try
         {
             String[] strArray = hexStr.split(" ");
@@ -124,16 +122,17 @@ public class MessageReceive_MO
             //05,MT_CONFIRMATION_ID
             //0001,长度
             //01,接收成功标志
-            responseStr = "01000405000101";
+            return "01000405000101";
         }
         catch (Exception e)
         {
+            m_logger.error(">>>解析内容时发生异常!");
             e.printStackTrace();
+            //返回"Error..."
+            return "4572726F722E2E2E";
         }
-        finally
-        {
-            return responseStr;
-        }
+        //返回"Null..."
+        //return "4E756C6C2E2E2E";
     }
 
     /**
