@@ -1,3 +1,5 @@
+package com.zistone;
+
 import com.zistone.socket.Server_GPRS;
 import com.zistone.socket.Server_MO;
 import com.zistone.util.PropertiesUtil;
