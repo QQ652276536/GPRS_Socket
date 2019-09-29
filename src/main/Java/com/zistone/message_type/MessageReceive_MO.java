@@ -51,34 +51,28 @@ public class MessageReceive_MO
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
         String deviceJsonStr = JSON.toJSONString(deviceInfo);
-        //由Web服务处理设备更新
+        //由Web服务处理终端注册
         String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
         int beginIndex = deviceResult.indexOf("{");
         int endIndex = deviceResult.lastIndexOf("}");
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>汇报铱星网关位置的返回:" + deviceResult);
+        m_logger.debug(">>>注册铱星设备的返回:" + deviceResult);
         deviceInfo = JSON.parseObject(deviceResult, DeviceInfo.class);
-        if (deviceInfo == null)
-        {
-            return deviceResult;
-        }
-        else
-        {
-            LocationInfo locationInfo = new LocationInfo();
-            locationInfo.setM_deviceId(deviceInfo.getM_deviceId());
-            locationInfo.setM_lat(deviceInfo.getM_lat());
-            locationInfo.setM_lot(deviceInfo.getM_lot());
-            locationInfo.setM_createTime(timeStr);
-            String locationStr = JSON.toJSONString(locationInfo);
-            //由Web服务处理位置汇报
-            String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", locationStr);
-            int beginIndex2 = locationResult.indexOf("{");
-            int endIndex2 = locationResult.lastIndexOf("}");
-            locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-            m_logger.debug(">>>汇报铱星网关位置的返回:" + locationResult);
-            locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
-            return deviceResult + "◎" + locationResult;
-        }
+
+        LocationInfo locationInfo = new LocationInfo();
+        locationInfo.setM_deviceId(deviceInfo.getM_deviceId());
+        locationInfo.setM_lat(deviceInfo.getM_lat());
+        locationInfo.setM_lot(deviceInfo.getM_lot());
+        locationInfo.setM_createTime(timeStr);
+        String locationStr = JSON.toJSONString(locationInfo);
+        //由Web服务处理位置汇报
+        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", locationStr);
+        int beginIndex2 = locationResult.indexOf("{");
+        int endIndex2 = locationResult.lastIndexOf("}");
+        locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
+        m_logger.debug(">>>汇报铱星网关位置的返回:" + locationResult);
+        locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
+        return deviceResult + "◎" + locationResult;
     }
 
     /**
