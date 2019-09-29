@@ -31,172 +31,6 @@ public class MessageReceive_MO
     private DeviceInfo m_deviceInfo;
 
     /**
-     * 终端注册
-     *
-     * @param tempIdStr       设备编号
-     * @param bodyPropertyStr 消息体属性
-     * @param typeStr         设备类型
-     * @param phoneStr        手机号或设备ID
-     * @param detailStr       消息流水
-     * @return
-     */
-    private String Register(String tempIdStr, String bodyPropertyStr, String typeStr, String phoneStr, String detailStr)
-    {
-        DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_createTime(new Date());
-        deviceInfo.setM_updateTime(new Date());
-        deviceInfo.setM_state(1);
-        deviceInfo.setM_deviceId(tempIdStr);
-        deviceInfo.setM_type(typeStr);
-        deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
-        String jsonStr = JSON.toJSONString(deviceInfo);
-        //由Web服务处理终端注册
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", jsonStr);
-        int beginIndex = result.indexOf("{");
-        int endIndex = result.lastIndexOf("}");
-        result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>终端注册返回:" + result);
-        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
-        //终端注册应答（0x8100）
-        String responseStr = "7E";
-        //应答ID,对应终端消息的ID
-        responseStr += "8100";
-        //        responseStr += "0005";
-        responseStr += bodyPropertyStr;
-        responseStr += phoneStr;
-        responseStr += detailStr;
-        responseStr += detailStr;
-        //                responseStr += idStr;
-        String akCode = "";
-        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
-        {
-            akCode = m_deviceInfo.getM_akCode();
-            m_logger.debug(">>>服务端生成的鉴权码:" + akCode);
-            //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
-            if (null != akCode && !"".equals(akCode))
-            {
-                m_logger.debug(">>>终端注册成功");
-                responseStr += "00";
-                m_isRunFlag = true;
-            }
-            else
-            {
-                m_logger.debug(">>>终端注册失败");
-                responseStr += "03";
-            }
-        }
-        else
-        {
-            m_logger.debug(">>>终端注册失败");
-            responseStr += "03";
-        }
-        //鉴权码
-        responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
-        responseStr += "A4";
-        responseStr += "7E";
-        return responseStr;
-    }
-
-    /**
-     * 终端鉴权
-     *
-     * @param akCode          鉴权码
-     * @param bodyPropertyStr 消息体属性
-     * @param phoneStr        手机号或设备ID
-     * @param detailStr       消息流水
-     * @param idStr           消息ID
-     * @return
-     */
-    private String Authoration(String akCode, String bodyPropertyStr, String phoneStr, String detailStr, String idStr)
-    {
-        DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_akCode(akCode);
-        String jsonStr = JSON.toJSONString(deviceInfo);
-        //由Web服务处理终端鉴权
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/FindByAKCode", jsonStr);
-        int beginIndex = result.indexOf("{");
-        int endIndex = result.lastIndexOf("}");
-        result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>终端鉴权返回:" + result);
-        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
-        //平台通用应答(0x8001)
-        String responseStr = "7E";
-        //应答ID
-        responseStr += "8001";
-        responseStr += bodyPropertyStr;
-        responseStr += phoneStr;
-        responseStr += detailStr;
-        responseStr += detailStr;
-        responseStr += idStr;
-        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
-        {
-            m_logger.debug(">>>终端鉴权成功");
-            responseStr += "00";
-        }
-        else
-        {
-            m_logger.debug(">>>终端鉴权失败");
-            responseStr += "01";
-        }
-        //                responseStr += checkCode;
-        responseStr += "A4";
-        responseStr += "7E";
-        return responseStr;
-    }
-
-    /**
-     * 位置信息汇报
-     *
-     * @param timeStr   汇报时间
-     * @param phoneStr  手机号或设备ID
-     * @param detailStr 消息流水
-     * @param idStr     消息ID
-     * @return
-     */
-    private String Location(String timeStr, String phoneStr, String detailStr, String idStr)
-    {
-        LocationInfo locationInfo = new LocationInfo();
-        locationInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
-        locationInfo.setM_lat(m_deviceInfo.getM_lat());
-        locationInfo.setM_lot(m_deviceInfo.getM_lot());
-        locationInfo.setM_createTime(timeStr);
-        String jsonStr = JSON.toJSONString(locationInfo);
-        //由Web服务处理位置汇报
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", jsonStr);
-        int beginIndex = result.indexOf("{");
-        int endIndex = result.lastIndexOf("}");
-        result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>位置汇报返回:" + result);
-        locationInfo = JSON.parseObject(result, LocationInfo.class);
-        //平台通用应答(0x8001)
-        String responseStr = "7E";
-        //应答ID
-        responseStr += "8001";
-        //                    responseStr += bodyPropertyStr;
-        responseStr += "0005";
-        responseStr += phoneStr;
-        responseStr += detailStr;
-        responseStr += detailStr;
-        responseStr += idStr;
-        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-        if (null != locationInfo && locationInfo.getM_id() != 0)
-        {
-            m_logger.debug(">>>位置信息汇报成功");
-            responseStr += "00";
-        }
-        else
-        {
-            m_logger.debug(">>>位置信息汇报失败");
-            responseStr += "01";
-        }
-        //                    responseStr += checkCode;
-        responseStr += "A4";
-        responseStr += "7E";
-        return responseStr;
-    }
-
-    /**
      * 解析终端发送过来的16进制的Str
      *
      * @param hexStr
@@ -204,10 +38,102 @@ public class MessageReceive_MO
      */
     public String RecevieHexStr(String hexStr)
     {
-        String[] strArray = hexStr.split(" ");
+        //"解析出来是'Error...'"
+        String responseStr = "4572726F722E2E2E";
+        try
+        {
+            String[] strArray = hexStr.split(" ");
+            //版本,例如:01
+            String version = strArray[0];
+            //总长度,例如:007E
+            String totalLength = strArray[1] + strArray[2];
+            //MO_HEAD标志,例如:01
+            String mo_head_flag = strArray[3];
+            //MO_HEAD长度,例如:001C
+            String mo_head_length = strArray[4] + strArray[5];
+            //消息参考,例如:ID4C4AF615
+            String messageId = strArray[6] + strArray[7] + strArray[8] + strArray[9];
+            //IMEI,例如:33 30 30 32 33 34 30 36 30 32 31 35 39 37 30
+            String imei =
+                    strArray[10] + strArray[11] + strArray[12] + strArray[13] + strArray[14] + strArray[15] + strArray[16] + strArray[17] + strArray[18] + strArray[19] + strArray[20] + strArray[21] + strArray[22] + strArray[23] + strArray[24];
+            //会话状态,例如:成功00
+            String sessionState = strArray[25];
+            //MO_MSN,例如:01EA
+            String mo_msn = strArray[26] + strArray[27];
+            //MT_MSN,例如:0000
+            String mt_msn = strArray[28] + strArray[29];
+            //EPOCH时间,例如:5C2DED4D
+            String epoch_time = strArray[30] + strArray[31] + strArray[32] + strArray[33];
 
-        //返回"Error..."
-        return "4572726F722E2E2E";
+            //从这里开始是铱星的辅组定位信息,例如:可以不管
+            //LOCATION_ID位置信息头,例如:03
+            String locationHead_yx = strArray[34];
+            //长度,例如:000B
+            String locationLength_yx = strArray[35] + strArray[36];
+            //定位状态,例如:00
+            String locationState_yx = strArray[37];
+            //纬度,例如:167D12
+            String lat_yx = strArray[38] + strArray[39] + strArray[40];
+            //经度,例如:71DFBB
+            String lot_yx = strArray[41] + strArray[42] + strArray[43];
+            //CEP半径,例如:00000009
+            String cep_yx = strArray[44] + strArray[45] + strArray[46] + strArray[47];
+            //PAYLOAD_ID头,数据字段,通过铱星网关发送给应用服务器的数据到打报在这里,例如:02
+            String payload_id_yx = strArray[48];
+            //字段数据长度,例如:004E
+            String length_yx = strArray[49] + strArray[50];
+
+            //从这里开始就是部标协议了
+            //头标识,例如:7E
+            String flag1 = strArray[51];
+            //MSG_ID, 0X0200, 终端位置报告,例如:0200
+            String messagId = strArray[52] + strArray[53];
+            //消息体数据长度,例如:003F
+            String bodyPropertyStr = strArray[54] + strArray[55];
+            //IMEI的后12位BCD码，6字节,例如:234060215970
+            String imei_bcd = strArray[56] + strArray[57] + strArray[58] + strArray[59] + strArray[60] + strArray[61];
+            //流水号,例如:199B
+            String detail = strArray[62] + strArray[63];
+            //告警信息,例如:00000000
+            String warning = strArray[64] + strArray[65] + strArray[66] + strArray[67];
+            //状态信息,例如:00000002
+            String state = strArray[68] + strArray[69] + strArray[70] + strArray[71];
+            //经度,例如:0157EFBC
+            String lot = strArray[72] + strArray[73] + strArray[74] + strArray[75];
+            //纬度,例如:06CAA233
+            String lat = strArray[76] + strArray[77] + strArray[78] + strArray[79];
+            //高度,例如:000C
+            String height = strArray[80] + strArray[81];
+            //速度,例如:0000
+            String speed = strArray[82] + strArray[83];
+            //方向,例如:0000
+            String dir = strArray[84] + strArray[85];
+            //时间,例如:190103190852
+            String time = strArray[86] + strArray[87] + strArray[88] + strArray[89] + strArray[90] + strArray[91];
+            //附加消息:01040000000030024102310100F11000000000000000000000000000000000F2020000
+            //检验标志,例如:EF
+            String checkCode = strArray[strArray.length - 2];
+            //标识,例如:7E
+            String flag2 = strArray[strArray.length - 1];
+            m_logger.debug(">>>校验码:" + checkCode + ",消息ID:" + messagId + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + imei_bcd + "," +
+                    "消息流水:" + detail);
+
+            //应用服务器发送MT给铱星网关确认收到MO的数据
+            //01,版本
+            //0004,总长度
+            //05,MT_CONFIRMATION_ID
+            //0001,长度
+            //01,接收成功标志
+            responseStr = "01000405000101";
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            return responseStr;
+        }
     }
 
     /**
@@ -234,67 +160,6 @@ public class MessageReceive_MO
             }
         }
         return Integer.toHexString(binaryNum);
-    }
-
-    public static void main(String[] args)
-    {
-        String str = "81 03";
-        //消息体属性
-        str += " 00 0A";
-        //手机号或设备ID
-        str += " 55 10 30 00 63 34";
-        //消息流水
-        String temp0 = "20";
-        String temp1 = "0A";
-        int temp2 = Integer.parseInt(temp1, 16) + 1;
-        //不够两位前面补零
-        String temp3 = Integer.toHexString(temp2);
-        if (temp3.length() <= 1)
-        {
-            temp3 = "0" + temp3;
-        }
-        str += " " + temp0 + " " + temp3;
-        //str += " 1F FB";
-        //参数总数
-        str += " 01";
-        //参数列表
-        str += " 00 00 00 01 04 00 00 00 14";
-        //        System.out.println(new MessageReceive_MO().CreateCheckCode("81 03 00 0A 55 10 30 00 63 34 19 B5 01 00 00 00 01 04 00
-        //        00 00
-        //        14"));
-        System.out.println(new MessageReceive_MO().CreateCheckCode(str));
-
-
-        String paramStr = "09";
-        //参数列表
-        //终端心跳间隔(10秒)
-        paramStr += " 00 01 02 00 14";
-        //TCP消息应答超时时间(30秒)
-        paramStr += " 00 02 02 00 1E";
-        //TCP消息重传次数(3次)
-        paramStr += " 00 03 02 00 03";
-        //UDP消息应答超时时间(30秒)
-        paramStr += " 00 04 02 00 1E";
-        //UDP消息重传次数(3次)
-        paramStr += " 00 05 02 00 03";
-        //位置汇报策略(0定时1定距2定时定距)
-        paramStr += " 00 20 02 00 00";
-        //缺省时间汇报间隔
-        paramStr += " 00 29 02 00 14";
-        //终端工作模式(跟踪)
-        paramStr += " 00 08 02 00 01";
-        //跟踪模式有效时长(3600秒)
-        paramStr += " 00 0B 02 0E 10";
-        //跟踪模式间隔(10秒)
-        paramStr += " 00 0B 02 00 0A";
-        //消息体属性
-        int paramSize = paramStr.split(" ").length;
-        String hexParamSize = Integer.toHexString(paramSize);
-        if (hexParamSize.length() <= 1)
-        {
-            hexParamSize = "0" + hexParamSize;
-        }
-        System.out.println(hexParamSize);
     }
 
 }
