@@ -40,14 +40,14 @@ public class Server_MO extends Thread
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>MO线程" + this.getId() + "启动失败,该线程正在执行!");
+            m_logger.error(">>>MO的线程" + this.getId() + "启动失败,该线程正在执行!");
             return;
         }
         else
         {
             m_isRuning = true;
             super.start();
-            m_logger.debug(">>>MO线程" + this.getId() + "启动...");
+            m_logger.debug(">>>终端已连接,MO的线程" + this.getId() + "启动,端口:" + m_socket.getLocalPort());
         }
     }
 
@@ -101,9 +101,9 @@ public class Server_MO extends Thread
                         //重置接收的数据
                         info = "";
                         m_logger.debug(">>>MO线程" + this.getId() + "生成的响应内容:" + responseStr);
-//                        m_socket.shutdownOutput();
-//                        m_socket.shutdownInput();
-//                        break;
+                        //                        m_socket.shutdownOutput();
+                        //                        m_socket.shutdownInput();
+                        //                        break;
                     }
                 }
             }

@@ -8,13 +8,13 @@ import java.net.Socket;
 
 public class Main
 {
-    private static int PORT_SOCKET;
-    private static int PORT_SOCKET2;
+    private static int PORT_SOCKET_GPRS;
+    private static int PORT_SOCKET_MO;
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
-        PORT_SOCKET2 = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
+        PORT_SOCKET_GPRS = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
+        PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
     }
 
     private static Logger m_logger = Logger.getLogger(Main.class);
@@ -23,20 +23,15 @@ public class Main
     {
         try
         {
-            ServerSocket server = new ServerSocket(PORT_SOCKET);
-            ServerSocket server2 = new ServerSocket(PORT_SOCKET2);
+            ServerSocket server_gprs = new ServerSocket(PORT_SOCKET_GPRS);
+            m_logger.debug(">>>服务启动,等待终端连接...\r\n");
             while (true)
             {
                 //开启监听
-                Socket socket = server.accept();
-                Server_GPRS server_gprs_thread = new Server_GPRS(socket);
+                Socket socket_gprs = server_gprs.accept();
+                Server_GPRS server_gprs_thread = new Server_GPRS(socket_gprs);
                 server_gprs_thread.start();
-                m_logger.debug(">>>GPRS的Socket服务启动,端口:" + PORT_SOCKET + ",等待终端连接...\r\n");
 
-                Socket socket2 = server2.accept();
-                Server_MO server_mo_thread = new Server_MO(socket2);
-                server_mo_thread.start();
-                m_logger.debug(">>>MO方式接收数据的Socket服务启动,端口:" + PORT_SOCKET2 + ",等待终端连接...\r\n");
             }
         }
         catch (Exception e)

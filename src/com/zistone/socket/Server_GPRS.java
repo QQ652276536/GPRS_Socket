@@ -38,14 +38,14 @@ public class Server_GPRS extends Thread
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>GPRS线程" + this.getId() + "启动失败,该线程正在执行!");
+            m_logger.error(">>>GPRS的线程" + this.getId() + "启动失败,该线程正在执行!");
             return;
         }
         else
         {
             m_isRuning = true;
             super.start();
-            m_logger.debug(">>>GPRS线程" + this.getId() + "启动...");
+            m_logger.debug(">>>终端已连接,GPRS的线程" + this.getId() + "启动,端口:" + m_socket.getLocalPort());
         }
     }
 
