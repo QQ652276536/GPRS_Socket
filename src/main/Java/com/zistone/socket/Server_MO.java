@@ -44,7 +44,6 @@ public class Server_MO extends Thread
         else
         {
             m_isRuning = true;
-            super.setName("Server_MO线程");
             super.start();
             m_logger.debug(">>>MO的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort() + ",等待终端连接...");
         }
