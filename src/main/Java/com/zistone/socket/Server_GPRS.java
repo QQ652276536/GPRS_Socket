@@ -45,14 +45,14 @@ public class Server_GPRS extends Thread
         {
             m_isRuning = true;
             super.start();
-            m_logger.debug(">>>GPRS的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort() + ",等待终端连接...");
+            m_logger.debug(">>>GPRS的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort());
         }
     }
 
     @Override
     public void run()
     {
-        while (m_isRuning)
+        while (true)
         {
             //开始监听
             try

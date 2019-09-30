@@ -25,7 +25,7 @@ public class Server_MO extends Thread
     private Socket m_socket;
     private Logger m_logger = Logger.getLogger(Server_MO.class);
     //接收到数据的最新时间
-    private long m_lastReceiveTime = System.currentTimeMillis();
+    private long m_lastReceiveTime;
     //该线程是否正在运行
     private boolean m_isRuning = false;
 
@@ -45,21 +45,23 @@ public class Server_MO extends Thread
         {
             m_isRuning = true;
             super.start();
-            m_logger.debug(">>>MO的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort() + ",等待终端连接...");
+            m_logger.debug(">>>MO的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort());
         }
     }
 
     @Override
     public void run()
     {
-        while (m_isRuning)
+        while (true)
         {
             //开始监听
             try
             {
                 m_socket = m_serverSocket.accept();
+                //接收到数据的最新时间
+                m_lastReceiveTime = System.currentTimeMillis();
                 //读写超时时间（5秒）
-                m_socket.setSoTimeout(5000);
+                //m_socket.setSoTimeout(5000);
                 //字节输入流
                 InputStream inputStream;
                 //字节输出流
@@ -72,11 +74,11 @@ public class Server_MO extends Thread
                 outputStream = m_socket.getOutputStream();
                 while (m_isRuning)
                 {
-                    //检测心跳
+                    //心跳检测
                     if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
                     {
                         m_isRuning = false;
-                        m_logger.debug(">>>线程" + this.getId() + "的连接已超时");
+                        m_logger.debug(">>>MO的线程" + this.getId() + "的连接已超时");
                         break;
                     }
                     //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
@@ -123,6 +125,7 @@ public class Server_MO extends Thread
                 try
                 {
                     m_socket.close();
+                    m_logger.debug(">>>MO的线程" + this.getId() + "的连接已关闭");
                 }
                 catch (IOException e)
                 {

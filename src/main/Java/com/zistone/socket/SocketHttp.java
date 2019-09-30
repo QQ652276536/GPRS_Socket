@@ -62,7 +62,6 @@ public class SocketHttp
                 //TODO:如果Web服务没有返回实体,那么这里将不会执行,直到超时
                 if (line.contains("}"))
                 {
-                    m_logger.debug(">>>内容读取完毕");
                     break;
                 }
             }
