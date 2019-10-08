@@ -40,7 +40,7 @@ public class Server_MO_Worker implements Runnable
             {
                 break;
             }
-            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
+            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
             //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
             if (inputStream.available() == 0)
@@ -73,7 +73,7 @@ public class Server_MO_Worker implements Runnable
         }
         catch (Exception e)
         {
-            m_logger.error(String.format(">>>连接MO服务(%s)的客户端意外断开:%s", m_clientIdentity, e.getMessage()));
+            m_logger.error(String.format(">>>连接MO服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
         }
         try

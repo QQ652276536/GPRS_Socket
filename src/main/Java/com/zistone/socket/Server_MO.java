@@ -9,14 +9,12 @@ import java.net.*;
 public class Server_MO
 {
     private static final int HEARTTIMEOUT_SOCKET;
-    private static final int READWRITETIMEOUT;
     private static final int PORT_SOCKET;
 
     static
     {
         PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
         HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
-        READWRITETIMEOUT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("READWRITETIMEOUT_SOCKET"));
     }
 
     private ServerSocket m_serverSocket;
@@ -38,7 +36,7 @@ public class Server_MO
             {
                 //开启监听
                 Socket socket = m_serverSocket.accept();
-                socket.setSoTimeout(READWRITETIMEOUT);
+                socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 //该线程用于接收MO数据
                 Thread thread = new Thread(server_mo_woker);

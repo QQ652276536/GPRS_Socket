@@ -9,8 +9,10 @@ import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class MessageReceive_GPRS
 {
@@ -19,7 +21,6 @@ public class MessageReceive_GPRS
     //Web服务端口
     private static int PORT_WEB;
     public boolean m_isRunFlag = false;
-    public String[] m_detailStr;
 
     static
     {
@@ -206,48 +207,39 @@ public class MessageReceive_GPRS
     {
         try
         {
-            String[] strArray = hexStr.split(" ");
+            String[] strArray = hexStr.split(",");
+            //过滤掉开头和结尾的逗号分割符
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++)
+            {
+                if (strArray[i].equals("") && i == 0)
+                {
+                    continue;
+                }
+                if (strArray[i].equals("") && i == strArray.length - 1)
+                {
+                    continue;
+                }
+                list.add(strArray[i]);
+            }
+            list.toArray(strArray);
             //前后两个标识位
             String flag1 = strArray[0];
             String flag2 = strArray[strArray.length - 1];
-            //若校验码、消息头、消息体出现0x7e(~字符)则要进行转义处理,0x7e<--->0x7d0x02,0x7d<-->0x7d0x01
-            //        for (int i = 0; i < strArray.length; i++)
-            //        {
-            //            //前后两个标识不转义
-            //            if (i == 0 || i == strArray.length - 1)
-            //            {
-            //                continue;
-            //            }
-            //            else if (strArray[i].equals("7e"))
-            //            {
-            //                strArray[i] = "7d 02";
-            //                Log.debug(">>>消息中有需要转义的字符!!!");
-            //            }
-            //        }
             //校验码
             String checkCode = strArray[strArray.length - 2];
-            //消息头,包含消息ID、消息体属性、手机号、消息流水
-            String[] tempArray = new String[strArray.length - 3];
-            System.arraycopy(strArray, 1, tempArray, 0, tempArray.length);
-            String[] headArray = Arrays.copyOfRange(tempArray, 0, 12);
             //消息ID
-            String[] idArray = Arrays.copyOfRange(headArray, 0, 2);
-            String idStr = ConvertUtil.StrArrayToStr(idArray);
-            int idValue = Integer.parseInt(idStr.replaceAll("0[x|X]", ""), 16);
+            String idStr = strArray[1] + strArray[2];
+            int idValue = Integer.parseInt(idStr, 16);
             //消息体属性
-            String[] bodyPropertyArray = Arrays.copyOfRange(headArray, 2, 4);
-            String bodyPropertyStr = ConvertUtil.StrArrayToStr(bodyPropertyArray);
+            String bodyPropertyStr = strArray[3] + strArray[4];
             //终端手机号或终端ID
-            String[] phoneArray = Arrays.copyOfRange(headArray, 4, 10);
-            String phoneStr = ConvertUtil.StrArrayToStr(phoneArray);
+            String phoneStr = strArray[5] + strArray[6] + strArray[7] + strArray[8] + strArray[9] + strArray[10];
             //消息流水
-            String[] detailArray = Arrays.copyOfRange(headArray, 10, 12);
-            String detailStr = ConvertUtil.StrArrayToStr(detailArray);
-            m_detailStr = detailArray;
+            String detailStr = strArray[11] + strArray[12];
             //消息包封装项
-            String[] bodyArray = Arrays.copyOfRange(tempArray, 12, tempArray.length);
-            m_logger.debug(">>>校验码:" + checkCode + ",消息ID:" + idStr + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + phoneStr + "," +
-                    "消息流水:" + detailStr);
+            String[] bodyArray = Arrays.copyOfRange(strArray, 13, strArray.length - 2);
+            m_logger.debug(">>>消息ID:" + idStr + ",消息体属性:" + bodyPropertyStr + ",终端手机号或终端ID:" + phoneStr + ",消息流水:" + detailStr + ",校验码:" + checkCode);
             //根据消息ID判断消息类型
             switch (idValue)
             {
@@ -255,14 +247,11 @@ public class MessageReceive_GPRS
                 case MessageType.CLIENTREGISTER:
                 {
                     //省域代码
-                    String[] capital = Arrays.copyOfRange(bodyArray, 0, 2);
-                    String provinceStr = ConvertUtil.StrArrayToStr(capital);
+                    String provinceStr = bodyArray[0] + bodyArray[1];
                     //市县代码
-                    String[] city = Arrays.copyOfRange(bodyArray, 2, 4);
-                    String cityStr = ConvertUtil.StrArrayToStr(city);
+                    String cityStr = bodyArray[2] + bodyArray[3];
                     //制造商
-                    String[] manufacture = Arrays.copyOfRange(bodyArray, 4, 9);
-                    String manufactureStr = ConvertUtil.StrArrayToStr(manufacture);
+                    String manufactureStr = bodyArray[4] + bodyArray[5] + bodyArray[6] + bodyArray[7] + bodyArray[8];
                     //终端型号
                     String[] type = Arrays.copyOfRange(bodyArray, 9, 29);
                     String typeStr = "";
@@ -276,14 +265,12 @@ public class MessageReceive_GPRS
                     }
                     typeStr = ConvertUtil.HexStrToStr(typeStr);
                     //终端ID
-                    String[] id = Arrays.copyOfRange(bodyArray, 29, 36);
-                    String tempIdStr = ConvertUtil.StrArrayToStr(id);
-                    tempIdStr = "Test" + idStr;
+                    String tempIdStr =
+                            bodyArray[29] + bodyArray[30] + bodyArray[31] + bodyArray[32] + bodyArray[33] + bodyArray[34] + bodyArray[35];
                     //车牌颜色
-                    String[] carColor = Arrays.copyOfRange(bodyArray, 36, 37);
-                    String carColorStr = ConvertUtil.StrArrayToStr(carColor);
+                    String carColorStr = bodyArray[36] + bodyArray[37];
                     //车辆标识(前两位为车牌归属地,后面为车牌号)
-                    String[] carFlag1 = Arrays.copyOfRange(bodyArray, 37, 39);
+                    String carFlag1Str = bodyArray[38] + bodyArray[39];
                     String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
                     String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
                     m_logger.debug(">>>收到[终端注册]的消息\r\n省域代码:" + provinceStr + ",市县代码:" + cityStr + ",制造商:" + manufactureStr + ",终端型号:" + typeStr + ",终端ID:" + tempIdStr + ",车牌颜色:" + carColorStr + ",车牌号:" + carFlag2Str);
@@ -294,6 +281,7 @@ public class MessageReceive_GPRS
                 {
                     //服务端生成的鉴权码为6位,所以这里取6位的长度
                     String[] akCodeArray = Arrays.copyOfRange(bodyArray, 0, 6);
+                    //String[] akCodeArray = Arrays.copyOfRange(bodyArray, 0, bodyArray.length);
                     String hexAkCode = ConvertUtil.StrArrayToStr(akCodeArray);
                     String akCode = ConvertUtil.HexStrToStr(hexAkCode);
                     m_logger.debug(">>>收到[终端鉴权]的消息\r\n鉴权码:" + akCode + ",16进制(" + hexAkCode + ")");
@@ -336,7 +324,8 @@ public class MessageReceive_GPRS
                     //时间
                     String[] time = Arrays.copyOfRange(bodyArray, 22, 28);
                     String year = time[0].equals("00") ? "0000" : "20" + time[0];
-                    String month = time[1].equals("00") ? "00" : time[1].replace("0", "");
+                    //String month = time[1].equals("00") ? "00" : time[1].replace("0", "");
+                    String month = time[1];
                     String day = time[2];
                     String hour = time[3];
                     String minute = time[4];
@@ -389,6 +378,7 @@ public class MessageReceive_GPRS
             }
         }
         catch (Exception e)
+
         {
             m_logger.error(">>>解析内容时发生异常!");
             e.printStackTrace();

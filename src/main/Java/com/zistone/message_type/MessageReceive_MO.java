@@ -10,8 +10,10 @@ import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class MessageReceive_MO
 {
@@ -87,7 +89,23 @@ public class MessageReceive_MO
     {
         try
         {
-            String[] strArray = hexStr.split(" ");
+            String[] strArray = hexStr.split(",");
+            //过滤掉开头和结尾的逗号分割符
+            List<String> list = new ArrayList<>();
+            for (int i = 0; i < strArray.length; i++)
+            {
+                if (strArray[i].equals("") && i == 0)
+                {
+                    continue;
+                }
+                if (strArray[i].equals("") && i == strArray.length - 1)
+                {
+                    continue;
+                }
+                list.add(strArray[i]);
+            }
+            strArray = new String[list.size()];
+            list.toArray(strArray);
             //版本,例如:01
             String version = strArray[0];
             //总长度,例如:007E
@@ -148,7 +166,7 @@ public class MessageReceive_MO
             String payload_id = strArray[48];
             //字段数据长度,例如:004E
             String length2 = strArray[49] + strArray[50];
-            //从这里开始是简化协议
+            //从这里开始是简化协议,也就是payload字段的数据
             String[] simpleStrArray = Arrays.copyOfRange(strArray, 51, strArray.length);
             //MSG_ID
             String msg_id = simpleStrArray[0] + simpleStrArray[1];
