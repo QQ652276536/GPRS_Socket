@@ -212,11 +212,11 @@ public class MessageReceive_GPRS
             List<String> list = new ArrayList<>();
             for (int i = 0; i < strArray.length; i++)
             {
-                if (strArray[i].equals("") && i == 0)
+                if (i == 0 && strArray[i].equals(""))
                 {
                     continue;
                 }
-                if (strArray[i].equals("") && i == strArray.length - 1)
+                if (i == strArray.length - 1 && strArray[i].equals(""))
                 {
                     continue;
                 }
@@ -273,7 +273,7 @@ public class MessageReceive_GPRS
                     String carFlag1Str = bodyArray[38] + bodyArray[39];
                     String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
                     String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
-                    m_logger.debug(">>>收到[终端注册]的消息\r\n省域代码:" + provinceStr + ",市县代码:" + cityStr + ",制造商:" + manufactureStr + ",终端型号:" + typeStr + ",终端ID:" + tempIdStr + ",车牌颜色:" + carColorStr + ",车牌号:" + carFlag2Str);
+                    m_logger.debug(">>>收到[终端注册]的消息,省域代码:" + provinceStr + ",市县代码:" + cityStr + ",制造商:" + manufactureStr + ",终端型号:" + typeStr + ",终端ID:" + tempIdStr + ",车牌颜色:" + carColorStr + ",车牌号:" + carFlag2Str);
                     return Register(tempIdStr, bodyPropertyStr, typeStr, phoneStr, detailStr);
                 }
                 //终端鉴权
@@ -284,7 +284,7 @@ public class MessageReceive_GPRS
                     //String[] akCodeArray = Arrays.copyOfRange(bodyArray, 0, bodyArray.length);
                     String hexAkCode = ConvertUtil.StrArrayToStr(akCodeArray);
                     String akCode = ConvertUtil.HexStrToStr(hexAkCode);
-                    m_logger.debug(">>>收到[终端鉴权]的消息\r\n鉴权码:" + akCode + ",16进制(" + hexAkCode + ")");
+                    m_logger.debug(">>>收到[终端鉴权]的消息,鉴权码:" + akCode + ",16进制(" + hexAkCode + ")");
                     return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr);
                 }
                 //位置信息汇报
@@ -331,7 +331,8 @@ public class MessageReceive_GPRS
                     String minute = time[4];
                     String second = time[5];
                     String timeStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-                    m_logger.debug(">>>收到[位置信息汇报]的消息\r\n报警标志:" + warningStr + ",状态:" + stateStr + ",纬度:" + latNum + ",经度:" + lotNum + "," + "海拨:" + heightNum + ",速度:" + speedNum + ",方向:" + dirNum + ",汇报时间:" + timeStr);
+                    m_logger.debug(">>>收到[位置信息汇报]的消息,报警标志:" + warningStr + ",状态:" + stateStr + ",纬度:" + latNum + ",经度:" + lotNum + "," +
+                            "海拨:" + heightNum + ",速度:" + speedNum + ",方向:" + dirNum + ",汇报时间:" + timeStr);
                     //需要先鉴权,即判断设备是否注册成功或已经注册过
                     if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
                     {

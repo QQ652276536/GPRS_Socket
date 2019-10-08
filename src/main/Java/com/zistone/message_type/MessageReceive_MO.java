@@ -94,17 +94,16 @@ public class MessageReceive_MO
             List<String> list = new ArrayList<>();
             for (int i = 0; i < strArray.length; i++)
             {
-                if (strArray[i].equals("") && i == 0)
+                if (i == 0 && strArray[i].equals(""))
                 {
                     continue;
                 }
-                if (strArray[i].equals("") && i == strArray.length - 1)
+                if (i == strArray.length - 1 && strArray[i].equals(""))
                 {
                     continue;
                 }
                 list.add(strArray[i]);
             }
-            strArray = new String[list.size()];
             list.toArray(strArray);
             //版本,例如:01
             String version = strArray[0];
