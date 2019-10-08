@@ -1,136 +1,94 @@
 package com.zistone.socket;
 
-import com.zistone.message_type.MessageReceive_GPRS;
-import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
 
-public class Server_GPRS extends Thread
+public class Server_GPRS
 {
-    //心跳超时时间
-    private static int TIMEOUT;
+    private static final int HEARTTIMEOUT_SOCKET;
+    private static final int READWRITETIMEOUT;
+    private static final int PORT_SOCKET;
 
     static
     {
-        TIMEOUT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
+        HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+        READWRITETIMEOUT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("READWRITETIMEOUT_SOCKET"));
     }
 
-    private final ServerSocket m_serverSocket;
-    private Socket m_socket;
+    private ServerSocket m_serverSocket;
     private Logger m_logger = Logger.getLogger(Server_GPRS.class);
-    //接收到数据的最新时间
-    private long m_lastReceiveTime = System.currentTimeMillis();
     //该线程是否正在运行
     private boolean m_isRuning = false;
+    private Thread m_thread;
 
-    public Server_GPRS(int port) throws IOException
+    public Server_GPRS() throws IOException
     {
-        m_serverSocket = new ServerSocket(port);
+        m_serverSocket = new ServerSocket(PORT_SOCKET);
     }
 
-    @Override
-    public void start()
+    public void MyRun()
+    {
+        while (m_isRuning)
+        {
+            try
+            {
+                //开启监听
+                Socket socket = m_serverSocket.accept();
+                socket.setSoTimeout(READWRITETIMEOUT);
+                Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket);
+                //该线程用于接收GPRS数据
+                Thread thread = new Thread(server_gprs_woker);
+                thread.setDaemon(true);
+                thread.start();
+            }
+            catch (Exception e)
+            {
+                m_logger.error(String.format(">>>MO服务开启接收MO数据的线程时,发生异常:%s", e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+        m_isRuning = false;
+    }
+
+    public void MyStart()
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>GPRS的线程" + this.getId() + "启动失败,该线程正在执行!");
+            m_logger.error(">>>GPRS服务(%s)启动失败,该服务正在运行!");
         }
         else
         {
             m_isRuning = true;
-            super.start();
-            m_logger.debug(">>>GPRS的线程" + this.getId() + "启动,端口:" + m_serverSocket.getLocalPort());
+            //该线程用于设备并发连接
+            m_thread = new Thread(this::MyRun);
+            m_thread.setDaemon(true);
+            m_thread.start();
+            m_logger.debug(String.format(">>>GPRS服务的线程%d启动...", m_thread.getId()));
         }
     }
 
-    @Override
-    public void run()
+    public void Join()
     {
-        while (true)
+        try
         {
-            //开始监听
-            try
+            if (m_thread != null)
             {
-                m_socket = m_serverSocket.accept();
-                //读写超时时间（5秒）
-                m_socket.setSoTimeout(5000);
-                //字节输入流
-                InputStream inputStream;
-                //字节输出流
-                OutputStream outputStream;
-                String info = "";
-                //按byte读
-                byte[] bytes = new byte[1];
-                MessageReceive_GPRS messageReceive_gprs = new MessageReceive_GPRS();
-                inputStream = m_socket.getInputStream();
-                outputStream = m_socket.getOutputStream();
-                while (m_isRuning)
-                {
-                    //检测心跳
-                    if (System.currentTimeMillis() - m_lastReceiveTime > TIMEOUT)
-                    {
-                        m_isRuning = false;
-                        m_logger.debug(">>>线程" + this.getId() + "的连接已超时");
-                        break;
-                    }
-                    //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-                    if (inputStream.available() > 0)
-                    {
-                        //重置接收到数据的最新时间
-                        m_lastReceiveTime = System.currentTimeMillis();
-                        inputStream.read(bytes);
-                        String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + " ";
-                        info += tempStr;
-                        //已经读完
-                        if (inputStream.available() == 0)
-                        {
-                            m_logger.debug(">>>GPRS的线程" + this.getId() + "接收到:" + info);
-                            //模拟业务处理Thread.sleep(1000);
-                            String responseStr = "";
-                            if (!"".equals(info))
-                            {
-                                //解析收到的内容并响应
-                                responseStr = messageReceive_gprs.RecevieHexStr(info);
-                            }
-                            byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
-                            outputStream.write(byteArray);
-                            outputStream.flush();
-                            //重置接收的数据
-                            info = "";
-                            m_logger.debug(">>>GPRS的线程" + this.getId() + "生成的响应内容:" + responseStr);
-                        }
-                    }
-                }
-            }
-            catch (SocketTimeoutException | SocketException e)
-            {
-                m_logger.error(">>>GPRS的线程" + this.getId() + "读取超时!");
-                e.printStackTrace();
-            }
-            catch (IOException e)
-            {
-                m_logger.error(">>>GPRS的线程" + this.getId() + "读取异常!");
-                e.printStackTrace();
-            }
-            finally
-            {
-                try
-                {
-                    m_socket.close();
-                }
-                catch (IOException e)
-                {
-                    m_logger.error(String.format(">>>GPRS的线程%d关闭Socket时出现错误:%s", this.getId(), e.getMessage()));
-                    e.printStackTrace();
-                }
+                m_thread.join();
             }
         }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void Stop()
+    {
+        m_isRuning = false;
     }
 
 }

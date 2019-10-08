@@ -2,35 +2,33 @@ package com.zistone;
 
 import com.zistone.socket.Server_GPRS;
 import com.zistone.socket.Server_MO;
-import com.zistone.util.PropertiesUtil;
-import org.apache.log4j.Logger;
+
 
 public class Main
 {
-    private static int PORT_SOCKET_GPRS;
-    private static int PORT_SOCKET_MO;
-
-    static
+    public static void main(String[] args) throws Exception
     {
-        PORT_SOCKET_GPRS = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
-        PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
-    }
-
-    private static Logger m_logger = Logger.getLogger(Main.class);
-
-    public static void main(String[] args)
-    {
+        Server_GPRS server_gprs;
+        Server_MO server_mo;
         try
         {
-            Server_GPRS server_gprs_thread = new Server_GPRS(PORT_SOCKET_GPRS);
-            server_gprs_thread.start();
-
-            Server_MO server_mo_thread = new Server_MO(PORT_SOCKET_MO);
-            server_mo_thread.start();
+            server_gprs = new Server_GPRS();
+            server_gprs.MyStart();
+            server_mo = new Server_MO();
+            server_mo.MyStart();
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            //如果开启服务时发生异常则直接中断
+            return;
         }
+
+        //挂起调用线程,被调用线程结束时才执行调用线程
+        server_gprs.Join();
+        server_mo.Join();
+
+        server_gprs.Stop();
+        server_mo.Stop();
     }
 }
