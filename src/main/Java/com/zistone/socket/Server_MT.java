@@ -3,25 +3,28 @@ package com.zistone.socket;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.net.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public class Server_MO
+public class Server_MT
 {
+    private static final int HEARTTIMEOUT_SOCKET;
     private static final int PORT_SOCKET;
 
     static
     {
         PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET3"));
+        HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
     }
 
     private ServerSocket m_serverSocket;
-    private Logger m_logger = Logger.getLogger(Server_MO.class);
+    private Logger m_logger = Logger.getLogger(Server_MT.class);
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
 
-    public Server_MO() throws IOException
+    public Server_MT() throws IOException
     {
         m_serverSocket = new ServerSocket(PORT_SOCKET);
     }
@@ -34,16 +37,16 @@ public class Server_MO
             {
                 //开启监听
                 Socket socket = m_serverSocket.accept();
-                socket.setSoTimeout(30 * 1000);
-                Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
-                //该线程用于接收MO数据
-                Thread thread = new Thread(server_mo_woker);
+                socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
+                Server_MT_Worker server_mt_woker = new Server_MT_Worker(socket);
+                //该线程用于接收MT数据
+                Thread thread = new Thread(server_mt_woker);
                 thread.setDaemon(true);
                 thread.start();
             }
             catch (Exception e)
             {
-                m_logger.error(String.format(">>>MO服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
+                m_logger.error(String.format(">>>MT服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
                 e.printStackTrace();
             }
         }
@@ -54,7 +57,7 @@ public class Server_MO
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>MO服务(%s)启动失败,该服务正在运行!");
+            m_logger.error(">>>MT服务(%s)启动失败,该服务正在运行!");
         }
         else
         {
@@ -63,7 +66,7 @@ public class Server_MO
             m_thread = new Thread(this::MyRun);
             m_thread.setDaemon(true);
             m_thread.start();
-            m_logger.debug(String.format(">>>MO服务的线程%d启动...", m_thread.getId()));
+            m_logger.debug(String.format(">>>MT服务的线程%d启动...", m_thread.getId()));
         }
     }
 
