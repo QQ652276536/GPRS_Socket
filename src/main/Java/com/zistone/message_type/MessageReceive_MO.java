@@ -204,7 +204,7 @@ public class MessageReceive_MO
                     String deviceTime = simpleStrArray[24] + simpleStrArray[25] + simpleStrArray[26] + simpleStrArray[27];
                     Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
                     String deviceTimeStr = SIMPLEDATEFORMAT.format(new Date(longDeviceTime));
-                    m_logger.debug(">>>收到铱星设备位置报告,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + deviceTimeStr);
+                    m_logger.debug(">>>收到铱星设备[位置信息汇报]的消息,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + deviceTimeStr);
                     String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr);
                     break;
                 }
@@ -225,7 +225,7 @@ public class MessageReceive_MO
                     //采样时间间隔,分钟
                     String collectTimeStr = simpleStrArray[11] + simpleStrArray[12];
                     int collectTime = Integer.parseInt(collectTimeStr, 16);
-                    m_logger.debug(">>>收到铱星设备通用应答,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + timeStr + ",上报时间间隔:" + upTime + "分钟,采样时间间隔:" + collectTime + "分钟");
+                    m_logger.debug(">>>收到铱星设备[通用应答]的消息,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + timeStr + ",上报时间间隔:" + upTime + "分钟,采样时间间隔:" + collectTime + "分钟");
                     String result = Location(latNum, lotNum, 0.0, imeiStr, "铱星设备", timeStr);
                     break;
                 }
