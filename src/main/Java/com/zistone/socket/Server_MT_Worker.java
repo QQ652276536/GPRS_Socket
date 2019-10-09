@@ -1,5 +1,6 @@
 package com.zistone.socket;
 
+import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;

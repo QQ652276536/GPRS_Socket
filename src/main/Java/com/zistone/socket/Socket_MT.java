@@ -38,11 +38,32 @@ public class Socket_MT
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public String SendData(String hexStr)
+    /**
+     * 向铱星网关发送参数设置
+     * 另,铱星设备固定为监控模式
+     *
+     * @param data
+     * @return
+     */
+    public String SendData(String data) throws IOException
     {
-        String info = "";
-        try
+        String[] strArray = data.split("◎");
+        if (strArray.length >= 2)
         {
+            String upTimeType = strArray[0];
+            String upTimeValue = strArray[1];
+            String hexStr = "";
+            if (upTimeType.equals("REPORTINTERVAL"))
+            {
+            }
+            else if (upTimeType.equals("STARTTIME"))
+            {
+            }
+            else
+            {
+                return "Error";
+            }
+            String info = "";
             byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
             OutputStream outputStream = m_socket.getOutputStream();
             outputStream.write(byteArray);
@@ -67,13 +88,9 @@ public class Socket_MT
                     break;
                 }
             }
+            return info;
         }
-        catch (Exception e)
-        {
-            m_logger.error(String.format(">>>MT服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
-            e.printStackTrace();
-        }
-        return info;
+        return "Null";
     }
 
 }
