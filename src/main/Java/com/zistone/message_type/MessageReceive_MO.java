@@ -44,6 +44,7 @@ public class MessageReceive_MO
      */
     private String Location(double lat, double lot, double height, String tempIdStr, String typeStr, String timeStr)
     {
+        //如果该铱星设备已经注册过则更新它在设备表里的经纬度,否则在设备表里新增一条记录
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_lat(lat);
@@ -62,7 +63,7 @@ public class MessageReceive_MO
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
         m_logger.debug(">>>注册铱星设备的返回:" + deviceResult);
         deviceInfo = JSON.parseObject(deviceResult, DeviceInfo.class);
-
+        //同时在历史轨迹里新增一条记录
         LocationInfo locationInfo = new LocationInfo();
         locationInfo.setM_deviceId(deviceInfo.getM_deviceId());
         locationInfo.setM_lat(deviceInfo.getM_lat());
@@ -105,10 +106,17 @@ public class MessageReceive_MO
                 list.add(strArray[i]);
             }
             list.toArray(strArray);
+            /**
+             * 全部数据由MO_HEAD + MO_LOCATION + PAYLOAD几部分组成
+             */
             //版本,例如:01
             String version = strArray[0];
             //总长度,例如:007E
-            String totalLength = strArray[1] + strArray[2];
+            String totalLengthStr = strArray[1] + strArray[2];
+            int totalLength = Integer.parseInt(totalLengthStr, 16);
+            /**
+             * MO_HEAD
+             */
             //MO_HEAD标志,例如:01
             String mo_head_flag = strArray[3];
             //MO_HEAD长度,例如:001C
@@ -141,8 +149,11 @@ public class MessageReceive_MO
             String epoch_time = strArray[30] + strArray[31] + strArray[32] + strArray[33];
             Long longTime = Long.parseLong(epoch_time, 16) * 1000;
             String timeStr = SIMPLEDATEFORMAT.format(new Date(longTime));
-            //从这里开始是铱星的辅组定位信息
-            //LOCATION_ID位置信息头,例如:03
+            /**
+             * LOCATION_ID
+             * 铱星的辅组定位信息
+             */
+            //位置信息头,例如:03
             String head = strArray[34];
             //长度,例如:000B
             String lengthStr = strArray[35] + strArray[36];
@@ -160,30 +171,70 @@ public class MessageReceive_MO
             String lot3Str = String.valueOf(Integer.parseInt(strArray[43], 16));
             double lotNum = Double.valueOf(lot1Str + lot2Str + lot3Str) / 1000000;
             //CEP半径,例如:00000009
-            String cep = strArray[44] + strArray[45] + strArray[46] + strArray[47];
-            //PAYLOAD_ID头,数据字段,通过铱星网关发送给应用服务器的数据到打报在这里,例如:02
-            String payload_id = strArray[48];
-            //字段数据长度,例如:004E
-            String length2 = strArray[49] + strArray[50];
-            //从这里开始是简化协议,也就是payload字段的数据
+            String cepStr = strArray[44] + strArray[45] + strArray[46] + strArray[47];
+            /**
+             * PAYLOAD
+             * 通过铱星网关发送给应用服务器的数据到打报在这里
+             */
+            //payload头,例如:02
+            String payloadIdStr = strArray[48];
+            //payload字段数据长度,例如:004E
+            String payloadLengthStr = strArray[49] + strArray[50];
+            int paylaodLength = Integer.parseInt(payloadLengthStr, 16);
+            //payload字段的数据
             String[] simpleStrArray = Arrays.copyOfRange(strArray, 51, strArray.length);
             //MSG_ID
-            String msg_id = simpleStrArray[0] + simpleStrArray[1];
-            //SN
-            String sn = simpleStrArray[2] + simpleStrArray[3];
-            //海拔
-            String height = simpleStrArray[20] + simpleStrArray[21];
-            int heightNum = Integer.parseInt(height, 16);
-            //速度
-            String speed = simpleStrArray[22];
-            //方向
-            String dir = simpleStrArray[23];
-            //终端时间
-            String deviceTime = simpleStrArray[24] + simpleStrArray[25] + simpleStrArray[26] + simpleStrArray[27];
-            Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
-            String deviceTimeStr = SIMPLEDATEFORMAT.format(new Date(longDeviceTime));
-            m_logger.debug(">>>消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + ",经度:" + lotNum + ",终端时间:" + deviceTimeStr);
-            String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr);
+            String msgIdStr = simpleStrArray[0] + simpleStrArray[1];
+            //铱星设备重启后网关会发一次全部数据,如果平台确认收到MO数据并响应网关,会收到应答信息,这时PAYLOAD部分有变动,需要重新解析,这里根据PAYLOAD里的消息ID判断如何解析
+            switch (msgIdStr)
+            {
+                //位置报告
+                case "0200":
+                {
+                    //SN
+                    String sn = simpleStrArray[2] + simpleStrArray[3];
+                    //海拔
+                    String height = simpleStrArray[20] + simpleStrArray[21];
+                    int heightNum = Integer.parseInt(height, 16);
+                    //速度
+                    String speed = simpleStrArray[22];
+                    //方向
+                    String dir = simpleStrArray[23];
+                    //终端时间
+                    String deviceTime = simpleStrArray[24] + simpleStrArray[25] + simpleStrArray[26] + simpleStrArray[27];
+                    Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
+                    String deviceTimeStr = SIMPLEDATEFORMAT.format(new Date(longDeviceTime));
+                    m_logger.debug(">>>收到铱星设备位置报告,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + deviceTimeStr);
+                    String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr);
+                    break;
+                }
+                //通用应答
+                case "0001":
+                {
+                    //流水号
+                    String detailStr = simpleStrArray[2] + simpleStrArray[3];
+                    //平台消息流水号
+                    String detailStr2 = simpleStrArray[4] + simpleStrArray[5];
+                    //消息
+                    String msgStr = simpleStrArray[6] + simpleStrArray[7];
+                    //成功标志
+                    String flag = simpleStrArray[8];
+                    //上报时间间隔,分钟
+                    String upTimeStr = simpleStrArray[9] + simpleStrArray[10];
+                    int upTime = Integer.parseInt(upTimeStr, 16);
+                    //采样时间间隔,分钟
+                    String collectTimeStr = simpleStrArray[11] + simpleStrArray[12];
+                    int collectTime = Integer.parseInt(collectTimeStr, 16);
+                    m_logger.debug(">>>收到铱星设备通用应答,消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + ",纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + timeStr + ",上报时间间隔:" + upTime + "分钟,采样时间间隔:" + collectTime + "分钟");
+                    String result = Location(latNum, lotNum, 0.0, imeiStr, "铱星设备", timeStr);
+                    break;
+                }
+                case "8103":
+                {
+                    m_logger.debug("--->--->--->怎么会收到8103的参数ID");
+                    break;
+                }
+            }
         }
         catch (Exception e)
         {
