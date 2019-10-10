@@ -12,7 +12,7 @@ public class Server_MO
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET3"));
+        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
     }
 
     private ServerSocket m_serverSocket;
