@@ -51,13 +51,13 @@ public class Server_MT_Worker implements Runnable
         }
         catch (SocketTimeoutException e)
         {
-            m_logger.error(String.format(">>>MT服务(%s)读取超时:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
+            m_logger.error(String.format(">>>MT服务(%s)读取超时:%s", m_clientIdentity, e.getMessage()));
         }
         catch (Exception e)
         {
-            m_logger.error(String.format(">>>连接MT服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
+            m_logger.error(String.format(">>>连接MT服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
         }
         try
         {
@@ -65,8 +65,8 @@ public class Server_MT_Worker implements Runnable
         }
         catch (IOException e)
         {
-            m_logger.error(String.format(">>>MT服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
+            m_logger.error(String.format(">>>MT服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
         }
     }
 

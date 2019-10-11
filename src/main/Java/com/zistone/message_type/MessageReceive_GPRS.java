@@ -49,7 +49,7 @@ public class MessageReceive_GPRS
         deviceInfo.setM_state(1);
         deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_type(typeStr);
-        deviceInfo.setM_comment("我是Socket模拟的Http请求发送过来的");
+        deviceInfo.setM_comment("我是Socket模拟的Http请求");
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
         String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", jsonStr);
@@ -379,10 +379,9 @@ public class MessageReceive_GPRS
             }
         }
         catch (Exception e)
-
         {
-            m_logger.error(">>>解析内容时发生异常!");
             e.printStackTrace();
+            m_logger.error(">>>解析内容时发生异常!" + e.getMessage());
             //返回"Error..."
             return "4572726F722E2E2E";
         }

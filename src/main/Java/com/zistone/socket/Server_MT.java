@@ -46,8 +46,8 @@ public class Server_MT
             }
             catch (Exception e)
             {
-                m_logger.error(String.format(">>>MT服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
                 e.printStackTrace();
+                m_logger.error(">>>MT服务开启接收数据的线程时,发生异常:%s" + e.getMessage());
             }
         }
         m_isRuning = false;

@@ -45,8 +45,8 @@ public class Server_GPRS
             }
             catch (Exception e)
             {
-                m_logger.error(String.format(">>>MO服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
                 e.printStackTrace();
+                m_logger.error(">>>MO服务开启接收数据的线程时,发生异常:%s" + e.getMessage());
             }
         }
         m_isRuning = false;

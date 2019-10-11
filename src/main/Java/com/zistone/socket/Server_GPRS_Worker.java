@@ -69,8 +69,8 @@ public class Server_GPRS_Worker implements Runnable
         }
         catch (IOException e)
         {
-            m_logger.error(String.format(">>>连接GPRS服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
+            m_logger.error(String.format(">>>连接GPRS服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
         }
         try
         {
@@ -78,8 +78,8 @@ public class Server_GPRS_Worker implements Runnable
         }
         catch (IOException e)
         {
-            m_logger.error(String.format(">>>GPRS服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
             e.printStackTrace();
+            m_logger.error(String.format(">>>GPRS服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
         }
     }
 

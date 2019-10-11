@@ -30,7 +30,7 @@ public class Socket_MT
     private Logger m_logger = Logger.getLogger(Socket_MT.class);
     private String m_clientIdentity;
 
-    public Socket_MT(String sfsf) throws IOException
+    public Socket_MT(String sfsf)
     {
     }
 
@@ -72,6 +72,7 @@ public class Socket_MT
         if (strArray.length >= 3)
         {
             String imei = strArray[0];
+            m_logger.debug(">>>该铱星设备的IMEI是:" + imei);
             String upTimeType = strArray[1];
             String upTimeValue = strArray[2];
             //上报间隔(分钟)
@@ -90,7 +91,7 @@ public class Socket_MT
             //版本
             String hexStr = "01";
             //总长度
-            hexStr += "002A";
+            hexStr += "002C";
             //MT_HEAD_ID
             hexStr += "41";
             //MT_HEAD字段长度
@@ -114,7 +115,7 @@ public class Socket_MT
              * PAYLOAD部分
              */
             //PAYLOAD字段长度
-            hexStr += "000F";
+            hexStr += "0011";
             //标志
             hexStr += "7E";
             //消息,参数下载
@@ -138,11 +139,12 @@ public class Socket_MT
             hexStr += "7E";
             m_logger.debug(">>>构建的MT数据:" + hexStr);
             byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
+            //向铱星网关发送数据
             OutputStream outputStream = m_socket.getOutputStream();
             outputStream.write(byteArray);
             //刷新缓冲
             outputStream.flush();
-            //得到一个输入流，用于接收服务器响应的数据
+            //接收铱星网关的数据
             InputStream inputStream = m_socket.getInputStream();
             //一次读取一个byte
             byte[] bytes = new byte[1];

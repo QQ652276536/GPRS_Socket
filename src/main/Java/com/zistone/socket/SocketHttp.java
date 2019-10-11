@@ -96,7 +96,7 @@ public class SocketHttp
             catch (IOException e)
             {
                 e.printStackTrace();
-                m_logger.error(">>>本次请求发生异常:", e);
+                m_logger.error(">>>本次请求发生异常:" + e.getMessage());
             }
         }
         return "Error...";
