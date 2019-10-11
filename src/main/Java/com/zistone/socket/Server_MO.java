@@ -37,11 +37,6 @@ public class Server_MO
                 //开启监听
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(30 * 1000);
-                Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
-                //该线程用于接收MO数据
-                Thread thread = new Thread(server_mo_woker);
-                thread.setDaemon(true);
-                thread.start();
                 if (bbb)
                 {
                     bbb = false;
@@ -49,6 +44,11 @@ public class Server_MO
                     String tttt = new Socket_MT().SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
                     m_logger.debug(String.format("----------------------------------执行参数设置后返回:" + tttt));
                 }
+                Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
+                //该线程用于接收MO数据
+                Thread thread = new Thread(server_mo_woker);
+                thread.setDaemon(true);
+                thread.start();
             }
             catch (Exception e)
             {
