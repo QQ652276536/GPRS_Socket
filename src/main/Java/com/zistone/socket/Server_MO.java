@@ -20,12 +20,14 @@ public class Server_MO
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
+    private boolean m_isSetParam = true;
 
     public Server_MO() throws IOException
     {
         m_serverSocket = new ServerSocket(PORT_SOCKET);
     }
 
+    private boolean bbb = true;
     public void MyRun()
     {
         while (m_isRuning)
@@ -40,6 +42,13 @@ public class Server_MO
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
+                if (bbb)
+                {
+                    bbb = false;
+                    m_logger.debug(String.format("----------------------------------执行发送参数设置"));
+                    String tttt = new Socket_MT().SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
+                    m_logger.debug(String.format("----------------------------------执行参数设置后返回:" + tttt));
+                }
             }
             catch (Exception e)
             {

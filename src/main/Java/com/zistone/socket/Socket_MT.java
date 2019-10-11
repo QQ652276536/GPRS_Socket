@@ -91,7 +91,7 @@ public class Socket_MT
             //版本
             String hexStr = "01";
             //总长度
-            hexStr += "002C";
+            hexStr += "0035";
             //MT_HEAD_ID
             hexStr += "41";
             //MT_HEAD字段长度
@@ -123,13 +123,19 @@ public class Socket_MT
             //平台消息流水号
             payloadHexStr += "199A";
             //参数个数
-            payloadHexStr += "01";
+            payloadHexStr += "02";
             //上报时间间隔
             payloadHexStr += "00000029";
             //参数值的长度
             payloadHexStr += "04";
-            //1小时上报一次
-            payloadHexStr += "00000E10";
+            //10分钟上报一次
+            payloadHexStr += "0000000A";
+            //采样时间间隔
+            payloadHexStr += "00000093";
+            //参数值的长度
+            payloadHexStr += "04";
+            //在休眠时不采集位置,每次位置上报只是当前的位置
+            payloadHexStr += "00000000";
             hexStr += payloadHexStr;
             //校验码
             String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr," ");
