@@ -24,7 +24,7 @@ public class Server_MO_Worker implements Runnable
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public void MyRun() throws IOException
+    public void MyRun() throws Exception
     {
         MessageReceive_MO messageReceive_mo = new MessageReceive_MO();
         //字节输入流
@@ -55,6 +55,9 @@ public class Server_MO_Worker implements Runnable
                 outputStream.write(byteArray);
                 outputStream.flush();
                 m_logger.debug(String.format(">>>MO服务(%s)生成的响应内容:%s", m_clientIdentity, responseStr));
+                m_logger.debug(String.format("----------------------------------执行发送参数设置"));
+                String tttt = new Socket_MT().SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
+                m_logger.debug(String.format("----------------------------------执行参数设置后返回:" + tttt));
             }
         }
     }

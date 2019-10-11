@@ -390,30 +390,4 @@ public class MessageReceive_GPRS
         return "4E756C6C2E2E2E";
     }
 
-    /**
-     * 生成校验码
-     * 将收到的消息还原转义后去除标识和校验位,然后按位异或得到的结果就是校验码
-     *
-     * @param hexStr 带空格不带0x的16进制字符串
-     * @return
-     */
-    public String CreateCheckCode(String hexStr)
-    {
-        int binaryNum = 0;
-        String[] strArray = hexStr.split(" ");
-        for (int i = 0; i < strArray.length; i++)
-        {
-            int tempHexNum = Integer.parseInt(strArray[i], 16);
-            if (i == 0)
-            {
-                binaryNum = tempHexNum;
-            }
-            else
-            {
-                binaryNum ^= tempHexNum;
-            }
-        }
-        return Integer.toHexString(binaryNum);
-    }
-
 }

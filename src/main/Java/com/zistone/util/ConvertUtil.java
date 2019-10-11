@@ -1,5 +1,7 @@
 package com.zistone.util;
 
+import jdk.nashorn.internal.runtime.ECMAException;
+
 /**
  * 字符转换工具类
  * 不支持特殊字符
@@ -26,6 +28,68 @@ public class ConvertUtil
     }
 
     /**
+     * 不带空格的16进制字符串插入指定字符
+     *
+     * @param hexStr    不带空格不带0x的16进制字符串,比如810300
+     * @param character 指定字符
+     * @return
+     */
+    public static String HexStrAddCharacter(String hexStr, String character)
+    {
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < hexStr.length(); i++)
+        {
+            if (i != hexStr.length() - 1)
+            {
+                if (i % 2 != 0)
+                {
+                    stringBuffer.append(hexStr.charAt(i));
+                    stringBuffer.append(character);
+                }
+                else
+                {
+                    stringBuffer.append(hexStr.charAt(i));
+                }
+            }
+            else
+            {
+                stringBuffer.append(hexStr.charAt(i));
+            }
+        }
+        return stringBuffer.toString();
+    }
+
+    /**
+     * 生成校验码
+     * 将收到的消息还原转义后去除标识和校验位,然后按位异或得到的结果就是校验码
+     *
+     * @param hexStr 带空格不带0x的16进制字符串,比如81 03 00
+     * @return
+     */
+    public static String CreateCheckCode(String hexStr) throws Exception
+    {
+        if (!hexStr.contains(" ") || hexStr.contains("0x") || hexStr.contains("0X"))
+        {
+            throw new Exception("参数必须为带空格不带0x的16进制字符串");
+        }
+        int binaryNum = 0;
+        String[] strArray = hexStr.split(" ");
+        for (int i = 0; i < strArray.length; i++)
+        {
+            int tempHexNum = Integer.parseInt(strArray[i], 16);
+            if (i == 0)
+            {
+                binaryNum = tempHexNum;
+            }
+            else
+            {
+                binaryNum ^= tempHexNum;
+            }
+        }
+        return Integer.toHexString(binaryNum);
+    }
+
+    /**
      * Str[]的每个元素拼接成Str
      *
      * @param strArray
@@ -47,7 +111,7 @@ public class ConvertUtil
      * @param value
      * @return
      */
-    private static String IntToHexStr(int value)
+    public static String IntToHexStr(int value)
     {
         StringBuffer stringBuffer = new StringBuffer();
         char[] charArray = HEXSTRING.toCharArray();

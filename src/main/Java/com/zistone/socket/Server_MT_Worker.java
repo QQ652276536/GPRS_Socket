@@ -23,7 +23,7 @@ public class Server_MT_Worker implements Runnable
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public void MyRun() throws IOException
+    public void MyRun() throws Exception
     {
         //字节输入流
         InputStream inputStream = m_socket.getInputStream();

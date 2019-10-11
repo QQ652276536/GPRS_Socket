@@ -237,7 +237,7 @@ public class MessageReceive_MO
                     }
                     case "8103":
                     {
-                        m_logger.debug("--->--->--->怎么会收到8103的参数ID");
+                        m_logger.debug(">>>怎么会收到8103的参数ID");
                         break;
                     }
                 }
