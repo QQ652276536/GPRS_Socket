@@ -30,10 +30,6 @@ public class Socket_MT
     private Logger m_logger = Logger.getLogger(Socket_MT.class);
     private String m_clientIdentity;
 
-    public Socket_MT(String sfsf)
-    {
-    }
-
     public Socket_MT() throws IOException
     {
         m_socket = new Socket(YXGATEWAY_IP, PORT_SOCKET);
@@ -41,22 +37,6 @@ public class Socket_MT
         String clientIP = inetSocketAddress.getAddress().getHostAddress();
         int clientPort = inetSocketAddress.getPort();
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
-    }
-
-    public static void main(String[] args)
-    {
-        try
-        {
-            String str =
-                    "810300322340602159701997050000000104000000640000002004000000020000002904000002580000002C040000003200000048083236303133373232";
-            str = ConvertUtil.HexStrAddCharacter(str, " ");
-            System.out.println(ConvertUtil.CreateCheckCode(str));
-            new Socket_MT("").SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -128,13 +108,13 @@ public class Socket_MT
             payloadHexStr += "00000029";
             //参数值的长度
             payloadHexStr += "04";
-            //10分钟上报一次
-            payloadHexStr += "0000000A";
+            //单位,秒
+            payloadHexStr += "00000258";
             //采样时间间隔
             payloadHexStr += "00000093";
             //参数值的长度
             payloadHexStr += "04";
-            //在休眠时不采集位置,每次位置上报只是当前的位置
+            //0表示在休眠时不采集位置,每次位置上报只是当前的位置
             payloadHexStr += "00000000";
             hexStr += payloadHexStr;
             //校验码
