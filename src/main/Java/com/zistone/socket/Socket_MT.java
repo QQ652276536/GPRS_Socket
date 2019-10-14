@@ -12,6 +12,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Socket_MT
@@ -76,9 +78,23 @@ public class Socket_MT
             hexStr += "41";
             //MT_HEAD字段长度
             hexStr += "0015";
-            //消息ID,终端自动产生,这里取系统时间数值
-            Long longTime = new Date().getTime() * 1000;
-            hexStr += "1C79E5B8";
+            //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
+            String dayOfYear = String.valueOf(LocalDate.now().getDayOfYear());
+            String hour = String.valueOf(LocalTime.now().getHour());
+            String minute = String.valueOf(LocalTime.now().getMinute());
+            String second = String.valueOf(LocalTime.now().getSecond());
+            String timeStr = dayOfYear + hour + minute + second;
+            int timeNum = Integer.valueOf(timeStr);
+            String timeHexStr = ConvertUtil.IntToHexStr(timeNum);
+            //补齐4位
+            if (timeHexStr.length() < 8)
+            {
+                StringBuffer stringBuffer = new StringBuffer(timeHexStr);
+                stringBuffer.insert(0, "0");
+                timeHexStr = stringBuffer.toString();
+            }
+            m_logger.debug(">>>生成的消息ID:" + timeHexStr);
+            hexStr += timeHexStr;
             //IMEI,15位
             StringBuffer imeiBuffer = new StringBuffer();
             for (int i = 0; i < imei.length(); i++)
@@ -108,7 +124,7 @@ public class Socket_MT
             payloadHexStr += "00000029";
             //参数值的长度
             payloadHexStr += "04";
-            //单位,秒
+            //上报间隔,单位:秒
             payloadHexStr += "00000258";
             //采样时间间隔
             payloadHexStr += "00000093";
@@ -118,7 +134,7 @@ public class Socket_MT
             payloadHexStr += "00000000";
             hexStr += payloadHexStr;
             //校验码
-            String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr," ");
+            String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
             String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
             hexStr += checkCode;
             //标志

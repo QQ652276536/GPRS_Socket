@@ -2,6 +2,10 @@ package com.zistone.util;
 
 import jdk.nashorn.internal.runtime.ECMAException;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+
 /**
  * 字符转换工具类
  * 不支持特殊字符
@@ -13,6 +17,25 @@ public class ConvertUtil
 
     public static void main(String[] args)
     {
+        //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
+        String dayOfYear = String.valueOf(LocalDate.now().getDayOfYear());
+        String hour = String.valueOf(LocalTime.now().getHour());
+        String minute = String.valueOf(LocalTime.now().getMinute());
+        String second = String.valueOf(LocalTime.now().getSecond());
+        String timeStr = dayOfYear + hour + minute + second;
+        int timeNum = Integer.valueOf(timeStr);
+        String timeHexStr = ConvertUtil.IntToHexStr(timeNum);
+        //补齐4位
+        if(timeHexStr.length()<8)
+        {
+            StringBuffer stringBuffer = new StringBuffer(timeHexStr);
+            stringBuffer.insert(0,"0");
+            timeHexStr = stringBuffer.toString();
+        }
+        System.out.println(timeHexStr);
+        System.out.println("------------------------------------------------");
+
+
         System.out.println(ByteArrayToHexStr(new byte[]{(byte) 2, (byte) 97, (byte) 51, (byte) 52}));
         System.out.println((double) ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15}) / 1000000);
         System.out.println("____________________________________________________________________");
@@ -25,6 +48,42 @@ public class ConvertUtil
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("674E5C0F4F1F"));
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("004C0069005700650069"));
         System.out.println("____________________________________________________________________");
+    }
+
+    /**
+     * 生成4位不同的随机数
+     *
+     * @return
+     */
+    public static int CreateDifferent4Random()
+    {
+        int n = 1;
+        int array[] = new int[4];
+        int result = 0;
+        //产生第一位大于0的随机数
+        array[0] = (int) (9 * Math.random() + 1);
+        //利用循环产生3个不同的随机数,且与第一个随机数不同
+        for (int i = 1; i < 4; i++)
+        {
+            array[i] = (int) (10 * Math.random());
+            //这里是循环判断a[i]与他们前面的每一位是否相同
+            for (int j = 0; j < i; j++)
+            {
+                //如果a[i]等于a[j]就重新赋随机值在进入这个循环判断
+                while (array[i] == array[j])
+                {
+                    j = 0;
+                    array[i] = (int) (10 * Math.random());
+                }
+            }
+        }
+        //在这里每循环一次,n就会乘以10
+        for (int i = 3; i >= 0; i--)
+        {
+            result = array[i] * n + result;
+            n = n * 10;
+        }
+        return result;
     }
 
     /**
