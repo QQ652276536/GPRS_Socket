@@ -2,6 +2,7 @@ package com.zistone.util;
 
 import jdk.nashorn.internal.runtime.ECMAException;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -15,7 +16,7 @@ public class ConvertUtil
     //16进制数字字符集
     public static final String HEXSTRING = "0123456789ABCDEF";
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
         String dayOfYear = String.valueOf(LocalDate.now().getDayOfYear());
@@ -26,13 +27,15 @@ public class ConvertUtil
         int timeNum = Integer.valueOf(timeStr);
         String timeHexStr = ConvertUtil.IntToHexStr(timeNum);
         //补齐4位
-        if(timeHexStr.length()<8)
+        if (timeHexStr.length() < 8)
         {
             StringBuffer stringBuffer = new StringBuffer(timeHexStr);
-            stringBuffer.insert(0,"0");
+            stringBuffer.insert(0, "0");
             timeHexStr = stringBuffer.toString();
         }
         System.out.println(timeHexStr);
+        System.out.println("------------------------------------------------");
+        System.out.println("生成的检验码为:" + CreateCheckCode("81 03 00 0A 05 51 03 00 63 34 19 99 01 00 00 00 29 04 00 00 02 58"));
         System.out.println("------------------------------------------------");
 
 
@@ -188,23 +191,15 @@ public class ConvertUtil
      * @param hexStr
      * @return
      */
-    public static String HexStrToStr(String hexStr)
+    public static String HexStrToStr(String hexStr) throws UnsupportedEncodingException
     {
         //能被16整除,肯定可以被2整除
         byte[] array = new byte[hexStr.length() / 2];
-        try
+        for (int i = 0; i < array.length; i++)
         {
-            for (int i = 0; i < array.length; i++)
-            {
-                array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
-            }
-            hexStr = new String(array, "UTF-8");
+            array[i] = (byte) (0xff & Integer.parseInt(hexStr.substring(i * 2, i * 2 + 2), 16));
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return "";
-        }
+        hexStr = new String(array, "UTF-8");
         return hexStr;
     }
 

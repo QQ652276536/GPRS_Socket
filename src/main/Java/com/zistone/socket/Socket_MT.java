@@ -70,10 +70,11 @@ public class Socket_MT
             {
                 return "Error";
             }
+            //以下为MT数据构建
             //版本
             String hexStr = "01";
             //总长度
-            hexStr += "0035";
+            hexStr += "0034";
             //MT_HEAD_ID
             hexStr += "41";
             //MT_HEAD字段长度
@@ -111,27 +112,43 @@ public class Socket_MT
              * PAYLOAD部分
              */
             //PAYLOAD字段长度
-            hexStr += "0011";
+            hexStr += "0019";
             //标志
             hexStr += "7E";
             //消息,参数下载
             String payloadHexStr = "8103";
-            //平台消息流水号
-            payloadHexStr += "199A";
+            //下载的参数的长度
+            payloadHexStr += "000A";
+            //IMEI的后12位,IMEI一共15位
+            payloadHexStr += imei.substring(3);
+            //流水号
+            payloadHexStr += "199B";
             //参数个数
-            payloadHexStr += "02";
-            //上报时间间隔
+            payloadHexStr += "01";
+            //终端心跳
+            //payloadHexStr += "00000001";
+            //payloadHexStr += "04";
+            //payloadHexStr += "00000064";
+            //协议选择,0JT808协议,1简化协议
+            //payloadHexStr += "0000000C";
+            //payloadHexStr += "04";
+            //payloadHexStr += "00000001";
+            //位置汇报策略,0定时汇报,1定距汇报,2定时定距汇报
+            //payloadHexStr += "00000020";
+            //payloadHexStr += "04";
+            //payloadHexStr += "00000000";
+            //
+            //payloadHexStr += "0000002C";
+            //payloadHexStr += "04";
+            //payloadHexStr += "00000032";
+            //
+            //payloadHexStr += "00000048";
+            //payloadHexStr += "08";
+            //payloadHexStr += "3236303133373232";
+            //上报时间间隔,单位:秒
             payloadHexStr += "00000029";
-            //参数值的长度
             payloadHexStr += "04";
-            //上报间隔,单位:秒
             payloadHexStr += "00000258";
-            //采样时间间隔
-            payloadHexStr += "00000093";
-            //参数值的长度
-            payloadHexStr += "04";
-            //0表示在休眠时不采集位置,每次位置上报只是当前的位置
-            payloadHexStr += "00000000";
             hexStr += payloadHexStr;
             //校验码
             String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");

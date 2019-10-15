@@ -132,7 +132,7 @@ public class MessageReceive_MO
             String mo_head_flag = strArray[3];
             //MO_HEAD长度,例如:001C
             String mo_head_length = strArray[4] + strArray[5];
-            //消息参考,例如:4C4AF615
+            //消息ID,终端自动产生,例如:4C4AF615
             String messageId = strArray[6] + strArray[7] + strArray[8] + strArray[9];
             //IMEI,例如:333030323334303630323135393730,表示300234060215970
             String imeiStr = strArray[10].substring(1);
@@ -201,9 +201,9 @@ public class MessageReceive_MO
              *
              * 通过铱星网关发送给应用服务器的数据到打报在这里
              */
-            //payload头,例如:02
+            //PAYLOAD_ID,例如:02
             String payloadIdStr = strArray[48];
-            //payload字段数据长度,例如:004E
+            //字段数据长度,例如:004E
             String payloadLengthStr = strArray[49] + strArray[50];
             int paylaodLength = Integer.parseInt(payloadLengthStr, 16);
             //payload字段的数据
