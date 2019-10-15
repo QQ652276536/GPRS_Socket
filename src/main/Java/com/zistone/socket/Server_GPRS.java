@@ -38,7 +38,6 @@ public class Server_GPRS
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket);
-                //该线程用于接收GPRS数据
                 Thread thread = new Thread(server_gprs_woker);
                 thread.setDaemon(true);
                 thread.start();
@@ -61,7 +60,6 @@ public class Server_GPRS
         else
         {
             m_isRuning = true;
-            //该线程用于设备并发连接
             m_thread = new Thread(this::MyRun);
             m_thread.setDaemon(true);
             m_thread.start();

@@ -24,7 +24,7 @@ public class Server_MO_Worker implements Runnable
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public void MyRun() throws Exception
+    public void Worker() throws Exception
     {
         MessageReceive_MO messageReceive_mo = new MessageReceive_MO();
         //字节输入流
@@ -63,26 +63,24 @@ public class Server_MO_Worker implements Runnable
     {
         try
         {
-            MyRun();
-        }
-        catch (SocketTimeoutException e)
-        {
-            e.printStackTrace();
-            m_logger.error(String.format(">>>MO服务(%s)读取超时:%s", m_clientIdentity, e.getMessage()));
+            Worker();
         }
         catch (Exception e)
         {
             e.printStackTrace();
             m_logger.error(String.format(">>>连接MO服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
         }
-        try
+        finally
         {
-            m_socket.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            m_logger.error(String.format(">>>MO服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
+            try
+            {
+                m_socket.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                m_logger.error(String.format(">>>MO服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
+            }
         }
     }
 

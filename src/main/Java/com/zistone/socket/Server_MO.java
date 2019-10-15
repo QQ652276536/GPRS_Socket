@@ -43,9 +43,8 @@ public class Server_MO
                     m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>执行发送参数设置<<<<<<<<<<<<<<<<<<<<"));
                     new Socket_MT().SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
                 }
-                socket.setSoTimeout(30 * 1000);
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
-                //该线程用于接收MO数据
+                //server_mo_woker.Worker();
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
@@ -68,7 +67,6 @@ public class Server_MO
         else
         {
             m_isRuning = true;
-            //该线程用于设备并发连接
             m_thread = new Thread(this::MyRun);
             m_thread.setDaemon(true);
             m_thread.start();

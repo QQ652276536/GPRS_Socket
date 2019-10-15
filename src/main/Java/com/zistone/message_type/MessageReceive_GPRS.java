@@ -375,6 +375,7 @@ public class MessageReceive_GPRS
                     break;
                 }
                 default:
+                    m_logger.debug(">>>该消息无法解析");
                     break;
             }
         }
