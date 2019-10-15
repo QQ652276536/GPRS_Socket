@@ -55,13 +55,21 @@ public class SocketHttp
             m_bufferedReader = new BufferedReader(new InputStreamReader(bufferedInputStream, "UTF-8"));
             String line;
             String result = "";
+            boolean isDebugResult = false;
             while ((line = m_bufferedReader.readLine()) != null)
             {
-                m_logger.debug(line);
                 result += line;
+                if (line.contains("{"))
+                {
+                    isDebugResult = true;
+                }
                 //TODO:如果Web服务没有返回实体,那么这里将不会执行,直到超时
                 if (line.contains("}"))
                 {
+                    if (isDebugResult)
+                    {
+                        m_logger.debug(line);
+                    }
                     break;
                 }
             }
@@ -75,7 +83,6 @@ public class SocketHttp
             //                m_logger.debug(line);
             //                result += line;
             //            }
-            m_logger.debug(">>>内容读取完毕");
             return result;
         }
         catch (Exception e)

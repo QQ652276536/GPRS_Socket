@@ -48,14 +48,13 @@ public class Server_GPRS_Worker implements Runnable
             {
                 String info = stringBuffer.toString();
                 m_logger.debug(String.format(">>>GPRS服务(%s)收到:%s", m_clientIdentity, info));
-                //清空缓冲
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 //解析收到的内容并响应
                 String responseStr = messageReceive_gprs.RecevieHexStr(info);
                 byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
                 outputStream.write(byteArray);
                 outputStream.flush();
-                m_logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s", m_clientIdentity, responseStr));
+                m_logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", m_clientIdentity, responseStr));
             }
         }
     }

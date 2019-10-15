@@ -22,11 +22,9 @@ public class SocketClient
                 }
                 byte[] byteArray = HexStrToByteArray(data);
                 outputStream.write(byteArray);
-                //刷新缓冲
                 outputStream.flush();
                 //得到一个输入流，用于接收服务器响应的数据
                 InputStream inputStream = socket.getInputStream();
-                // 一次读取一个byte
                 byte[] bytes = new byte[1];
                 String info = "";
                 while (true)

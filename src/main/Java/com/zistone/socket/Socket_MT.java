@@ -120,9 +120,11 @@ public class Socket_MT
             //下载的参数的长度
             payloadHexStr += "000A";
             //IMEI的后12位,IMEI一共15位
-            payloadHexStr += imei.substring(3);
+            //payloadHexStr += imei.substring(3);
+            //模拟工具为毛这里是写死的?
+            payloadHexStr += "055103006334";
             //流水号
-            payloadHexStr += "199B";
+            payloadHexStr += "1997";
             //参数个数
             payloadHexStr += "01";
             //终端心跳
@@ -161,11 +163,9 @@ public class Socket_MT
             //向铱星网关发送数据
             OutputStream outputStream = m_socket.getOutputStream();
             outputStream.write(byteArray);
-            //刷新缓冲
             outputStream.flush();
             //接收铱星网关的数据
             InputStream inputStream = m_socket.getInputStream();
-            //一次读取一个byte
             byte[] bytes = new byte[1];
             String info = "";
             StringBuffer stringBuffer = new StringBuffer();
@@ -175,7 +175,7 @@ public class Socket_MT
                 {
                     break;
                 }
-                inputStream.read(bytes);
+                //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
                 String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
                 stringBuffer.append(tempStr);
                 //已经读完
@@ -183,6 +183,7 @@ public class Socket_MT
                 {
                     info = stringBuffer.toString();
                     m_logger.debug(String.format(">>>MT服务(%s)收到来自铱星网关的信息:%s", m_clientIdentity, info));
+                    stringBuffer.delete(0, stringBuffer.length() - 1);
                     break;
                 }
             }
