@@ -122,7 +122,7 @@ public class SendMT
         //MT_PAYLOAD_ID
         hexStr += "42";
         //PAYLOAD字段长度,JTT808打包后的数据长度
-        hexStr += "0021";
+        hexStr += "0022";
         //标志
         hexStr += "7E";
         //消息,参数下载
