@@ -8,11 +8,15 @@ import java.net.*;
 
 public class Server_MO
 {
-    private static final int PORT_SOCKET;
+    private static final int PORT_SOCKET_MO;
+    private static String YXGATEWAY_IP;
+    private static int PORT_SOCKET_MT;
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
+        YXGATEWAY_IP = PropertiesUtil.GetValueProperties().getProperty("YXGATEWAY_IP");
+        PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
+        PORT_SOCKET_MT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
     }
 
     private ServerSocket m_serverSocket;
@@ -24,7 +28,7 @@ public class Server_MO
 
     public Server_MO() throws IOException
     {
-        m_serverSocket = new ServerSocket(PORT_SOCKET);
+        m_serverSocket = new ServerSocket(PORT_SOCKET_MO);
     }
 
     private boolean bbb = true;
@@ -37,11 +41,12 @@ public class Server_MO
             {
                 Socket socket = m_serverSocket.accept();
                 //先配置MT,再接收数据
-                if (bbb)
+                if (!bbb)
                 {
                     bbb = false;
-                    m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>执行发送参数设置<<<<<<<<<<<<<<<<<<<<"));
-                    new SendMT().SendData("300234067349750&09,00,00&3600");
+
+                    Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
+                    new SendParamSetting(tempSocket, "300234067349750&09,00,00&600").SendMT();
                 }
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 //server_mo_woker.Worker();
