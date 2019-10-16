@@ -1,62 +1,123 @@
 package com.zistone.socket;
 
 import com.zistone.util.ConvertUtil;
-import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class SendMT
+public class SendParamSetting
 {
-    private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static String YXGATEWAY_IP;
-    private static int PORT_SOCKET;
-
-    static
-    {
-        YXGATEWAY_IP = PropertiesUtil.GetValueProperties().getProperty("YXGATEWAY_IP");
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
-    }
-
     private Socket m_socket;
-    private Logger m_logger = Logger.getLogger(SendMT.class);
+    private Logger m_logger = Logger.getLogger(SendParamSetting.class);
     private String m_clientIdentity;
+    private String m_data;
 
-    public SendMT() throws IOException
+    public SendParamSetting(Socket socket, String data)
     {
-        m_socket = new Socket(YXGATEWAY_IP, PORT_SOCKET);
+        m_socket = socket;
+        m_data = data;
         InetSocketAddress inetSocketAddress = (InetSocketAddress) m_socket.getRemoteSocketAddress();
         String clientIP = inetSocketAddress.getAddress().getHostAddress();
         int clientPort = inetSocketAddress.getPort();
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public SendMT(int a)
+    /**
+     * 向GPRS发送参数设置
+     *
+     * @return
+     * @throws Exception
+     */
+    public String SendGPRS() throws Exception
     {
-    }
-
-    public static void main(String[] args) throws Exception
-    {
-        new SendMT(0).SendData("300234067349750&09,00,00&3600");
+        if (m_data == null || m_data.equals(""))
+        {
+            throw new Exception("设置参数不能为空");
+        }
+        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>发送GPRS参数设置<<<<<<<<<<<<<<<<<<<<"));
+        String startUpStr = "00090000", upIntervalStr = "0000003C";
+        //标志
+        String hexStr = "7E";
+        //消息,参数下载
+        String payloadHexStr = "8103";
+        //下载的参数的长度
+        payloadHexStr += "0013";
+        //IMEI,模拟工具为毛这里是写死的?
+        payloadHexStr += "055103006334";
+        //流水号
+        payloadHexStr += "1998";
+        //参数个数
+        payloadHexStr += "02";
+        //位置汇报策略,0定时汇报,1定距汇报,2定时定距汇报
+        //payloadHexStr += "00000020";
+        //payloadHexStr += "04";
+        //payloadHexStr += "00000000";
+        //每日起始上报时间
+        payloadHexStr += "00000009";
+        payloadHexStr += "04";
+        payloadHexStr += startUpStr;
+        //上报时间间隔,单位:秒
+        payloadHexStr += "00000029";
+        payloadHexStr += "04";
+        payloadHexStr += upIntervalStr;
+        hexStr += payloadHexStr;
+        //校验码
+        String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
+        hexStr += checkCode;
+        //标志
+        hexStr += "7E";
+        m_logger.debug(">>>构建的GPRS参数设置:" + hexStr);
+        byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
+        //向铱星网关发送数据
+        OutputStream outputStream = m_socket.getOutputStream();
+        outputStream.write(byteArray);
+        outputStream.flush();
+        String info = "";
+        //接收铱星网关的数据
+        //        InputStream inputStream = m_socket.getInputStream();
+        //        byte[] bytes = new byte[1];
+        //        StringBuffer stringBuffer = new StringBuffer();
+        //        while (true)
+        //        {
+        //            if (inputStream.read(bytes) <= 0)
+        //            {
+        //                break;
+        //            }
+        //            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+        //            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+        //            stringBuffer.append(tempStr);
+        //            //已经读完
+        //            if (inputStream.available() == 0)
+        //            {
+        //                info = stringBuffer.toString();
+        //                m_logger.debug(">>>GPRS执行参数设置后收到的信息:" + info);
+        //                stringBuffer.delete(0, stringBuffer.length() - 1);
+        //                break;
+        //            }
+        //        }
+        return info;
     }
 
     /**
      * 向铱星网关发送参数设置
      * 另,铱星设备固定为监控模式
      *
-     * @param data
      * @return
      */
-    public String SendData(String data) throws Exception
+    public String SendMT() throws Exception
     {
-        String[] strArray = data.split("&");
+        if (m_data == null || m_data.equals(""))
+        {
+            throw new Exception("设置参数不能为空");
+        }
+        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>发送铱星设备参数设置<<<<<<<<<<<<<<<<<<<<"));
+        String[] strArray = m_data.split("&");
         String imeiStr;
         String startUpStr;
         String upIntervalStr;
@@ -152,7 +213,6 @@ public class SendMT
         payloadHexStr += "00000009";
         payloadHexStr += "04";
         payloadHexStr += startUpStr;
-
         //上报时间间隔,单位:秒
         payloadHexStr += "00000029";
         payloadHexStr += "04";

@@ -32,8 +32,7 @@ public class Server_MT_Worker implements Runnable
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         String data = dataInputStream.readUTF();
         m_logger.debug(String.format(">>>MT服务(%s)收到来自客户端的终端设置参数:%s", m_clientIdentity, data));
-        //读取客户端发送的数据并发送至铱星网关
-        new SendMT().SendData(data);
+        //TODO:读取客户端发送的数据并发送至铱星网关
         dataOutputStream.close();
         dataInputStream.close();
     }

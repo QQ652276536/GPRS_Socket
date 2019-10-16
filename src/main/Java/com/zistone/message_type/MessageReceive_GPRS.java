@@ -62,12 +62,10 @@ public class MessageReceive_GPRS
         String responseStr = "7E";
         //应答ID,对应终端消息的ID
         responseStr += "8100";
-        //        responseStr += "0005";
         responseStr += bodyPropertyStr;
         responseStr += phoneStr;
         responseStr += detailStr;
         responseStr += detailStr;
-        //                responseStr += idStr;
         String akCode = "";
         if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
         {
@@ -140,7 +138,6 @@ public class MessageReceive_GPRS
             m_logger.debug(">>>终端鉴权失败");
             responseStr += "01";
         }
-        //                responseStr += checkCode;
         responseStr += "A4";
         responseStr += "7E";
         return responseStr;
@@ -174,7 +171,6 @@ public class MessageReceive_GPRS
         String responseStr = "7E";
         //应答ID
         responseStr += "8001";
-        //                    responseStr += bodyPropertyStr;
         responseStr += "0005";
         responseStr += phoneStr;
         responseStr += detailStr;
@@ -191,7 +187,6 @@ public class MessageReceive_GPRS
             m_logger.debug(">>>位置信息汇报失败");
             responseStr += "01";
         }
-        //                    responseStr += checkCode;
         responseStr += "A4";
         responseStr += "7E";
         return responseStr;
@@ -343,7 +338,6 @@ public class MessageReceive_GPRS
                         String responseStr = "7E";
                         //应答ID
                         responseStr += "8001";
-                        //responseStr += bodyPropertyStr;
                         responseStr += "0005";
                         responseStr += phoneStr;
                         responseStr += detailStr;
@@ -351,7 +345,6 @@ public class MessageReceive_GPRS
                         responseStr += idStr;
                         //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
                         responseStr += "01";
-                        //responseStr += checkCode;
                         responseStr += "A4";
                         responseStr += "7E";
                         m_logger.error(">>>位置信息汇报失败,需要先鉴权!\r\n");
