@@ -129,9 +129,8 @@ public class SendMT
         String payloadHexStr = "8103";
         //下载的参数的长度
         payloadHexStr += "0013";
-        //IMEI的后12位,IMEI一共15位
+        //IMEI的后12位,IMEI一共15位,模拟工具为毛这里是写死的?
         //payloadHexStr += imei.substring(3);
-        //模拟工具为毛这里是写死的?
         payloadHexStr += "055103006334";
         //流水号
         payloadHexStr += "1997";
