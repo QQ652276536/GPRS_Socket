@@ -35,7 +35,6 @@ public class Server_MT
         {
             try
             {
-                //开启监听
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 Server_MT_Worker server_mt_woker = new Server_MT_Worker(socket);

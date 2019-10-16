@@ -28,20 +28,20 @@ public class Server_MO
     }
 
     private boolean bbb = true;
+
     public void MyRun()
     {
         while (m_isRuning)
         {
             try
             {
-                //开启监听
                 Socket socket = m_serverSocket.accept();
                 //先配置MT,再接收数据
                 if (bbb)
                 {
                     bbb = false;
                     m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>执行发送参数设置<<<<<<<<<<<<<<<<<<<<"));
-                    new Socket_MT().SendData("300234067349750◎REPORTINTERVAL◎STARTTIME◎1,1,1");
+                    new SendMT().SendData("300234067349750&09,00,00&3600");
                 }
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 //server_mo_woker.Worker();

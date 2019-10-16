@@ -77,7 +77,7 @@ public class MessageReceive_MO
         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
         m_logger.debug(">>>汇报铱星设备位置,返回:" + locationResult);
         locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
-        return deviceResult + "◎" + locationResult;
+        return deviceResult + "&" + locationResult;
     }
 
     /**

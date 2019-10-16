@@ -18,6 +18,8 @@ public class ConvertUtil
 
     public static void main(String[] args) throws Exception
     {
+        System.out.println("Int转HexStr为:" + IntToHexStr(600));
+        System.out.println("------------------------------------------------");
         //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
         String dayOfYear = String.valueOf(LocalDate.now().getDayOfYear());
         String hour = String.valueOf(LocalTime.now().getHour());

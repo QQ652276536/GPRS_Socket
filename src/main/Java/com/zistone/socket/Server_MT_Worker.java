@@ -1,6 +1,5 @@
 package com.zistone.socket;
 
-import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -23,7 +22,7 @@ public class Server_MT_Worker implements Runnable
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public void MyRun() throws Exception
+    public void Worker() throws Exception
     {
         //字节输入流
         InputStream inputStream = m_socket.getInputStream();
@@ -34,7 +33,7 @@ public class Server_MT_Worker implements Runnable
         String data = dataInputStream.readUTF();
         m_logger.debug(String.format(">>>MT服务(%s)收到来自客户端的终端设置参数:%s", m_clientIdentity, data));
         //读取客户端发送的数据并发送至铱星网关
-        new Socket_MT().SendData(data);
+        new SendMT().SendData(data);
         dataOutputStream.close();
         dataInputStream.close();
     }
@@ -44,7 +43,7 @@ public class Server_MT_Worker implements Runnable
     {
         try
         {
-            MyRun();
+            Worker();
         }
         catch (SocketTimeoutException e)
         {

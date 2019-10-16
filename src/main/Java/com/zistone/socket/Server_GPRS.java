@@ -34,7 +34,6 @@ public class Server_GPRS
         {
             try
             {
-                //开启监听
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket);
