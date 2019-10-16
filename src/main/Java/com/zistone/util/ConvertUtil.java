@@ -37,7 +37,7 @@ public class ConvertUtil
         }
         System.out.println(timeHexStr);
         System.out.println("------------------------------------------------");
-        System.out.println("生成的检验码为:" + CreateCheckCode("81 03 00 0A 05 51 03 00 63 34 19 99 01 00 00 00 29 04 00 00 02 58"));
+        System.out.println("生成的检验码为:" + CreateCheckCode("80 01 00 05 55 10 30 00 63 34 12 34 12 34 01 02 00"));
         System.out.println("------------------------------------------------");
 
 
@@ -46,7 +46,11 @@ public class ConvertUtil
         System.out.println("____________________________________________________________________");
         //测试通过
         System.out.println("普通Str转16进制Str:" + StrToHexStr("113943321"));
-        System.out.println("16进制Str转普通Str:" + HexStrToStr("210F6A9C"));
+
+        int aaa = Integer.parseInt("1997",16);
+        System.out.println("aaa:" + aaa);
+
+        System.out.println("16进制Str转普通Str:" + HexStrToStr("21870102"));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("LiWei"));

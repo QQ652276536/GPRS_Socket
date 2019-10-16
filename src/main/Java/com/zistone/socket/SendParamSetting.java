@@ -80,27 +80,27 @@ public class SendParamSetting
         outputStream.flush();
         String info = "";
         //接收铱星网关的数据
-        //        InputStream inputStream = m_socket.getInputStream();
-        //        byte[] bytes = new byte[1];
-        //        StringBuffer stringBuffer = new StringBuffer();
-        //        while (true)
-        //        {
-        //            if (inputStream.read(bytes) <= 0)
-        //            {
-        //                break;
-        //            }
-        //            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-        //            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
-        //            stringBuffer.append(tempStr);
-        //            //已经读完
-        //            if (inputStream.available() == 0)
-        //            {
-        //                info = stringBuffer.toString();
-        //                m_logger.debug(">>>GPRS执行参数设置后收到的信息:" + info);
-        //                stringBuffer.delete(0, stringBuffer.length() - 1);
-        //                break;
-        //            }
-        //        }
+        InputStream inputStream = m_socket.getInputStream();
+        byte[] bytes = new byte[1];
+        StringBuffer stringBuffer = new StringBuffer();
+        while (true)
+        {
+            if (inputStream.read(bytes) <= 0)
+            {
+                break;
+            }
+            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+            stringBuffer.append(tempStr);
+            //已经读完
+            if (inputStream.available() == 0)
+            {
+                info = stringBuffer.toString();
+                m_logger.debug(">>>GPRS执行参数设置后收到的信息:" + info);
+                stringBuffer.delete(0, stringBuffer.length() - 1);
+                break;
+            }
+        }
         return info;
     }
 

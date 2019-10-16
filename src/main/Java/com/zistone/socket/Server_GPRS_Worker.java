@@ -76,6 +76,7 @@ public class Server_GPRS_Worker implements Runnable
             try
             {
                 m_socket.close();
+                m_logger.debug(String.format(">>>GPRS服务(%s)的Socket连接已关闭", m_clientIdentity));
             }
             catch (IOException e)
             {

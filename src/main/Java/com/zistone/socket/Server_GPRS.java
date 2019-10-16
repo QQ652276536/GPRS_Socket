@@ -37,6 +37,7 @@ public class Server_GPRS
             try
             {
                 Socket socket = m_serverSocket.accept();
+                socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket);
                 Thread thread = new Thread(server_gprs_woker);
                 thread.setDaemon(true);
