@@ -122,7 +122,7 @@ public class SendParamSetting
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s", m_clientIdentity, info));
+                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 break;
             }
@@ -278,7 +278,7 @@ public class SendParamSetting
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s", m_clientIdentity, info));
+                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s\r\n", m_clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 break;
             }

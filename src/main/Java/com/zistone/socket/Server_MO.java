@@ -8,12 +8,14 @@ import java.net.*;
 
 public class Server_MO
 {
+    private static final int HEARTTIMEOUT_SOCKET;
     private static final int PORT_SOCKET_MO;
     private static String YXGATEWAY_IP;
     private static int PORT_SOCKET_MT;
 
     static
     {
+        HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
         YXGATEWAY_IP = PropertiesUtil.GetValueProperties().getProperty("YXGATEWAY_IP");
         PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
         PORT_SOCKET_MT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
@@ -24,7 +26,7 @@ public class Server_MO
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
-    public boolean m_isSetYXParam = true;
+    public boolean m_isSetYXParam = false;
     public String m_data = "YX&300234067349750&09,00,00&600";
 
     public Server_MO() throws IOException
@@ -39,6 +41,7 @@ public class Server_MO
             try
             {
                 Socket socket = m_serverSocket.accept();
+                socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 //先配置MT,再接收数据
                 if (m_isSetYXParam)
                 {

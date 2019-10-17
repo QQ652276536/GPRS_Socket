@@ -371,7 +371,8 @@ public class MessageReceive_GPRS
                 //定位数据批量上传
                 case MessageType.LOCATIONBATCHUP:
                 {
-                    m_logger.debug(">>>该消息为[定位数据批量上传]\r\n暂未支持该消息的解析...");
+                    m_logger.debug(">>>该消息为[定位数据批量上传],暂未支持该消息的解析...");
+                    break;
                 }
                 //终端心跳,消息体为空
                 case MessageType.CLIENTHEARTBEAT:
