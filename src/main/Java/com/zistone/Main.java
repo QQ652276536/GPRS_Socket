@@ -41,7 +41,7 @@ public class Main
             DataInputStream dataInputStream = new DataInputStream(inputStream);
             String data = dataInputStream.readUTF();
             //例如:GPRS&300234067349750&09,00,00&600
-            m_logger.debug(">>>收到来自Android端的设置参数:" + data);
+            m_logger.debug(">>>收到来自Android端的设置参数:" + data + "\r\n");
             String deviceType = data.split("&")[0];
             switch (deviceType)
             {
