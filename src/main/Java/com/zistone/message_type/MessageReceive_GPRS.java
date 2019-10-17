@@ -368,13 +368,18 @@ public class MessageReceive_GPRS
                         return responseStr;
                     }
                 }
+                //定位数据批量上传
+                case MessageType.LOCATIONBATCHUP:
+                {
+                    m_logger.debug(">>>该消息为[定位数据批量上传]\r\n暂未支持该消息的解析...");
+                }
                 //终端心跳,消息体为空
                 case MessageType.CLIENTHEARTBEAT:
                 {
                     m_logger.debug(">>>该消息为[终端心跳]");
                     //收到终端的心跳消息后发送平台通用应答消息
                     String responseStr = "7E8001";
-                    responseStr += idValue + 1;
+                    responseStr += ++idValue;
                     responseStr += "007E";
                     return responseStr;
                 }
