@@ -164,8 +164,12 @@ public class SendParamSetting
         //补齐4位
         if (timeHexStr.length() < 8)
         {
+            int i = 8 - timeHexStr.length();
             StringBuffer stringBuffer = new StringBuffer(timeHexStr);
-            stringBuffer.insert(0, "0");
+            for (; i > 0; i--)
+            {
+                stringBuffer.insert(0, "0");
+            }
             timeHexStr = stringBuffer.toString();
         }
         m_logger.debug(">>>生成的消息ID:" + timeHexStr);

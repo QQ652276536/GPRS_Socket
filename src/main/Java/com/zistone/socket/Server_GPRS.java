@@ -46,7 +46,7 @@ public class Server_GPRS
                 {
                     bbb = false;
 
-                    //new SendParamSetting(socket, "300234067349750&09,00,00&600").SendGPRS();
+                    new SendParamSetting(socket, "300234067349750&09,00,00&600").SendGPRS();
                 }
             }
             catch (Exception e)

@@ -18,6 +18,7 @@ public class ConvertUtil
 
     public static void main(String[] args) throws Exception
     {
+        System.out.println("HexSt转Int为:" + Integer.valueOf("00"));
         System.out.println("Int转HexStr为:" + IntToHexStr(600));
         System.out.println("------------------------------------------------");
         //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
@@ -31,13 +32,17 @@ public class ConvertUtil
         //补齐4位
         if (timeHexStr.length() < 8)
         {
+            int i = 8 - timeHexStr.length();
             StringBuffer stringBuffer = new StringBuffer(timeHexStr);
-            stringBuffer.insert(0, "0");
+            for (; i > 0; i--)
+            {
+                stringBuffer.insert(0, "0");
+            }
             timeHexStr = stringBuffer.toString();
         }
         System.out.println(timeHexStr);
         System.out.println("------------------------------------------------");
-        System.out.println("生成的检验码为:" + CreateCheckCode("80 01 00 05 55 10 30 00 63 34 12 34 12 34 01 02 00"));
+        System.out.println("生成的检验码为:" + CreateCheckCode("80 01 00 05 05 51 03 00 63 34 19 97 23 04 01 02 00"));
         System.out.println("------------------------------------------------");
 
 
@@ -45,12 +50,12 @@ public class ConvertUtil
         System.out.println((double) ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15}) / 1000000);
         System.out.println("____________________________________________________________________");
         //测试通过
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("113943321"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("rD9TcH"));
 
-        int aaa = Integer.parseInt("1997",16);
+        int aaa = Integer.parseInt("1997", 16);
         System.out.println("aaa:" + aaa);
 
-        System.out.println("16进制Str转普通Str:" + HexStrToStr("21870102"));
+        System.out.println("16进制Str转普通Str:" + HexStrToStr("00"));
         System.out.println("____________________________________________________________________");
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("李小伟"));
         System.out.println("Unicode编码的中文转16进制的Str:" + DeUnicode("LiWei"));

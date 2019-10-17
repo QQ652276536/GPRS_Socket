@@ -106,7 +106,7 @@ public class MessageReceive_GPRS
      * @param idStr           消息ID
      * @return
      */
-    private String Authoration(String akCode, String bodyPropertyStr, String phoneStr, String detailStr, String idStr)
+    private String Authoration(String akCode, String bodyPropertyStr, String phoneStr, String detailStr, String idStr) throws Exception
     {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_akCode(akCode);
@@ -118,29 +118,46 @@ public class MessageReceive_GPRS
         result = result.substring(beginIndex, endIndex + 1);
         m_logger.debug(">>>终端鉴权返回:" + result);
         m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+        String hexStr = "7E";
         //平台通用应答(0x8001)
-        String responseStr = "7E";
-        //应答ID
-        responseStr += "8001";
-        responseStr += bodyPropertyStr;
-        responseStr += phoneStr;
-        responseStr += detailStr;
-        responseStr += detailStr;
-        responseStr += idStr;
+        String payloadHexStr = "8001";
+        int bodyProperty = Integer.parseInt(bodyPropertyStr, 16);
+        bodyPropertyStr = ConvertUtil.IntToHexStr(++bodyProperty);
+        //补齐4位
+        if (bodyPropertyStr.length() < 4)
+        {
+            int i = 4 - bodyPropertyStr.length();
+            StringBuffer stringBuffer = new StringBuffer(bodyPropertyStr);
+            for (; i > 0; i--)
+            {
+                stringBuffer.insert(0, "0");
+            }
+            bodyPropertyStr = stringBuffer.toString();
+        }
+        payloadHexStr += bodyPropertyStr;
+        payloadHexStr += phoneStr;
+        payloadHexStr += detailStr;
+        payloadHexStr += detailStr;
+        payloadHexStr += idStr;
+        //payloadHexStr += "0005055103006334199723040102";
         //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
         if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
         {
-            m_logger.debug(">>>终端鉴权成功");
-            responseStr += "00";
+            m_logger.debug(">>>存在该鉴权码");
+            payloadHexStr += "00";
         }
         else
         {
-            m_logger.debug(">>>终端鉴权失败");
-            responseStr += "01";
+            m_logger.error(">>>不存在该鉴权码");
+            payloadHexStr += "01";
         }
-        responseStr += "A4";
-        responseStr += "7E";
-        return responseStr;
+        hexStr += payloadHexStr;
+        //校验码
+        String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
+        hexStr += checkCode;
+        hexStr += "7E";
+        return hexStr;
     }
 
     /**
