@@ -23,13 +23,14 @@ public class Server_GPRS
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
+    public boolean m_isSetGPRSParam = false;
+    public String m_data = "";
 
     public Server_GPRS() throws IOException
     {
         m_serverSocket = new ServerSocket(PORT_SOCKET);
     }
 
-    private boolean bbb = true;
     public void MyRun()
     {
         while (m_isRuning)
@@ -42,11 +43,10 @@ public class Server_GPRS
                 Thread thread = new Thread(server_gprs_woker);
                 thread.setDaemon(true);
                 thread.start();
-                if(bbb)
+                if (m_isSetGPRSParam)
                 {
-                    bbb = false;
-
-                    new SendParamSetting(socket, "300234067349750&09,00,00&600").SendGPRS();
+                    m_isSetGPRSParam = false;
+                    new SendParamSetting(socket, m_data).SendGPRS();
                 }
             }
             catch (Exception e)

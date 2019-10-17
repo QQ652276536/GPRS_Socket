@@ -37,10 +37,36 @@ public class SendParamSetting
     {
         if (m_data == null || m_data.equals(""))
         {
-            throw new Exception("设置参数不能为空");
+            throw new Exception("GPRS设置参数不能为空");
         }
-        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>发送GPRS参数设置<<<<<<<<<<<<<<<<<<<<"));
-        String startUpStr = "00090000", upIntervalStr = "0000003C";
+        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>(%s)发送GPRS参数设置<<<<<<<<<<<<<<<<<<<<", m_clientIdentity));
+        String[] strArray = m_data.split("&");
+        String imeiStr;
+        String startUpStr;
+        String upIntervalStr;
+        if (strArray.length >= 4)
+        {
+            imeiStr = strArray[1];
+            m_logger.debug(">>>该铱星设备的IMEI是:" + imeiStr);
+            String startUP = strArray[2];
+            String upInterval = strArray[3];
+            //每日起始时间
+            String[] startUPArray = startUP.split(",");
+            startUpStr = "00" + startUPArray[0] + startUPArray[1] + startUPArray[2];
+            //上报间隔
+            upIntervalStr = ConvertUtil.IntToHexStr(Integer.valueOf(upInterval));
+            StringBuffer stringBuffer = new StringBuffer(upIntervalStr);
+            int i = 8 - upIntervalStr.length();
+            for (; i > 0; i--)
+            {
+                stringBuffer.insert(0, "0");
+            }
+            upIntervalStr = stringBuffer.toString();
+        }
+        else
+        {
+            return "Error";
+        }
         //标志
         String hexStr = "7E";
         //消息,参数下载
@@ -96,7 +122,7 @@ public class SendParamSetting
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();
-                m_logger.debug(">>>GPRS执行参数设置后收到的信息:" + info);
+                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s", m_clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 break;
             }
@@ -114,19 +140,19 @@ public class SendParamSetting
     {
         if (m_data == null || m_data.equals(""))
         {
-            throw new Exception("设置参数不能为空");
+            throw new Exception("铱星设置参数不能为空");
         }
-        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>发送铱星设备参数设置<<<<<<<<<<<<<<<<<<<<"));
+        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>(%s)发送铱星设备参数设置<<<<<<<<<<<<<<<<<<<<", m_clientIdentity));
         String[] strArray = m_data.split("&");
         String imeiStr;
         String startUpStr;
         String upIntervalStr;
-        if (strArray.length >= 3)
+        if (strArray.length >= 4)
         {
-            imeiStr = strArray[0];
+            imeiStr = strArray[1];
             m_logger.debug(">>>该铱星设备的IMEI是:" + imeiStr);
-            String startUP = strArray[1];
-            String upInterval = strArray[2];
+            String startUP = strArray[2];
+            String upInterval = strArray[3];
             //每日起始时间
             String[] startUPArray = startUP.split(",");
             startUpStr = "00" + startUPArray[0] + startUPArray[1] + startUPArray[2];
@@ -252,7 +278,7 @@ public class SendParamSetting
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>MT服务(%s)收到来自铱星网关的信息:%s", m_clientIdentity, info));
+                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s", m_clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 break;
             }

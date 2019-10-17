@@ -4,6 +4,7 @@ import com.zistone.message_type.MessageReceive_MO;
 import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,11 +28,8 @@ public class Server_MO_Worker implements Runnable
     public void Worker() throws Exception
     {
         MessageReceive_MO messageReceive_mo = new MessageReceive_MO();
-        //字节输入流
         InputStream inputStream = m_socket.getInputStream();
-        //字节输出流
         OutputStream outputStream = m_socket.getOutputStream();
-        //按byte读
         byte[] bytes = new byte[1];
         StringBuffer stringBuffer = new StringBuffer();
         while (true)

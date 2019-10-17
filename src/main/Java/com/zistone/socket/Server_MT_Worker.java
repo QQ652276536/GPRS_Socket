@@ -24,10 +24,8 @@ public class Server_MT_Worker implements Runnable
 
     public void Worker() throws Exception
     {
-        //字节输入流
         InputStream inputStream = m_socket.getInputStream();
         DataInputStream dataInputStream = new DataInputStream(inputStream);
-        //字节输出流
         OutputStream outputStream = m_socket.getOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
         String data = dataInputStream.readUTF();

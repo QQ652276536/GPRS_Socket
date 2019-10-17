@@ -28,11 +28,8 @@ public class Server_GPRS_Worker implements Runnable
     public void Worker() throws IOException
     {
         MessageReceive_GPRS messageReceive_gprs = new MessageReceive_GPRS();
-        //字节输入流
         InputStream inputStream = m_socket.getInputStream();
-        //字节输出流
         OutputStream outputStream = m_socket.getOutputStream();
-        //按byte读
         byte[] bytes = new byte[1];
         StringBuffer stringBuffer = new StringBuffer();
         while (true)

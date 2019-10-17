@@ -24,14 +24,13 @@ public class Server_MO
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
-    private boolean m_isSetParam = true;
+    public boolean m_isSetYXParam = false;
+    public String m_data = "";
 
     public Server_MO() throws IOException
     {
         m_serverSocket = new ServerSocket(PORT_SOCKET_MO);
     }
-
-    private boolean bbb = true;
 
     public void MyRun()
     {
@@ -41,12 +40,11 @@ public class Server_MO
             {
                 Socket socket = m_serverSocket.accept();
                 //先配置MT,再接收数据
-                if (!bbb)
+                if (!m_isSetYXParam)
                 {
-                    bbb = false;
-
+                    m_isSetYXParam = false;
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
-                    new SendParamSetting(tempSocket, "300234067349750&09,00,00&600").SendMT();
+                    new SendParamSetting(tempSocket, m_data).SendMT();
                 }
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 //server_mo_woker.Worker();
