@@ -24,8 +24,8 @@ public class Server_MO
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
-    public boolean m_isSetYXParam = false;
-    public String m_data = "";
+    public boolean m_isSetYXParam = true;
+    public String m_data = "YX&300234067349750&09,00,00&600";
 
     public Server_MO() throws IOException
     {
@@ -40,7 +40,7 @@ public class Server_MO
             {
                 Socket socket = m_serverSocket.accept();
                 //先配置MT,再接收数据
-                if (!m_isSetYXParam)
+                if (m_isSetYXParam)
                 {
                     m_isSetYXParam = false;
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
@@ -73,7 +73,7 @@ public class Server_MO
             m_thread = new Thread(this::MyRun);
             m_thread.setDaemon(true);
             m_thread.start();
-            m_logger.debug(String.format(">>>MO服务的线程%d启动...", m_thread.getId()));
+            m_logger.debug(String.format(">>>MO服务的线程%d启动...\r\n", m_thread.getId()));
         }
     }
 
