@@ -52,8 +52,7 @@ public class Server_Set
                         server_gprs.m_setData = data;
                         break;
                     case "YX":
-                        server_mo.m_data = data;
-                        server_mo.m_isSetYXParam = true;
+                        server_mo.m_setData = data;
                         break;
                 }
                 dataOutputStream.writeUTF("OK");
