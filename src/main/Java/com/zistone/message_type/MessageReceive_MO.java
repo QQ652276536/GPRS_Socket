@@ -224,12 +224,12 @@ public class MessageReceive_MO
                     double lotNum = Double.valueOf(Integer.valueOf(lotStr, 16)) / 1000000;
                     //海拔
                     String heighStr = simpleStrArray[20] + simpleStrArray[21];
-                    double heightNum = Integer.parseInt(heighStr, 16);
+                    int heightNum = Integer.parseInt(heighStr, 16);
                     //终端时间
                     String deviceTime = simpleStrArray[24] + simpleStrArray[25] + simpleStrArray[26] + simpleStrArray[27];
                     Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
                     String deviceTimeStr = SIMPLEDATEFORMAT.format(new Date(longDeviceTime));
-                    m_logger.debug(">>>该消息为[位置信息汇报],消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + "," + "纬度:" + latNum + "," + "经度:" + lotNum + ",终端时间:" + deviceTimeStr);
+                    m_logger.debug(">>>该消息为[位置信息汇报],消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + "," + "纬度:" + latNum + "," + "经度:" + lotNum + "海拔:" + heightNum + ",终端时间:" + deviceTimeStr);
                     String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr);
                     break;
                 //通用应答
