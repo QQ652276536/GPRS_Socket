@@ -67,9 +67,11 @@ public class Server_GPRS_Worker implements Runnable
                 outputStream.write(byteArray);
                 outputStream.flush();
                 m_logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", m_clientIdentity, responseStr));
+                //鉴权完毕后发送参数设置
                 if (tempFlag)
                 {
-                    //鉴权完毕后发送参数设置
+                    //延时发送
+                    Thread.sleep(100);
                     if (m_setData != null && !m_setData.equals(""))
                     {
                         String hexDetail = ConvertUtil.IntToHexStr(m_detail);

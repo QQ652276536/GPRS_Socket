@@ -399,11 +399,8 @@ public class MessageReceive_GPRS
         {
             e.printStackTrace();
             m_logger.error(">>>解析内容时发生异常!" + e.getMessage());
-            //返回"Error..."
-            return "4572726F722E2E2E";
         }
-        //返回"Null..."
-        return "4E756C6C2E2E2E";
+        return "";
     }
 
 }

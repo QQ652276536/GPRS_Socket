@@ -42,11 +42,10 @@ public class Server_GPRS
                 //在下发参数设置前有一次设备鉴权后的通用应答
                 m_detail += 2;
                 Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket, m_detail, m_setData);
-                server_gprs_woker.Worker();
-                //                Thread thread = new Thread(server_gprs_woker);
-                //                thread.setDaemon(true);
-                //                thread.start();
-                //                m_logger.debug(">>>----------Server_GPRS_Worker线程启动----------");
+                Thread thread = new Thread(server_gprs_woker);
+                thread.setDaemon(true);
+                thread.start();
+                m_logger.debug(">>>----------Server_GPRS_Worker线程启动----------");
             }
             catch (Exception e)
             {
