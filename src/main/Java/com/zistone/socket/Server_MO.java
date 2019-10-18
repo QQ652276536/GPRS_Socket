@@ -26,7 +26,6 @@ public class Server_MO
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
-    public boolean m_isSetYXParam = false;
     public String m_data = "YX&300234067349750&09,00,00&600";
 
     public Server_MO() throws IOException
@@ -42,15 +41,13 @@ public class Server_MO
             {
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
-                //先配置MT,再接收数据
-                if (m_isSetYXParam)
+                //先发送MT,再接收数据
+                if (m_data != null && !m_data.equals(""))
                 {
-                    m_isSetYXParam = false;
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
                     new SendParamSetting(tempSocket, m_data).SendMT();
                 }
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
-                //server_mo_woker.Worker();
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
