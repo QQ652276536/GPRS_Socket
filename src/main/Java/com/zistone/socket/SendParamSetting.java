@@ -46,7 +46,7 @@ public class SendParamSetting
         if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
-            m_logger.debug(String.format(">>>IMEI是:%s,消息流水是:%s", imeiStr, detail));
+            m_logger.debug(String.format(">>>(%s)IMEI是:%s,消息流水是:%s", m_clientIdentity, imeiStr, detail));
             setParamStr = strArray[2];
         }
         else
@@ -120,7 +120,7 @@ public class SendParamSetting
         if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
-            m_logger.debug(">>>该铱星设备的IMEI是:" + imeiStr);
+            m_logger.debug(String.format(">>>(%s)IMEI是:%s", m_clientIdentity, imeiStr));
             setParamStr = strArray[2];
         }
         else
