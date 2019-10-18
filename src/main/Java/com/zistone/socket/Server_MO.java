@@ -49,12 +49,12 @@ public class Server_MO
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
                     new SendParamSetting(tempSocket, m_data).SendMT();
                 }
+                m_logger.debug(">>>----------创建一个Server_MO_Worker线程----------");
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 //server_mo_woker.Worker();
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
-                m_logger.debug("-----------------------创建一个Server_MO_Worker线程-----------------------");
             }
             catch (Exception e)
             {
