@@ -36,7 +36,6 @@ public class SocketClient_GPRS
                         inputStream.read(bytes);
                         String hexStr = ByteArrayToHexStr(bytes);
                         info += HexStrToStr(hexStr);
-                        //已经读完
                         if (inputStream.available() == 0)
                         {
                             System.out.println("收到来自服务端的信息:" + info);

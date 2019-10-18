@@ -54,6 +54,7 @@ public class Server_MO
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
+                m_logger.debug("-----------------------创建一个Server_MO_Worker线程-----------------------");
             }
             catch (Exception e)
             {
@@ -76,7 +77,7 @@ public class Server_MO
             m_thread = new Thread(this::MyRun);
             m_thread.setDaemon(true);
             m_thread.start();
-            m_logger.debug(String.format(">>>MO服务的线程%d启动...\r\n", m_thread.getId()));
+            m_logger.debug(String.format(">>>MO服务的线程%d启动...", m_thread.getId()));
         }
     }
 

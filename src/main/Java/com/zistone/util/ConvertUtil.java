@@ -42,7 +42,8 @@ public class ConvertUtil
         }
         System.out.println(timeHexStr);
         System.out.println("------------------------------------------------");
-        System.out.println("生成的检验码为:" + CreateCheckCode("80 01 00 05 05 51 03 00 63 34 19 97 23 04 01 02 00"));
+        String sss = HexStrAddCharacter("8103001305510300633419980200000009040009000000000029040000003C", " ");
+        System.out.println("生成的检验码为:" + CreateCheckCode(sss));
         System.out.println("------------------------------------------------");
 
 
@@ -137,7 +138,7 @@ public class ConvertUtil
      * 将收到的消息还原转义后去除标识和校验位,然后按位异或得到的结果就是校验码
      *
      * @param hexStr 带空格不带0x的16进制字符串,比如81 03 00
-     * @return
+     * @return 不足2位前面补零
      */
     public static String CreateCheckCode(String hexStr) throws Exception
     {
@@ -159,7 +160,12 @@ public class ConvertUtil
                 binaryNum ^= tempHexNum;
             }
         }
-        return Integer.toHexString(binaryNum);
+        String result = Integer.toHexString(binaryNum);
+        if (result.length() < 2)
+        {
+            result = "0" + result;
+        }
+        return result;
     }
 
     /**

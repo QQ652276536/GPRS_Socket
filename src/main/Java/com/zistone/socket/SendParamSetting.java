@@ -30,38 +30,24 @@ public class SendParamSetting
     /**
      * 向GPRS发送参数设置
      *
+     * @param detail 16进制的消息流水
      * @return
      * @throws Exception
      */
-    public String SendGPRS() throws Exception
+    public String SendGPRS(String detail) throws Exception
     {
         if (m_data == null || m_data.equals(""))
         {
             throw new Exception("GPRS设置参数不能为空");
         }
-        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>(%s)发送GPRS参数设置<<<<<<<<<<<<<<<<<<<<", m_clientIdentity));
         String[] strArray = m_data.split("&");
         String imeiStr;
-        String startUpStr;
-        String upIntervalStr;
-        if (strArray.length >= 4)
+        String setParamStr;
+        if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
-            m_logger.debug(">>>该铱星设备的IMEI是:" + imeiStr);
-            String startUP = strArray[2];
-            String upInterval = strArray[3];
-            //每日起始时间
-            String[] startUPArray = startUP.split(",");
-            startUpStr = "00" + startUPArray[0] + startUPArray[1] + startUPArray[2];
-            //上报间隔
-            upIntervalStr = ConvertUtil.IntToHexStr(Integer.valueOf(upInterval));
-            StringBuffer stringBuffer = new StringBuffer(upIntervalStr);
-            int i = 8 - upIntervalStr.length();
-            for (; i > 0; i--)
-            {
-                stringBuffer.insert(0, "0");
-            }
-            upIntervalStr = stringBuffer.toString();
+            m_logger.debug(String.format(">>>IMEI是:%s,消息流水是:%s", imeiStr, detail));
+            setParamStr = strArray[2];
         }
         else
         {
@@ -76,21 +62,9 @@ public class SendParamSetting
         //IMEI,模拟工具为毛这里是写死的?
         payloadHexStr += "055103006334";
         //流水号
-        payloadHexStr += "1998";
-        //参数个数
-        payloadHexStr += "02";
-        //位置汇报策略,0定时汇报,1定距汇报,2定时定距汇报
-        //payloadHexStr += "00000020";
-        //payloadHexStr += "04";
-        //payloadHexStr += "00000000";
-        //每日起始上报时间
-        payloadHexStr += "00000009";
-        payloadHexStr += "04";
-        payloadHexStr += startUpStr;
-        //上报时间间隔,单位:秒
-        payloadHexStr += "00000029";
-        payloadHexStr += "04";
-        payloadHexStr += upIntervalStr;
+        payloadHexStr += detail;
+        //设置的参数
+        payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
         String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
@@ -98,35 +72,33 @@ public class SendParamSetting
         hexStr += checkCode;
         //标志
         hexStr += "7E";
-        m_logger.debug(">>>构建的GPRS参数设置:" + hexStr);
+        m_logger.debug(String.format(">>>(%s)发送GPRS设置参数:%s\r\n", m_clientIdentity, hexStr));
         byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
-        //向铱星网关发送数据
         OutputStream outputStream = m_socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
+        //发送参数设置后会收到终端的通用应答,这里就不再接收了
         String info = "";
-        //接收铱星网关的数据
-        InputStream inputStream = m_socket.getInputStream();
-        byte[] bytes = new byte[1];
-        StringBuffer stringBuffer = new StringBuffer();
-        while (true)
-        {
-            if (inputStream.read(bytes) <= 0)
-            {
-                break;
-            }
-            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
-            stringBuffer.append(tempStr);
-            //已经读完
-            if (inputStream.available() == 0)
-            {
-                info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
-                stringBuffer.delete(0, stringBuffer.length() - 1);
-                break;
-            }
-        }
+        //        InputStream inputStream = m_socket.getInputStream();
+        //        byte[] bytes = new byte[1];
+        //        StringBuffer stringBuffer = new StringBuffer();
+        //        while (true)
+        //        {
+        //            if (inputStream.read(bytes) <= 0)
+        //            {
+        //                break;
+        //            }
+        //            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+        //            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+        //            stringBuffer.append(tempStr);
+        //            if (inputStream.available() == 0)
+        //            {
+        //                info = stringBuffer.toString();
+        //                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
+        //                stringBuffer.delete(0, stringBuffer.length() - 1);
+        //                break;
+        //            }
+        //        }
         return info;
     }
 
@@ -142,29 +114,14 @@ public class SendParamSetting
         {
             throw new Exception("铱星设置参数不能为空");
         }
-        m_logger.debug(String.format(">>>>>>>>>>>>>>>>>>>>(%s)发送铱星设备参数设置<<<<<<<<<<<<<<<<<<<<", m_clientIdentity));
         String[] strArray = m_data.split("&");
         String imeiStr;
-        String startUpStr;
-        String upIntervalStr;
-        if (strArray.length >= 4)
+        String setParamStr;
+        if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
             m_logger.debug(">>>该铱星设备的IMEI是:" + imeiStr);
-            String startUP = strArray[2];
-            String upInterval = strArray[3];
-            //每日起始时间
-            String[] startUPArray = startUP.split(",");
-            startUpStr = "00" + startUPArray[0] + startUPArray[1] + startUPArray[2];
-            //上报间隔
-            upIntervalStr = ConvertUtil.IntToHexStr(Integer.valueOf(upInterval));
-            StringBuffer stringBuffer = new StringBuffer(upIntervalStr);
-            int i = 8 - upIntervalStr.length();
-            for (; i > 0; i--)
-            {
-                stringBuffer.insert(0, "0");
-            }
-            upIntervalStr = stringBuffer.toString();
+            setParamStr = strArray[2];
         }
         else
         {
@@ -225,28 +182,8 @@ public class SendParamSetting
         payloadHexStr += "055103006334";
         //流水号
         payloadHexStr += "1997";
-        //参数个数
-        payloadHexStr += "02";
-        //终端心跳
-        //payloadHexStr += "00000001";
-        //payloadHexStr += "04";
-        //payloadHexStr += "00000064";
-        //协议选择,0JT808协议,1简化协议
-        //payloadHexStr += "0000000C";
-        //payloadHexStr += "04";
-        //payloadHexStr += "00000001";
-        //位置汇报策略,0定时汇报,1定距汇报,2定时定距汇报
-        //payloadHexStr += "00000020";
-        //payloadHexStr += "04";
-        //payloadHexStr += "00000000";
-        //每日起始上报时间
-        payloadHexStr += "00000009";
-        payloadHexStr += "04";
-        payloadHexStr += startUpStr;
-        //上报时间间隔,单位:秒
-        payloadHexStr += "00000029";
-        payloadHexStr += "04";
-        payloadHexStr += upIntervalStr;
+        //设置的参数
+        payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
         String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
@@ -254,13 +191,11 @@ public class SendParamSetting
         hexStr += checkCode;
         //标志
         hexStr += "7E";
-        m_logger.debug(">>>构建的MT数据:" + hexStr);
+        m_logger.debug(String.format(">>>(%s)发送铱星设置参数:%s\r\n", m_clientIdentity, hexStr));
         byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
-        //向铱星网关发送数据
         OutputStream outputStream = m_socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
-        //接收铱星网关的数据
         InputStream inputStream = m_socket.getInputStream();
         byte[] bytes = new byte[1];
         String info = "";
@@ -271,10 +206,8 @@ public class SendParamSetting
             {
                 break;
             }
-            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
             String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
-            //已经读完
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();

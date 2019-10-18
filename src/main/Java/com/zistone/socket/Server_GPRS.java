@@ -11,6 +11,7 @@ public class Server_GPRS
 {
     private static final int HEARTTIMEOUT_SOCKET;
     private static final int PORT_SOCKET;
+    private static int m_detail = 6550;
 
     static
     {
@@ -23,8 +24,7 @@ public class Server_GPRS
     //该线程是否正在运行
     private boolean m_isRuning = false;
     private Thread m_thread;
-    public boolean m_isSetGPRSParam = false;
-    public String m_data = "";
+    public String m_setData = "";
 
     public Server_GPRS() throws IOException
     {
@@ -39,15 +39,13 @@ public class Server_GPRS
             {
                 Socket socket = m_serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
-                Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket);
+                //在下发参数设置前有一次设备鉴权后的通用应答
+                m_detail += 2;
+                Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket, m_detail, m_setData);
                 Thread thread = new Thread(server_gprs_woker);
                 thread.setDaemon(true);
                 thread.start();
-                if (m_isSetGPRSParam)
-                {
-                    m_isSetGPRSParam = false;
-                    new SendParamSetting(socket, m_data).SendGPRS();
-                }
+                m_logger.debug("-----------------------创建一个Server_GPRS_Worker线程-----------------------");
             }
             catch (Exception e)
             {

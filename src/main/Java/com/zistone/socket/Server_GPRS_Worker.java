@@ -15,17 +15,21 @@ public class Server_GPRS_Worker implements Runnable
     private Socket m_socket;
     private Logger m_logger = Logger.getLogger(Server_GPRS_Worker.class);
     private String m_clientIdentity;
+    private int m_detail;
+    private String m_setData;
 
-    public Server_GPRS_Worker(Socket socket)
+    public Server_GPRS_Worker(Socket socket, int detail, String setData)
     {
         m_socket = socket;
+        m_detail = detail;
+        m_setData = setData;
         InetSocketAddress inetSocketAddress = (InetSocketAddress) m_socket.getRemoteSocketAddress();
         String clientIP = inetSocketAddress.getAddress().getHostAddress();
         int clientPort = inetSocketAddress.getPort();
         m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
-    public void Worker() throws IOException
+    public void Worker() throws Exception
     {
         MessageReceive_GPRS messageReceive_gprs = new MessageReceive_GPRS();
         InputStream inputStream = m_socket.getInputStream();
@@ -48,10 +52,30 @@ public class Server_GPRS_Worker implements Runnable
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 //解析收到的内容并响应
                 String responseStr = messageReceive_gprs.RecevieHexStr(info);
+                //需要下发设置参数
+                boolean tempFlag = false;
+                if (responseStr.contains("&"))
+                {
+                    String []tempArray = responseStr.split("&");
+                    responseStr = tempArray[0];
+                    if (tempArray[1].equals("SETPARAM"))
+                    {
+                        tempFlag = true;
+                    }
+                }
                 byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
                 outputStream.write(byteArray);
                 outputStream.flush();
                 m_logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", m_clientIdentity, responseStr));
+                if (tempFlag)
+                {
+                    //鉴权完毕后发送参数设置
+                    if (m_setData != null && !m_setData.equals(""))
+                    {
+                        String hexDetail = ConvertUtil.IntToHexStr(m_detail);
+                        new SendParamSetting(m_socket, m_setData).SendGPRS(hexDetail);
+                    }
+                }
             }
         }
     }
@@ -63,7 +87,7 @@ public class Server_GPRS_Worker implements Runnable
         {
             Worker();
         }
-        catch (IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
             m_logger.error(String.format(">>>连接GPRS服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
@@ -73,12 +97,11 @@ public class Server_GPRS_Worker implements Runnable
             try
             {
                 m_socket.close();
-                m_logger.debug(String.format(">>>GPRS服务(%s)的Socket连接已关闭", m_clientIdentity));
             }
             catch (IOException e)
             {
                 e.printStackTrace();
-                m_logger.error(String.format(">>>GPRS服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
+                m_logger.error(String.format(">>>MO服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
             }
         }
     }

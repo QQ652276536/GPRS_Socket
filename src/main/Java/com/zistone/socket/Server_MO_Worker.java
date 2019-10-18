@@ -65,7 +65,6 @@ public class Server_MO_Worker implements Runnable
         }
         catch (Exception e)
         {
-            e.printStackTrace();
             m_logger.error(String.format(">>>连接MO服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
         }
         finally
