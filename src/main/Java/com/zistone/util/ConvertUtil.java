@@ -18,7 +18,7 @@ public class ConvertUtil
 
     public static void main(String[] args) throws Exception
     {
-        System.out.println("HexSt转Int为:" + Integer.valueOf("00"));
+        System.out.println("HexStr转Int为:" + Integer.parseInt("0044",16));
         System.out.println("Int转HexStr为:" + IntToHexStr(9984));
         System.out.println("------------------------------------------------");
         //消息ID,终端自动产生,这里取dayOfYear+hour+minute+s
