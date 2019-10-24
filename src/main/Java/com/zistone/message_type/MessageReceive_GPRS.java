@@ -175,6 +175,7 @@ public class MessageReceive_GPRS
         locationInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
         locationInfo.setM_lat(m_deviceInfo.getM_lat());
         locationInfo.setM_lot(m_deviceInfo.getM_lot());
+        locationInfo.setM_height(m_deviceInfo.getM_height());
         locationInfo.setM_createTime(timeStr);
         String jsonStr = JSON.toJSONString(locationInfo);
         //由Web服务处理位置汇报

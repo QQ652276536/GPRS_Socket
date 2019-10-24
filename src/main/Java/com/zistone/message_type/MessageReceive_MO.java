@@ -18,9 +18,7 @@ import java.util.List;
 public class MessageReceive_MO
 {
     private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    //Web服务IP
     private static String IP_WEB;
-    //Web服务端口
     private static int PORT_WEB;
 
     static
@@ -34,15 +32,18 @@ public class MessageReceive_MO
     /**
      * 位置信息汇报
      *
-     * @param lat       纬度
-     * @param lot       经度
-     * @param height    高度
-     * @param tempIdStr 设备编号
-     * @param typeStr   设备类型
-     * @param timeStr   汇报时间
+     * @param lat         纬度
+     * @param lot         经度
+     * @param height      高度
+     * @param tempIdStr   设备编号
+     * @param typeStr     设备类型
+     * @param timeStr     汇报时间
+     * @param temperature 温度
+     * @param electricity 剩余电量
      * @return
      */
-    private String Location(double lat, double lot, double height, String tempIdStr, String typeStr, String timeStr)
+    private String Location(double lat, double lot, int height, String tempIdStr, String typeStr, String timeStr, int temperature,
+                            int electricity)
     {
         //如果该铱星设备已经注册过则更新它在设备表里的经纬度,否则在设备表里新增一条记录
         DeviceInfo deviceInfo = new DeviceInfo();
@@ -55,6 +56,8 @@ public class MessageReceive_MO
         deviceInfo.setM_state(1);
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_comment("我是Socket模拟的Http请求");
+        deviceInfo.setM_temperature(temperature);
+        deviceInfo.setM_electricity(electricity);
         String deviceJsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
         String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
@@ -216,6 +219,11 @@ public class MessageReceive_MO
                 case "0200":
                     //SN
                     String sn = simpleStrArray[2] + simpleStrArray[3];
+                    //温度
+                    String tempperatureStr = simpleStrArray[10] + simpleStrArray[11];
+                    int temperatureNum = Integer.parseInt(tempperatureStr, 16);
+                    //剩余电量
+                    int electricityNum = 0;
                     //纬度
                     String latStr = simpleStrArray[12] + simpleStrArray[13] + simpleStrArray[14] + simpleStrArray[15];
                     double latNum = Double.valueOf(Integer.valueOf(latStr, 16)) / 1000000;
@@ -225,12 +233,18 @@ public class MessageReceive_MO
                     //海拔
                     String heighStr = simpleStrArray[20] + simpleStrArray[21];
                     int heightNum = Integer.parseInt(heighStr, 16);
+                    //速度
+                    String speedStr = simpleStrArray[22];
+                    int speedNum = Integer.parseInt(heighStr, 16);
+                    //方向
+                    String dirStr = simpleStrArray[23];
+                    int dirNum = Integer.parseInt(heighStr, 16);
                     //终端时间
                     String deviceTime = simpleStrArray[24] + simpleStrArray[25] + simpleStrArray[26] + simpleStrArray[27];
                     Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
                     String deviceTimeStr = SIMPLEDATEFORMAT.format(new Date(longDeviceTime));
                     m_logger.debug(">>>该消息为[位置信息汇报],消息长度:" + length + ",终端手机号或终端ID:" + imeiStr + ",状态信息:" + sessionState + "," + "纬度:" + latNum + "," + "经度:" + lotNum + "海拔:" + heightNum + ",终端时间:" + deviceTimeStr);
-                    String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr);
+                    String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", deviceTimeStr, temperatureNum, electricityNum);
                     break;
                 //通用应答
                 case "0001":

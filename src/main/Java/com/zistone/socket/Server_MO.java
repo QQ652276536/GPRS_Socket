@@ -1,5 +1,6 @@
 package com.zistone.socket;
 
+import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
@@ -12,6 +13,7 @@ public class Server_MO
     private static final int PORT_SOCKET_MO;
     private static String YXGATEWAY_IP;
     private static int PORT_SOCKET_MT;
+    private static int m_detail = 6550;
 
     static
     {
@@ -45,7 +47,11 @@ public class Server_MO
                 if (m_setData != null && !m_setData.equals(""))
                 {
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
-                    new SendParamSetting(tempSocket, m_setData).SendMT();
+                    m_detail += 1;
+                    String hexDetail = ConvertUtil.IntToHexStr(m_detail);
+                    new SendParamSetting(tempSocket, m_setData).SendMT(hexDetail);
+                    tempSocket.close();
+                    Thread.sleep(100);
                 }
                 Server_MO_Worker server_mo_woker = new Server_MO_Worker(socket);
                 Thread thread = new Thread(server_mo_woker);

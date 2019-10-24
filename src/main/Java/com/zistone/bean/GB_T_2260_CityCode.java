@@ -5,10 +5,6 @@ package com.zistone.bean;
  */
 public class GB_T_2260_CityCode
 {
-    public GB_T_2260_CityCode()
-    {
-    }
-
     @Override
     public String toString()
     {
@@ -20,6 +16,23 @@ public class GB_T_2260_CityCode
      */
     private int m_id;
 
+    /**
+     * 城市编码
+     */
+    private int m_code;
+
+    /**
+     * 城市名称
+     *
+     * @return
+     */
+    private String m_name;
+
+    /**
+     * 所属省
+     */
+    private int m_parentProvinceId;
+
     public int getM_id()
     {
         return m_id;
@@ -29,11 +42,6 @@ public class GB_T_2260_CityCode
     {
         this.m_id = m_id;
     }
-
-    /**
-     * 城市编码
-     */
-    private int m_code;
 
     public int getM_code()
     {
@@ -45,13 +53,6 @@ public class GB_T_2260_CityCode
         this.m_code = m_code;
     }
 
-    /**
-     * 城市名称
-     *
-     * @return
-     */
-    private String m_name;
-
     public String getM_name()
     {
         return m_name;
@@ -62,11 +63,6 @@ public class GB_T_2260_CityCode
         this.m_name = m_name;
     }
 
-    /**
-     * 所属省
-     */
-    private int m_parentProvinceId;
-
     public int getM_parentProvinceId()
     {
         return m_parentProvinceId;
@@ -76,5 +72,4 @@ public class GB_T_2260_CityCode
     {
         this.m_parentProvinceId = m_parentProvinceId;
     }
-
 }

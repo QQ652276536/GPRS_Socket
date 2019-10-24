@@ -5,12 +5,14 @@ import java.util.Date;
 
 public class DeviceInfo
 {
+    private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     @Override
     public String toString()
     {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                .format(m_createTime) + ", m_updateTime=" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                .format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + '}';
+        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + SIMPLEDATEFORMAT
+                .format(m_createTime) + ", m_updateTime=" + SIMPLEDATEFORMAT
+                .format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + ", m_temperature=" + m_temperature + ", m_electricity=" + m_electricity + '}';
     }
 
     /**
@@ -26,7 +28,7 @@ public class DeviceInfo
     /**
      * SIM卡号
      */
-    private int m_sim;
+    private String m_sim;
 
     /**
      * 设备名
@@ -55,7 +57,7 @@ public class DeviceInfo
     /**
      * 海拔
      */
-    private double m_height;
+    private int m_height;
 
     /**
      * 创建时间
@@ -77,6 +79,16 @@ public class DeviceInfo
      */
     private String m_akCode;
 
+    /**
+     * 温度
+     */
+    private int m_temperature;
+
+    /**
+     * 剩余电量
+     */
+    private int m_electricity;
+
     public int getM_id()
     {
         return m_id;
@@ -97,12 +109,12 @@ public class DeviceInfo
         this.m_deviceId = m_deviceId;
     }
 
-    public int getM_sim()
+    public String getM_sim()
     {
         return m_sim;
     }
 
-    public void setM_sim(int m_sim)
+    public void setM_sim(String m_sim)
     {
         this.m_sim = m_sim;
     }
@@ -157,12 +169,12 @@ public class DeviceInfo
         this.m_lot = m_lot;
     }
 
-    public double getM_height()
+    public int getM_height()
     {
         return m_height;
     }
 
-    public void setM_height(double m_height)
+    public void setM_height(int m_height)
     {
         this.m_height = m_height;
     }
@@ -205,5 +217,25 @@ public class DeviceInfo
     public void setM_akCode(String m_akCode)
     {
         this.m_akCode = m_akCode;
+    }
+
+    public int getM_temperature()
+    {
+        return m_temperature;
+    }
+
+    public void setM_temperature(int m_temperature)
+    {
+        this.m_temperature = m_temperature;
+    }
+
+    public int getM_electricity()
+    {
+        return m_electricity;
+    }
+
+    public void setM_electricity(int m_electricity)
+    {
+        this.m_electricity = m_electricity;
     }
 }

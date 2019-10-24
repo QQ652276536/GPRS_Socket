@@ -108,7 +108,7 @@ public class SendParamSetting
      *
      * @return
      */
-    public String SendMT() throws Exception
+    public String SendMT(String detail) throws Exception
     {
         if (m_data == null || m_data.equals(""))
         {
@@ -181,7 +181,7 @@ public class SendParamSetting
         //payloadHexStr += imei.substring(3);
         payloadHexStr += "055103006334";
         //流水号
-        payloadHexStr += "1997";
+        payloadHexStr += detail;
         //设置的参数
         payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
@@ -216,6 +216,8 @@ public class SendParamSetting
                 break;
             }
         }
+        inputStream.close();
+        outputStream.close();
         return info;
     }
 
