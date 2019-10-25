@@ -64,7 +64,7 @@ public class MessageReceive_MO
         int beginIndex = deviceResult.indexOf("{");
         int endIndex = deviceResult.lastIndexOf("}");
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>注册铱星设备,返回:" + deviceResult);
+        m_logger.debug(">>>注册/更新铱星设备,返回:" + deviceResult);
         deviceInfo = JSON.parseObject(deviceResult, DeviceInfo.class);
         //同时在历史轨迹里新增一条记录
         LocationInfo locationInfo = new LocationInfo();
@@ -78,7 +78,7 @@ public class MessageReceive_MO
         int beginIndex2 = locationResult.indexOf("{");
         int endIndex2 = locationResult.lastIndexOf("}");
         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-        m_logger.debug(">>>汇报铱星设备位置,返回:" + locationResult);
+        m_logger.debug(">>>汇报铱星设备轨迹位置,返回:" + locationResult);
         locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
         return deviceResult + "&" + locationResult;
     }
