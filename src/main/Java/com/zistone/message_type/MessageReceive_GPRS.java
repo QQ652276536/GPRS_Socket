@@ -326,12 +326,10 @@ public class MessageReceive_GPRS
                     String stateStr = bodyArray[4] + bodyArray[5] + bodyArray[6] + bodyArray[7];
                     //纬度
                     String latStr = bodyArray[8] + bodyArray[9] + bodyArray[10] + bodyArray[11];
-                    byte[] latBytes = ConvertUtil.HexStrToByteArray(latStr);
-                    double latNum = (double) ConvertUtil.ByteArray4ToLong(latBytes) / 1000000;
+                    double latNum = Double.valueOf(Integer.valueOf(latStr, 16)) / 1000000;
                     //经度
                     String lotStr = bodyArray[12] + bodyArray[13] + bodyArray[14] + bodyArray[15];
-                    byte[] lotBytes = ConvertUtil.HexStrToByteArray(lotStr);
-                    double lotNum = (double) ConvertUtil.ByteArray4ToLong(lotBytes) / 1000000;
+                    double lotNum = Double.valueOf(Integer.valueOf(lotStr, 16)) / 1000000;
                     //海拔
                     String heightStr = bodyArray[16] + bodyArray[17];
                     byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
