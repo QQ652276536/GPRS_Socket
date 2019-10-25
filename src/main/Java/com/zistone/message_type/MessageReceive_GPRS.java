@@ -9,6 +9,7 @@ import com.zistone.util.ConvertUtil;
 import com.zistone.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,9 +17,8 @@ import java.util.List;
 
 public class MessageReceive_GPRS
 {
-    //Web服务IP
+    private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static String IP_WEB;
-    //Web服务端口
     private static int PORT_WEB;
     public boolean m_isRunFlag = false;
 
@@ -39,9 +39,12 @@ public class MessageReceive_GPRS
      * @param typeStr         设备类型
      * @param phoneStr        手机号或设备ID
      * @param detailStr       消息流水
+     * @param temperature     温度
+     * @param electricity     剩余电量
      * @return
      */
-    private String Register(String tempIdStr, String bodyPropertyStr, String typeStr, String phoneStr, String detailStr)
+    private String Register(String tempIdStr, String bodyPropertyStr, String typeStr, String phoneStr, String detailStr, int temperature,
+                            int electricity)
     {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_createTime(new Date());
@@ -50,6 +53,8 @@ public class MessageReceive_GPRS
         deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_type(typeStr);
         deviceInfo.setM_comment("我是Socket模拟的Http请求");
+        deviceInfo.setM_temperature(temperature);
+        deviceInfo.setM_electricity(electricity);
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
         String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", jsonStr);
@@ -163,47 +168,61 @@ public class MessageReceive_GPRS
     /**
      * 位置信息汇报
      *
-     * @param timeStr   汇报时间
-     * @param phoneStr  手机号或设备ID
-     * @param detailStr 消息流水
-     * @param idStr     消息ID
+     * @param phoneStr    手机号或设备ID
+     * @param detailStr   消息流水
+     * @param idStr       消息ID
+     * @param lat         纬度
+     * @param lot         经度
+     * @param height      高度
+     * @param dateTime    汇报时间
+     * @param temperature 温度
+     * @param electricity 剩余电量
      * @return
      */
-    private String Location(String timeStr, String phoneStr, String detailStr, String idStr)
+    private String Location(String phoneStr, String detailStr, String idStr, double lat, double lot, int height, Date dateTime,
+                            int temperature, int electricity)
     {
-        LocationInfo locationInfo = new LocationInfo();
-        locationInfo.setM_deviceId(m_deviceInfo.getM_deviceId());
-        locationInfo.setM_lat(m_deviceInfo.getM_lat());
-        locationInfo.setM_lot(m_deviceInfo.getM_lot());
-        locationInfo.setM_height(m_deviceInfo.getM_height());
-        locationInfo.setM_createTime(timeStr);
-        String jsonStr = JSON.toJSONString(locationInfo);
-        //由Web服务处理位置汇报
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", jsonStr);
-        int beginIndex = result.indexOf("{");
-        int endIndex = result.lastIndexOf("}");
-        result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(">>>位置汇报返回:" + result);
-        locationInfo = JSON.parseObject(result, LocationInfo.class);
         //平台通用应答(0x8001)
         String responseStr = "7E";
-        //应答ID
         responseStr += "8001";
         responseStr += "0005";
         responseStr += phoneStr;
         responseStr += detailStr;
         responseStr += detailStr;
         responseStr += idStr;
-        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-        if (null != locationInfo && locationInfo.getM_id() != 0)
+        if (m_deviceInfo != null && m_deviceInfo.getM_id() != 0)
         {
-            m_logger.debug(">>>位置信息汇报成功");
-            responseStr += "00";
+            m_deviceInfo.setM_lat(lat);
+            m_deviceInfo.setM_lot(lot);
+            m_deviceInfo.setM_height(height);
+            m_deviceInfo.setM_createTime(dateTime);
+            m_deviceInfo.setM_temperature(temperature);
+            m_deviceInfo.setM_electricity(electricity);
+            String jsonStr = JSON.toJSONString(m_deviceInfo);
+            //由Web服务处理位置汇报
+            String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/Update", jsonStr);
+            int beginIndex = result.indexOf("{");
+            int endIndex = result.lastIndexOf("}");
+            result = result.substring(beginIndex, endIndex + 1);
+            m_logger.debug(">>>位置汇报返回:" + result);
+            m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+            //判断设备信息是否更新成功
+            //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
+            if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+            {
+                m_logger.debug(">>>位置信息汇报成功");
+                responseStr += "00";
+            }
+            else
+            {
+                m_logger.debug(">>>位置信息汇报失败");
+                responseStr += "01";
+            }
         }
         else
         {
-            m_logger.debug(">>>位置信息汇报失败");
             responseStr += "01";
+            m_logger.error(">>>位置信息汇报失败,需要先鉴权!\r\n");
         }
         responseStr += "A4";
         responseStr += "7E";
@@ -287,15 +306,13 @@ public class MessageReceive_GPRS
                     String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
                     String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
                     m_logger.debug(">>>该消息为[终端注册],省域代码:" + provinceStr + ",市县代码:" + cityStr + ",制造商:" + manufactureStr + ",终端型号:" + typeStr + ",终端ID:" + tempIdStr + ",车牌颜色:" + carColorStr + ",车牌号:" + carFlag2Str);
-                    return Register(tempIdStr, bodyPropertyStr, typeStr, phoneStr, detailStr);
+                    return Register(tempIdStr, bodyPropertyStr, typeStr, phoneStr, detailStr, 0, 0);
                 }
                 //终端鉴权
                 case MessageType.CLIENTAK:
                 {
                     //服务端生成的鉴权码为6位,所以这里取6位的长度
-                    String[] akCodeArray = Arrays.copyOfRange(bodyArray, 0, 6);
-                    //String[] akCodeArray = Arrays.copyOfRange(bodyArray, 0, bodyArray.length);
-                    String hexAkCode = ConvertUtil.StrArrayToStr(akCodeArray);
+                    String hexAkCode = bodyArray[0] + bodyArray[1] + bodyArray[2] + bodyArray[3] + bodyArray[4] + bodyArray[5];
                     String akCode = ConvertUtil.HexStrToStr(hexAkCode);
                     m_logger.debug(">>>该消息为[终端鉴权],鉴权码:" + akCode + ",16进制(" + hexAkCode + ")");
                     return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr) + "&SETPARAM";
@@ -304,70 +321,44 @@ public class MessageReceive_GPRS
                 case MessageType.LOCATIONREPORT:
                 {
                     //报警标志
-                    String[] warningFlag = Arrays.copyOfRange(bodyArray, 0, 4);
-                    String warningStr = ConvertUtil.StrArrayToStr(warningFlag);
+                    String warningStr = bodyArray[0] + bodyArray[1] + bodyArray[2] + bodyArray[3];
                     //状态
-                    String[] state = Arrays.copyOfRange(bodyArray, 4, 8);
-                    String stateStr = ConvertUtil.StrArrayToStr(state);
+                    String stateStr = bodyArray[4] + bodyArray[5] + bodyArray[6] + bodyArray[7];
                     //纬度
-                    String[] lat = Arrays.copyOfRange(bodyArray, 8, 12);
-                    String latStr = ConvertUtil.StrArrayToStr(lat);
+                    String latStr = bodyArray[8] + bodyArray[9] + bodyArray[10] + bodyArray[11];
                     byte[] latBytes = ConvertUtil.HexStrToByteArray(latStr);
                     double latNum = (double) ConvertUtil.ByteArray4ToLong(latBytes) / 1000000;
                     //经度
-                    String[] lot = Arrays.copyOfRange(bodyArray, 12, 16);
-                    String lotStr = ConvertUtil.StrArrayToStr(lot);
+                    String lotStr = bodyArray[12] + bodyArray[13] + bodyArray[14] + bodyArray[15];
                     byte[] lotBytes = ConvertUtil.HexStrToByteArray(lotStr);
                     double lotNum = (double) ConvertUtil.ByteArray4ToLong(lotBytes) / 1000000;
                     //海拔
-                    String[] height = Arrays.copyOfRange(bodyArray, 16, 18);
-                    String heightStr = ConvertUtil.StrArrayToStr(height);
+                    String heightStr = bodyArray[16] + bodyArray[17];
                     byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
-                    double heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
+                    int heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
                     //速度
-                    String[] speed = Arrays.copyOfRange(bodyArray, 18, 20);
-                    String speedStr = ConvertUtil.StrArrayToStr(speed);
+                    String speedStr = bodyArray[18] + bodyArray[19];
                     byte[] speedBytes = ConvertUtil.HexStrToByteArray(speedStr);
                     double speedNum = ConvertUtil.ByteArray2ToInt(speedBytes);
                     //方向
-                    String[] dir = Arrays.copyOfRange(bodyArray, 20, 22);
-                    String dirStr = ConvertUtil.StrArrayToStr(dir);
+                    String dirStr = bodyArray[20] + bodyArray[21];
                     byte[] dirBytes = ConvertUtil.HexStrToByteArray(dirStr);
                     int dirNum = ConvertUtil.ByteArray2ToInt(dirBytes);
                     //时间
-                    String[] time = Arrays.copyOfRange(bodyArray, 22, 28);
-                    String year = time[0].equals("00") ? "0000" : "20" + time[0];
-                    //String month = time[1].equals("00") ? "00" : time[1].replace("0", "");
-                    String month = time[1];
-                    String day = time[2];
-                    String hour = time[3];
-                    String minute = time[4];
-                    String second = time[5];
+                    String year = bodyArray[22].equals("00") ? "0000" : "20" + bodyArray[22];
+                    String month = bodyArray[23];
+                    String day = bodyArray[24];
+                    String hour = bodyArray[25];
+                    String minute = bodyArray[26];
+                    String second = bodyArray[27];
                     String timeStr = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
-                    m_logger.debug(">>>该消息为[位置信息汇报],报警标志:" + warningStr + ",状态:" + stateStr + ",纬度:" + latNum + ",经度:" + lotNum + "," +
-                            "海拨:" + heightNum + ",速度:" + speedNum + ",方向:" + dirNum + ",汇报时间:" + timeStr);
-                    //需要先鉴权,即判断设备是否注册成功或已经注册过
-                    if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
-                    {
-                        return Location(timeStr, phoneStr, detailStr, idStr);
-                    }
-                    else
-                    {
-                        String responseStr = "7E";
-                        //应答ID
-                        responseStr += "8001";
-                        responseStr += "0005";
-                        responseStr += phoneStr;
-                        responseStr += detailStr;
-                        responseStr += detailStr;
-                        responseStr += idStr;
-                        //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-                        responseStr += "01";
-                        responseStr += "A4";
-                        responseStr += "7E";
-                        m_logger.error(">>>位置信息汇报失败,需要先鉴权!\r\n");
-                        return responseStr;
-                    }
+                    Date dateTime = SIMPLEDATEFORMAT.parse(timeStr);
+                    //温度
+                    int temperatureNum = 0;
+                    //电量
+                    int electricityNum = 0;
+                    m_logger.debug(">>>该消息为[位置信息汇报],报警标志:" + warningStr + ",状态:" + stateStr + ",纬度:" + latNum + ",经度:" + lotNum + ",海拨:" + heightNum + ",温度:" + temperatureNum + ",电量:" + electricityNum + ",速度:" + speedNum + ",方向:" + dirNum + ",汇报时间:" + timeStr);
+                    return Location(phoneStr, detailStr, idStr, latNum, lotNum, heightNum, dateTime, temperatureNum, electricityNum);
                 }
                 //定位数据批量上传
                 case MessageType.LOCATIONBATCHUP:

@@ -1,6 +1,7 @@
 package com.zistone.bean;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LocationInfo
 {
@@ -39,9 +40,9 @@ public class LocationInfo
     private int m_height;
 
     /**
-     * 创建时间(由前端上传)
+     * 创建时间
      */
-    private String m_createTime;
+    private Date m_createTime;
 
     public int getM_id()
     {
@@ -83,12 +84,12 @@ public class LocationInfo
         this.m_lot = m_lot;
     }
 
-    public String getM_createTime()
+    public Date getM_createTime()
     {
         return m_createTime;
     }
 
-    public void setM_createTime(String m_createTime)
+    public void setM_createTime(Date m_createTime)
     {
         this.m_createTime = m_createTime;
     }

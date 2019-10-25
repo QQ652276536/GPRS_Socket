@@ -81,7 +81,7 @@ public class FileContentEvent_YX
                         locationInfo.setM_deviceId(deviceId);
                         locationInfo.setM_lat(lat);
                         locationInfo.setM_lot(lot);
-                        locationInfo.setM_createTime(time1);
+                        locationInfo.setM_createTime(date1);
                         locationInfoList.add(locationInfo);
                     }
                 }
@@ -195,7 +195,7 @@ public class FileContentEvent_YX
                         locationInfo.setM_deviceId(deviceId);
                         locationInfo.setM_lat(lat);
                         locationInfo.setM_lot(lot);
-                        locationInfo.setM_createTime(time1);
+                        locationInfo.setM_createTime(date1);
                         m_logger.debug(">>>将本次数据" + locationInfo.toString() + "更新至MySQL数据库");
                         String locationStr = JSON.toJSONString(locationInfo);
                         //由Web服务处理位置汇报
