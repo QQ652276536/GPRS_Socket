@@ -1,14 +1,14 @@
 package com.zistone.socket;
 
 import com.zistone.message_type.MessageReceive_GPRS;
-import com.zistone.message_type.MessageReceive_GPRS;
 import com.zistone.util.ConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 public class Server_GPRS_Worker implements Runnable
 {
@@ -54,9 +54,9 @@ public class Server_GPRS_Worker implements Runnable
                 String responseStr = messageReceive_gprs.RecevieHexStr(info);
                 //需要下发设置参数
                 boolean tempFlag = false;
-                if (responseStr.contains("&"))
+                if (responseStr.contains(","))
                 {
-                    String []tempArray = responseStr.split("&");
+                    String[] tempArray = responseStr.split(",");
                     responseStr = tempArray[0];
                     if (tempArray[1].equals("SETPARAM"))
                     {
@@ -75,7 +75,7 @@ public class Server_GPRS_Worker implements Runnable
                     if (m_setData != null && !m_setData.equals(""))
                     {
                         String hexDetail = ConvertUtil.IntToHexStr(m_detail);
-                        new SendParamSetting(m_socket, m_setData).SendGPRS(hexDetail);
+                        new SendParamSetting(m_socket, m_setData).SendToGPRS(hexDetail);
                     }
                 }
             }

@@ -49,7 +49,7 @@ public class Server_MO
                     Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
                     m_detail += 1;
                     String hexDetail = ConvertUtil.IntToHexStr(m_detail);
-                    new SendParamSetting(tempSocket, m_setData).SendMT(hexDetail);
+                    new SendParamSetting(tempSocket, m_setData).SendToMT(hexDetail);
                     tempSocket.close();
                     Thread.sleep(100);
                 }

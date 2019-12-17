@@ -34,13 +34,13 @@ public class SendParamSetting
      * @return
      * @throws Exception
      */
-    public String SendGPRS(String detail) throws Exception
+    public String SendToGPRS(String detail) throws Exception
     {
-        if (m_data == null || m_data.equals(""))
+        if (m_data == null || m_data.trim().equals(""))
         {
             throw new Exception("GPRS设置参数不能为空");
         }
-        String[] strArray = m_data.split("&");
+        String[] strArray = m_data.split(",");
         String imeiStr;
         String setParamStr;
         if (strArray.length >= 3)
@@ -108,13 +108,13 @@ public class SendParamSetting
      *
      * @return
      */
-    public String SendMT(String detail) throws Exception
+    public String SendToMT(String detail) throws Exception
     {
-        if (m_data == null || m_data.equals(""))
+        if (m_data == null || m_data.trim().equals(""))
         {
             throw new Exception("铱星设置参数不能为空");
         }
-        String[] strArray = m_data.split("&");
+        String[] strArray = m_data.split(",");
         String imeiStr;
         String setParamStr;
         if (strArray.length >= 3)

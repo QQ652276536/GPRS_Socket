@@ -1,7 +1,5 @@
 package com.zistone;
 
-import com.zistone.file_listener.FileContentEvent_YX;
-import com.zistone.file_listener.FileData;
 import com.zistone.socket.Server_GPRS;
 import com.zistone.socket.Server_MO;
 import com.zistone.socket.Server_Set;
