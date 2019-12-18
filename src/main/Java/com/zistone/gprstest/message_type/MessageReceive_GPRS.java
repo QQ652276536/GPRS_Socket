@@ -314,7 +314,7 @@ public class MessageReceive_GPRS
                     String hexAkCode = bodyArray[0] + bodyArray[1] + bodyArray[2] + bodyArray[3] + bodyArray[4] + bodyArray[5];
                     String akCode = ConvertUtil.HexStrToStr(hexAkCode);
                     m_logger.debug(">>>该消息为[终端鉴权],鉴权码:" + akCode + ",16进制(" + hexAkCode + ")");
-                    return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr) + "&SETPARAM";
+                    return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr) + ",SETPARAM";
                 }
                 //位置信息汇报
                 case MessageType.LOCATIONREPORT:
