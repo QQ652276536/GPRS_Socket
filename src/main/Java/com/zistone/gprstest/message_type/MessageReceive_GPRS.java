@@ -56,7 +56,7 @@ public class MessageReceive_GPRS
         deviceInfo.setM_electricity(electricity);
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", jsonStr);
+        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/DeviceInfo/InsertByDeviceId", jsonStr);
         int beginIndex = result.indexOf("{");
         int endIndex = result.lastIndexOf("}");
         result = result.substring(beginIndex, endIndex + 1);
@@ -116,7 +116,7 @@ public class MessageReceive_GPRS
         deviceInfo.setM_akCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端鉴权
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/FindByAKCode", jsonStr);
+        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/DeviceInfo/FindByAKCode", jsonStr);
         int beginIndex = result.indexOf("{");
         int endIndex = result.lastIndexOf("}");
         result = result.substring(beginIndex, endIndex + 1);
@@ -199,7 +199,7 @@ public class MessageReceive_GPRS
             m_deviceInfo.setM_electricity(electricity);
             String jsonStr = JSON.toJSONString(m_deviceInfo);
             //由Web服务处理位置汇报
-            String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/Update", jsonStr);
+            String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/DeviceInfo/Update", jsonStr);
             int beginIndex = result.indexOf("{");
             int endIndex = result.lastIndexOf("}");
             result = result.substring(beginIndex, endIndex + 1);

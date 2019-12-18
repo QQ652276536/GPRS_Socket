@@ -96,7 +96,7 @@ public class FileContentEvent_YX
                 m_logger.debug(">>>本次共读取(过滤了空行):" + lineCount + "条数据,新增" + locationInfoList.size() + "条正确数据");
                 String locationStr = JSON.toJSONString(locationInfoList);
                 //由Web服务处理位置汇报
-                String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/InsertList", locationStr);
+                String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/LocationInfo/InsertList", locationStr);
                 int beginIndex2 = locationResult.indexOf("{");
                 int endIndex2 = locationResult.lastIndexOf("}");
                 locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
@@ -200,7 +200,7 @@ public class FileContentEvent_YX
                         String locationStr = JSON.toJSONString(locationInfo);
                         //由Web服务处理位置汇报
                         String locationResult = new SocketHttp()
-                                .SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/InsertList", locationStr);
+                                .SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/LocationInfo/InsertList", locationStr);
                         int beginIndex2 = locationResult.indexOf("{");
                         int endIndex2 = locationResult.lastIndexOf("}");
                         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);

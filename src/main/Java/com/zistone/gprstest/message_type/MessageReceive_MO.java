@@ -58,7 +58,7 @@ public class MessageReceive_MO
         deviceInfo.setM_electricity(electricity);
         String deviceJsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
-        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
+        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
         int beginIndex = deviceResult.indexOf("{");
         int endIndex = deviceResult.lastIndexOf("}");
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
@@ -72,7 +72,7 @@ public class MessageReceive_MO
         locationInfo.setM_createTime(dateTime);
         String locationStr = JSON.toJSONString(locationInfo);
         //由Web服务处理位置汇报
-        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/Blowdown_Web/LocationInfo/Insert", locationStr);
+        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/LocationInfo/Insert", locationStr);
         int beginIndex2 = locationResult.indexOf("{");
         int endIndex2 = locationResult.lastIndexOf("}");
         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
