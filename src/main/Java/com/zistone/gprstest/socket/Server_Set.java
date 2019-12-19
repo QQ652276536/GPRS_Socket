@@ -43,16 +43,17 @@ public class Server_Set
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 String data = dataInputStream.readUTF();
-                //例如:GPRS&300234067349750&020000000A040000000A0000000B0400000E10
-                m_logger.debug(">>>收到来自Android端的设置参数:" + data + "\r\n");
-                String deviceType = data.split("&")[0];
+                //例如:GPRS,300234067349750,020000000A040000000A0000000B0400000E10
+                String deviceType = data.split(",")[0];
                 switch (deviceType)
                 {
                     case "GPRS":
                         server_gprs.m_setData = data;
+                        m_logger.debug(">>>收到来自Android端设置GPRS的参数:" + data + "\r\n");
                         break;
                     case "YX":
                         server_mo.m_setData = data;
+                        m_logger.debug(">>>收到来自Android端设置铱星的参数:" + data + "\r\n");
                         break;
                 }
                 dataOutputStream.writeUTF("OK");
