@@ -43,7 +43,6 @@ public class MessageReceive_MO
     private String Location(double lat, double lot, int height, String tempIdStr, String typeStr, Date dateTime, int temperature,
                             int electricity)
     {
-        //如果该铱星设备已经注册过则更新它在设备表里的信息,否则在设备表里新增一条记录
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_lat(lat);
