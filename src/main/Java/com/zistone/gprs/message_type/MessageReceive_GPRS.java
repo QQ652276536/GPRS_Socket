@@ -368,7 +368,7 @@ public class MessageReceive_GPRS
                     int temperatureNum = 0;
                     //电量
                     int electricityNum = 0;
-                    m_logger.debug(String.format(">>>该消息为[位置信息汇报],报警标志:%s,状态:%s,纬度:%d,经度:%d,海拨:%d,温度:%d,电量:%d,速度:%d," +
+                    m_logger.debug(String.format(">>>该消息为[位置信息汇报],报警标志:%s,状态:%s,纬度:%lf,经度:%lf,海拨:%d,温度:%d,电量:%d,速度:%lf," +
                                     "方向:%d,汇报时间:%s", warningStr, stateStr, latNum, lotNum, heightNum, temperatureNum,
                             electricityNum,
                             speedNum, dirNum, timeStr));
