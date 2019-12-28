@@ -93,14 +93,15 @@ public class FileContentEvent_YX
             }
             if (locationInfoList.size() > 0)
             {
-                m_logger.debug(">>>本次共读取(过滤了空行):" + lineCount + "条数据,新增" + locationInfoList.size() + "条正确数据");
+                m_logger.debug(String.format(">>>本次共读取(过滤了空行):%d条数据,新增%d条正确数据", lineCount, locationInfoList.size()));
                 String locationStr = JSON.toJSONString(locationInfoList);
                 //由Web服务处理位置汇报
-                String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo/InsertList", locationStr);
+                String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo" +
+                        "/InsertList", locationStr);
                 int beginIndex2 = locationResult.indexOf("{");
                 int endIndex2 = locationResult.lastIndexOf("}");
                 locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-                m_logger.debug(">>>汇报铱星设备位置,返回:" + locationResult);
+                m_logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
             }
         }
         catch (Exception e)
@@ -164,7 +165,8 @@ public class FileContentEvent_YX
                 inputStreamReader = new InputStreamReader(fileInputStream, m_fileData.getM_encode());
                 bufferedReader = new BufferedReader(inputStreamReader);
                 //过滤空行
-                Stream<String> streams = bufferedReader.lines().filter(p -> p != null && !"".equals(p) && p.contains("L"));
+                Stream<String> streams = bufferedReader.lines().filter(p -> p != null && !"".equals(p) && p.contains(
+                        "L"));
                 Object[] array = streams.toArray();
                 lineCount = array.length;
                 m_logger.info(">>>本次共读取(过滤了空行):" + lineCount);
@@ -172,8 +174,9 @@ public class FileContentEvent_YX
                 if (lineCount != LINECOUNT)
                 {
                     //最新的一条数据
-                    String line = String.valueOf(Stream.of(array).filter(p -> p.equals("让过滤器的结果为false,执行返回最后一个元素")).findFirst()
-                            .orElse(array[lineCount - 1]));
+                    String line =
+                            String.valueOf(Stream.of(array).filter(p -> p.equals("让过滤器的结果为false,执行返回最后一个元素")).findFirst()
+                                    .orElse(array[lineCount - 1]));
                     System.out.println(">>>监听的文本文件的内容有更新:" + line);
                     String[] strArray1 = line.split("L");
                     //设备编号
@@ -196,7 +199,7 @@ public class FileContentEvent_YX
                         locationInfo.setM_lat(lat);
                         locationInfo.setM_lot(lot);
                         locationInfo.setM_createTime(date1);
-                        m_logger.debug(">>>将本次数据" + locationInfo.toString() + "更新至MySQL数据库");
+                        m_logger.debug(String.format(">>>将本次数据%s更新至MySQL数据库", locationInfo.toString()));
                         String locationStr = JSON.toJSONString(locationInfo);
                         //由Web服务处理位置汇报
                         String locationResult = new SocketHttp()
@@ -204,7 +207,7 @@ public class FileContentEvent_YX
                         int beginIndex2 = locationResult.indexOf("{");
                         int endIndex2 = locationResult.lastIndexOf("}");
                         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-                        m_logger.debug(">>>汇报铱星设备位置,返回:" + locationResult);
+                        m_logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
                     }
                     else
                     {

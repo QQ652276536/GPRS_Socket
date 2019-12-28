@@ -62,7 +62,7 @@ public class Server_MO
             catch (Exception e)
             {
                 e.printStackTrace();
-                m_logger.error(">>>MO服务开启接收数据的线程时,发生异常:%s" + e.getMessage());
+                m_logger.error(String.format(">>>MO服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
             }
         }
         m_isRuning = false;
@@ -72,7 +72,7 @@ public class Server_MO
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>MO服务(%s)启动失败,该服务正在运行!");
+            m_logger.error(">>>MO服务启动失败,该服务正在运行!");
         }
         else
         {

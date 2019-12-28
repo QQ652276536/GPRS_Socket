@@ -26,7 +26,7 @@ public class Server_Set
     private Server_GPRS server_gprs;
     private Server_MO server_mo;
 
-    public Server_Set(Server_GPRS server_gprs,Server_MO server_mo) throws IOException
+    public Server_Set(Server_GPRS server_gprs, Server_MO server_mo) throws IOException
     {
         m_serverSocket = new ServerSocket(PORT_SOCKET);
         this.server_gprs = server_gprs;
@@ -49,11 +49,11 @@ public class Server_Set
                 {
                     case "GPRS":
                         server_gprs.m_setData = data;
-                        m_logger.debug(">>>收到来自Android端设置GPRS的参数:" + data + "\r\n");
+                        m_logger.debug(String.format(">>>收到来自Android端设置GPRS的参数:%s\r\n", data));
                         break;
                     case "YX":
                         server_mo.m_setData = data;
-                        m_logger.debug(">>>收到来自Android端设置铱星的参数:" + data + "\r\n");
+                        m_logger.debug(String.format(">>>收到来自Android端设置铱星的参数:%s\r\n", data));
                         break;
                 }
                 dataOutputStream.writeUTF("OK");
@@ -65,7 +65,7 @@ public class Server_Set
             catch (Exception e)
             {
                 e.printStackTrace();
-                m_logger.error(">>>Set服务开启接收数据的线程时,发生异常:%s" + e.getMessage());
+                m_logger.error(String.format(">>>Set服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
             }
         }
         m_isRuning = false;
@@ -75,7 +75,7 @@ public class Server_Set
     {
         if (m_isRuning)
         {
-            m_logger.error(">>>Set服务(%s)启动失败,该服务正在运行!");
+            m_logger.error(">>>Set服务启动失败,该服务正在运行!");
         }
         else
         {

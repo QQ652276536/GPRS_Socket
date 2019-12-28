@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: log4j-1.2.17.jar activation-1.1.jar javax.mail-1.5.0.jar f
- astjson-1.2.41.jar javaee-api-7.0.jar
-Main-Class: com.zistone.gprs.Main
-

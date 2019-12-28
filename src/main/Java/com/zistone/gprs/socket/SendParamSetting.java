@@ -155,7 +155,7 @@ public class SendParamSetting
             }
             timeHexStr = stringBuffer.toString();
         }
-        m_logger.debug(">>>生成的消息ID:" + timeHexStr);
+        m_logger.debug(String.format(">>>生成的消息ID:%s", timeHexStr));
         hexStr += timeHexStr;
         //IMEI,15位
         StringBuffer imeiBuffer = new StringBuffer();
