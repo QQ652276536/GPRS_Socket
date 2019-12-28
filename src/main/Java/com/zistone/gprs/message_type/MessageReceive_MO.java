@@ -251,7 +251,7 @@ public class MessageReceive_MO
                     Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
                     Date dateTime = new Date(longDeviceTime);
                     String deviceTimeStr = SIMPLEDATEFORMAT.format(dateTime);
-                    m_logger.debug(String.format(">>>该消息为[位置信息汇报],消息长度:%d,终端手机号或终端ID:%s,状态信息:%s,纬度:%lf,经度:%lf,海拔:%d," +
+                    m_logger.debug(String.format(">>>该消息为[位置信息汇报],消息长度:%d,终端手机号或终端ID:%s,状态信息:%s,纬度:%s,经度:%s,海拔:%d," +
                             "温度:%d,电量:%d,终端时间:%s", length, imeiStr, sessionState, latNum, lotNum, heightNum,
                             temperatureNum, electricityNum, deviceTimeStr));
                     String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", dateTime, temperatureNum,
