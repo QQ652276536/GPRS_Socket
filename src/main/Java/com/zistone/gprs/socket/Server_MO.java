@@ -1,7 +1,7 @@
-package com.zistone.gprstest.socket;
+package com.zistone.gprs.socket;
 
-import com.zistone.gprstest.util.ConvertUtil;
-import com.zistone.gprstest.util.PropertiesUtil;
+import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;

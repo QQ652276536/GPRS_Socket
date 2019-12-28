@@ -1,4 +1,4 @@
-package com.zistone.gprstest.bean;
+package com.zistone.gprs.bean;
 
 public class MessageType
 {

@@ -1,10 +1,10 @@
-package com.zistone.gprstest.message_type;
+package com.zistone.gprs.message_type;
 
 import com.alibaba.fastjson.JSON;
-import com.zistone.gprstest.bean.DeviceInfo;
-import com.zistone.gprstest.bean.LocationInfo;
-import com.zistone.gprstest.socket.SocketHttp;
-import com.zistone.gprstest.util.PropertiesUtil;
+import com.zistone.gprs.bean.DeviceInfo;
+import com.zistone.gprs.bean.LocationInfo;
+import com.zistone.gprs.socket.SocketHttp;
+import com.zistone.gprs.util.PropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -58,7 +58,7 @@ public class MessageReceive_MO
         deviceInfo.setM_electricity(electricity);
         String deviceJsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
-        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
+        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
         int beginIndex = deviceResult.indexOf("{");
         int endIndex = deviceResult.lastIndexOf("}");
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
@@ -72,7 +72,7 @@ public class MessageReceive_MO
         locationInfo.setM_createTime(dateTime);
         String locationStr = JSON.toJSONString(locationInfo);
         //由Web服务处理位置汇报
-        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRSTest_Web/LocationInfo/Insert", locationStr);
+        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo/Insert", locationStr);
         int beginIndex2 = locationResult.indexOf("{");
         int endIndex2 = locationResult.lastIndexOf("}");
         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);

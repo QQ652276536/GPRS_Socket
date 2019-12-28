@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>groupId</groupId>
-    <artifactId>GPRSTest_Sokcet</artifactId>
+    <artifactId>GPRS_Sokcet</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
@@ -37,8 +37,8 @@
         </dependency>
     </dependencies>
 
-    <name>GPRSTest_Sokcet</name>
-    <description>GPRSTest的Socket服务端</description>
+    <name>GPRS_Sokcet</name>
+    <description>GPRS的Socket服务端</description>
 
     <build>
         <plugins>

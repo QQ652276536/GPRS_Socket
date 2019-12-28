@@ -1,4 +1,4 @@
-package com.zistone.gprstest.util;
+package com.zistone.gprs.util;
 
 public class GB2312Util
 {

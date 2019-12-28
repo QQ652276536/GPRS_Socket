@@ -1,4 +1,4 @@
-package com.zistone.gprstest.file_listener;
+package com.zistone.gprs.file_listener;
 
 public class FileData
 {

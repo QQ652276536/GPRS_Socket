@@ -1,4 +1,4 @@
-import com.zistone.gprstest.util.ConvertUtil;
+import com.zistone.gprs.util.ConvertUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.zistone.gprstest.bean;
+package com.zistone.gprs.bean;
 
 /**
  * 《中华人民共和国行政区划代码》的市级代码

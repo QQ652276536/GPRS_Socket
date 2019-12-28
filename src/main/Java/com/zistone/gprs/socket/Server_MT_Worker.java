@@ -1,4 +1,4 @@
-package com.zistone.gprstest.socket;
+package com.zistone.gprs.socket;
 
 import org.apache.log4j.Logger;
 
