@@ -43,6 +43,11 @@ public class MessageReceive_MO
     private String Location(double lat, double lot, int height, String tempIdStr, String typeStr, Date dateTime, int temperature,
                             int electricity)
     {
+        if (lat == 0 || lot == 0)
+        {
+            m_logger.error(">>>数据解析有误,停止注册/更新/汇报铱星设备的位置!");
+            return "Error...";
+        }
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setM_deviceId(tempIdStr);
         deviceInfo.setM_lat(lat);

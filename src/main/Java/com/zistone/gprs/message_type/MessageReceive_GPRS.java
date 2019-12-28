@@ -181,6 +181,11 @@ public class MessageReceive_GPRS
     private String Location(String phoneStr, String detailStr, String idStr, double lat, double lot, int height, Date dateTime,
                             int temperature, int electricity)
     {
+        if(lat == 0 || lot == 0)
+        {
+            m_logger.error(">>>数据解析有误,停止注册/更新/汇报GPRS设备的位置!");
+            return "Error...";
+        }
         //平台通用应答(0x8001)
         String responseStr = "7E";
         responseStr += "8001";
