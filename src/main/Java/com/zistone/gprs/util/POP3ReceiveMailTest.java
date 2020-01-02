@@ -1,31 +1,14 @@
 package com.zistone.gprs.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Properties;
-
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Store;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * 使用POP3协议接收邮件
@@ -35,13 +18,13 @@ public class POP3ReceiveMailTest
 
     public static void main(String[] args) throws Exception
     {
-        receive();
+        Receive();
     }
 
     /**
      * 接收邮件
      */
-    public static void receive() throws Exception
+    public static void Receive() throws Exception
     {
         // 准备连接服务器的会话信息
         Properties props = new Properties();
@@ -52,7 +35,8 @@ public class POP3ReceiveMailTest
         // 创建Session实例对象
         Session session = Session.getInstance(props);
         Store store = session.getStore("pop3");
-        store.connect("qq652276536@163.com", "123456a");
+        //store.connect("qq652276536@163.com", "123456a");
+        store.connect("zstwx9xx@163.com", "zistone123456");
 
         // 获得收件箱
         Folder folder = store.getFolder("INBOX");
@@ -61,7 +45,7 @@ public class POP3ReceiveMailTest
          * Folder.READ_ONLY:只读权限
          * Folder.READ_WRITE:可读可写（可以修改邮件的状态）
          */
-        folder.open(Folder.READ_WRITE);    //打开收件箱
+        folder.open(Folder.READ_ONLY);    //打开收件箱
 
         // 由于POP3协议无法获知邮件的状态,所以getUnreadMessageCount得到的是收件箱的邮件总数
         System.out.println("未读邮件数:" + folder.getUnreadMessageCount());
@@ -71,11 +55,11 @@ public class POP3ReceiveMailTest
         System.out.println("新邮件:" + folder.getNewMessageCount());
 
         // 获得收件箱中的邮件总数
-        System.out.println("邮件总数:" + folder.getMessageCount());
+        System.out.println("邮件总数:" + folder.getMessageCount() + "\n");
 
         // 得到收件箱中的所有邮件,并解析
         Message[] messages = folder.getMessages();
-        parseMessage(messages);
+        ParseMessage(messages);
 
         //释放资源
         folder.close(true);
@@ -87,35 +71,48 @@ public class POP3ReceiveMailTest
      *
      * @param messages 要解析的邮件列表
      */
-    public static void parseMessage(Message... messages) throws MessagingException, IOException
+    public static void ParseMessage(Message... messages)
     {
         if (messages == null || messages.length < 1)
-            throw new MessagingException("未找到要解析的邮件!");
-
+        {
+            System.out.println("没有要解析的邮件!");
+        }
         // 解析所有邮件
         for (int i = 0, count = messages.length; i < count; i++)
         {
-            MimeMessage msg = (MimeMessage) messages[i];
-            System.out.println("------------------解析第" + msg.getMessageNumber() + "封邮件------------------");
-            System.out.println("主题:" + getSubject(msg));
-            System.out.println("发件人:" + getFrom(msg));
-            System.out.println("收件人:" + getReceiveAddress(msg, null));
-            System.out.println("发送时间:" + getSentDate(msg, null));
-            System.out.println("是否已读:" + isSeen(msg));
-            System.out.println("邮件优先级:" + getPriority(msg));
-            System.out.println("是否需要回执:" + isReplySign(msg));
-            System.out.println("邮件大小:" + msg.getSize()+"B");
-            boolean isContainerAttachment = isContainAttachment(msg);
-            System.out.println("是否包含附件:" + isContainerAttachment);
-            if (isContainerAttachment)
+            try
             {
-                saveAttachment(msg, "c:\\mailtmp\\" + msg.getSubject() + "_"); //保存附件
+                MimeMessage msg = (MimeMessage) messages[i];
+                //只解析铱星网关发过来的邮件
+                if (GetFrom(msg).equals("<sbdservice@sbd.iridium.com>"))
+                {
+                    System.out.println("------------------解析第" + msg.getMessageNumber() + "封铱星的邮件------------------");
+                    System.out.println("主题:" + GetSubject(msg));
+                    System.out.println("发件人:" + GetFrom(msg));
+                    System.out.println("收件人:" + GetReceiveAddress(msg, null));
+                    System.out.println("发送时间:" + GetSentDate(msg, null));
+                    System.out.println("是否已读:" + IsSeen(msg));
+                    System.out.println("邮件优先级:" + GetPriority(msg));
+                    System.out.println("是否需要回执:" + IsReplySign(msg));
+                    System.out.println("邮件大小:" + msg.getSize() + "B");
+                    //是否包含附件
+                    boolean flag = IsContainAttachment(msg);
+                    System.out.println("是否包含附件:" + flag);
+                    if (flag)
+                    {
+                        //保存附件
+                        SaveAttachment(msg, String.format("C:\\Users\\zistone\\Desktop\\YX_Email\\", msg.getSubject()));
+                    }
+                    StringBuffer content = new StringBuffer();
+                    GetMailTextContent(msg, content);
+                    System.out.println("邮件正文:" + (content.length() > 500 ? content.substring(0, 500) + "..." : content));
+                    System.out.println("-----------------第" + msg.getMessageNumber() + "封铱星的邮件解析结束-----------------\n");
+                }
             }
-            StringBuffer content = new StringBuffer(30);
-            getMailTextContent(msg, content);
-            System.out.println("邮件正文:" + (content.length() > 100 ? content.substring(0, 100) + "..." : content));
-            System.out.println("-----------------第" + msg.getMessageNumber() + "封邮件解析结束-----------------");
-            System.out.println();
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -125,7 +122,7 @@ public class POP3ReceiveMailTest
      * @param msg 邮件内容
      * @return 解码后的邮件主题
      */
-    public static String getSubject(MimeMessage msg) throws UnsupportedEncodingException, MessagingException
+    public static String GetSubject(MimeMessage msg) throws UnsupportedEncodingException, MessagingException
     {
         return MimeUtility.decodeText(msg.getSubject());
     }
@@ -134,17 +131,18 @@ public class POP3ReceiveMailTest
      * 获得邮件发件人
      *
      * @param msg 邮件内容
-     * @return 姓名 <Email地址>
+     * @return 姓名<Email地址>
      * @throws MessagingException
      * @throws UnsupportedEncodingException
      */
-    public static String getFrom(MimeMessage msg) throws MessagingException, UnsupportedEncodingException
+    public static String GetFrom(MimeMessage msg) throws MessagingException, UnsupportedEncodingException
     {
-        String from = "";
+        String from;
         Address[] froms = msg.getFrom();
         if (froms.length < 1)
+        {
             throw new MessagingException("没有发件人!");
-
+        }
         InternetAddress address = (InternetAddress) froms[0];
         String person = address.getPersonal();
         if (person != null)
@@ -156,7 +154,6 @@ public class POP3ReceiveMailTest
             person = "";
         }
         from = person + "<" + address.getAddress() + ">";
-
         return from;
     }
 
@@ -168,10 +165,10 @@ public class POP3ReceiveMailTest
      *
      * @param msg  邮件内容
      * @param type 收件人类型
-     * @return 收件人1 <邮件地址1>, 收件人2 <邮件地址2>, ...
+     * @return 收件人1<邮件地址1>, 收件人2<邮件地址2>, ...
      * @throws MessagingException
      */
-    public static String getReceiveAddress(MimeMessage msg, Message.RecipientType type) throws MessagingException
+    public static String GetReceiveAddress(MimeMessage msg, Message.RecipientType type) throws MessagingException
     {
         StringBuffer receiveAddress = new StringBuffer();
         Address[] addresss = null;
@@ -183,17 +180,17 @@ public class POP3ReceiveMailTest
         {
             addresss = msg.getRecipients(type);
         }
-
         if (addresss == null || addresss.length < 1)
+        {
             throw new MessagingException("没有收件人!");
+        }
         for (Address address : addresss)
         {
             InternetAddress internetAddress = (InternetAddress) address;
             receiveAddress.append(internetAddress.toUnicodeString()).append(",");
         }
-
-        receiveAddress.deleteCharAt(receiveAddress.length() - 1);    //删除最后一个逗号
-
+        //删除最后一个逗号
+        receiveAddress.deleteCharAt(receiveAddress.length() - 1);
         return receiveAddress.toString();
     }
 
@@ -204,26 +201,28 @@ public class POP3ReceiveMailTest
      * @return yyyy年mm月dd日 星期X HH:mm
      * @throws MessagingException
      */
-    public static String getSentDate(MimeMessage msg, String pattern) throws MessagingException
+    public static String GetSentDate(MimeMessage msg, String pattern) throws MessagingException
     {
         Date receivedDate = msg.getSentDate();
         if (receivedDate == null)
+        {
             return "";
-
+        }
         if (pattern == null || "".equals(pattern))
+        {
             pattern = "yyyy年MM月dd日 E HH:mm ";
-
+        }
         return new SimpleDateFormat(pattern).format(receivedDate);
     }
 
     /**
      * 判断邮件中是否包含附件
      *
-     * @return 邮件中存在附件返回true，不存在返回false
+     * @return 邮件中存在附件返回true, 不存在返回false
      * @throws MessagingException
      * @throws IOException
      */
-    public static boolean isContainAttachment(Part part) throws MessagingException, IOException
+    public static boolean IsContainAttachment(Part part) throws MessagingException, IOException
     {
         boolean flag = false;
         if (part.isMimeType("multipart/*"))
@@ -240,7 +239,7 @@ public class POP3ReceiveMailTest
                 }
                 else if (bodyPart.isMimeType("multipart/*"))
                 {
-                    flag = isContainAttachment(bodyPart);
+                    flag = IsContainAttachment(bodyPart);
                 }
                 else
                 {
@@ -255,14 +254,15 @@ public class POP3ReceiveMailTest
                         flag = true;
                     }
                 }
-
                 if (flag)
+                {
                     break;
+                }
             }
         }
         else if (part.isMimeType("message/rfc822"))
         {
-            flag = isContainAttachment((Part) part.getContent());
+            flag = IsContainAttachment((Part) part.getContent());
         }
         return flag;
     }
@@ -274,7 +274,7 @@ public class POP3ReceiveMailTest
      * @return 如果邮件已读返回true, 否则返回false
      * @throws MessagingException
      */
-    public static boolean isSeen(MimeMessage msg) throws MessagingException
+    public static boolean IsSeen(MimeMessage msg) throws MessagingException
     {
         return msg.getFlags().contains(Flags.Flag.SEEN);
     }
@@ -286,12 +286,14 @@ public class POP3ReceiveMailTest
      * @return 需要回执返回true, 否则返回false
      * @throws MessagingException
      */
-    public static boolean isReplySign(MimeMessage msg) throws MessagingException
+    public static boolean IsReplySign(MimeMessage msg) throws MessagingException
     {
         boolean replySign = false;
         String[] headers = msg.getHeader("Disposition-Notification-To");
         if (headers != null)
+        {
             replySign = true;
+        }
         return replySign;
     }
 
@@ -302,7 +304,7 @@ public class POP3ReceiveMailTest
      * @return 1(High):紧急  3:普通(Normal)  5:低(Low)
      * @throws MessagingException
      */
-    public static String getPriority(MimeMessage msg) throws MessagingException
+    public static String GetPriority(MimeMessage msg) throws MessagingException
     {
         String priority = "普通";
         String[] headers = msg.getHeader("X-Priority");
@@ -310,11 +312,17 @@ public class POP3ReceiveMailTest
         {
             String headerPriority = headers[0];
             if (headerPriority.indexOf("1") != -1 || headerPriority.indexOf("High") != -1)
+            {
                 priority = "紧急";
+            }
             else if (headerPriority.indexOf("5") != -1 || headerPriority.indexOf("Low") != -1)
+            {
                 priority = "低";
+            }
             else
+            {
                 priority = "普通";
+            }
         }
         return priority;
     }
@@ -327,7 +335,7 @@ public class POP3ReceiveMailTest
      * @throws MessagingException
      * @throws IOException
      */
-    public static void getMailTextContent(Part part, StringBuffer content) throws MessagingException, IOException
+    public static void GetMailTextContent(Part part, StringBuffer content) throws MessagingException, IOException
     {
         //如果是文本类型的附件，通过getContent方法可以取到文本内容，但这不是我们需要的结果，所以在这里要做判断
         boolean isContainTextAttach = part.getContentType().indexOf("name") > 0;
@@ -337,7 +345,7 @@ public class POP3ReceiveMailTest
         }
         else if (part.isMimeType("message/rfc822"))
         {
-            getMailTextContent((Part) part.getContent(), content);
+            GetMailTextContent((Part) part.getContent(), content);
         }
         else if (part.isMimeType("multipart/*"))
         {
@@ -346,7 +354,7 @@ public class POP3ReceiveMailTest
             for (int i = 0; i < partCount; i++)
             {
                 BodyPart bodyPart = multipart.getBodyPart(i);
-                getMailTextContent(bodyPart, content);
+                GetMailTextContent(bodyPart, content);
             }
         }
     }
@@ -361,12 +369,12 @@ public class POP3ReceiveMailTest
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void saveAttachment(Part part, String destDir) throws UnsupportedEncodingException, MessagingException,
+    public static void SaveAttachment(Part part, String destDir) throws UnsupportedEncodingException, MessagingException,
             FileNotFoundException, IOException
     {
         if (part.isMimeType("multipart/*"))
         {
-            Multipart multipart = (Multipart) part.getContent();    //复杂体邮件
+            Multipart multipart = (Multipart) part.getContent();
             //复杂体邮件包含多个邮件体
             int partCount = multipart.getCount();
             for (int i = 0; i < partCount; i++)
@@ -377,26 +385,33 @@ public class POP3ReceiveMailTest
                 String disp = bodyPart.getDisposition();
                 if (disp != null && (disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)))
                 {
-                    InputStream is = bodyPart.getInputStream();
-                    saveFile(is, destDir, decodeText(bodyPart.getFileName()));
+                    String fileName = bodyPart.getFileName();
+                    if (fileName != null && !fileName.equals(""))
+                    {
+                        SaveFile(bodyPart.getInputStream(), destDir, DecodeText(fileName));
+                    }
                 }
                 else if (bodyPart.isMimeType("multipart/*"))
                 {
-                    saveAttachment(bodyPart, destDir);
+                    SaveAttachment(bodyPart, destDir);
                 }
                 else
                 {
                     String contentType = bodyPart.getContentType();
                     if (contentType.indexOf("name") != -1 || contentType.indexOf("application") != -1)
                     {
-                        saveFile(bodyPart.getInputStream(), destDir, decodeText(bodyPart.getFileName()));
+                        String fileName = bodyPart.getFileName();
+                        if (fileName != null && !fileName.equals(""))
+                        {
+                            SaveFile(bodyPart.getInputStream(), destDir, DecodeText(fileName));
+                        }
                     }
                 }
             }
         }
         else if (part.isMimeType("message/rfc822"))
         {
-            saveAttachment((Part) part.getContent(), destDir);
+            SaveAttachment((Part) part.getContent(), destDir);
         }
     }
 
@@ -409,12 +424,16 @@ public class POP3ReceiveMailTest
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private static void saveFile(InputStream is, String destDir, String fileName) throws FileNotFoundException, IOException
+    private static void SaveFile(InputStream is, String destDir, String fileName) throws FileNotFoundException, IOException
     {
+        if (fileName == null || fileName.equals(""))
+        {
+            System.err.println("要写入的文件名不能为空!");
+            return;
+        }
         BufferedInputStream bis = new BufferedInputStream(is);
-        //        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(destDir + fileName)));
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File("C:\\Users\\zistone\\Desktop\\" + fileName)));
-        int len = -1;
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(new File(destDir + fileName)));
+        int len;
         while ((len = bis.read()) != -1)
         {
             bos.write(len);
@@ -431,7 +450,7 @@ public class POP3ReceiveMailTest
      * @return 解码后的文本
      * @throws UnsupportedEncodingException
      */
-    public static String decodeText(String encodeText) throws UnsupportedEncodingException
+    public static String DecodeText(String encodeText) throws UnsupportedEncodingException
     {
         if (encodeText == null || "".equals(encodeText))
         {
