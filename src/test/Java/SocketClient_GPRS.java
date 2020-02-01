@@ -27,7 +27,7 @@ public class SocketClient_GPRS
                 outputStream.flush();
                 //得到一个输入流，用于接收服务器响应的数据
                 InputStream inputStream = socket.getInputStream();
-                byte[] bytes = new byte[1]; // 一次读取一个byte
+                byte[] bytes = new byte[1];
                 String info = "";
                 while (true)
                 {

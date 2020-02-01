@@ -117,7 +117,7 @@ public class MessageReceive_MO
              */
             //版本,例如:01
             String version = strArray[0];
-            if (version.equals("03") || version.equals("16") || version.equals("47") || version.equals("80"))
+            if (!version.equals("01"))
             {
                 int length = Integer.valueOf(strArray[4]);
                 if (length > 0)

@@ -79,26 +79,26 @@ public class SendParamSetting
         outputStream.flush();
         //发送参数设置后会收到终端的通用应答,这里就不再接收了
         String info = "";
-        //        InputStream inputStream = m_socket.getInputStream();
-        //        byte[] bytes = new byte[1];
-        //        StringBuffer stringBuffer = new StringBuffer();
-        //        while (true)
-        //        {
-        //            if (inputStream.read(bytes) <= 0)
-        //            {
-        //                break;
-        //            }
-        //            //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-        //            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
-        //            stringBuffer.append(tempStr);
-        //            if (inputStream.available() == 0)
-        //            {
-        //                info = stringBuffer.toString();
-        //                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
-        //                stringBuffer.delete(0, stringBuffer.length() - 1);
-        //                break;
-        //            }
-        //        }
+        //       InputStream inputStream = m_socket.getInputStream();
+        //       byte[] bytes = new byte[1];
+        //       StringBuffer stringBuffer = new StringBuffer();
+        //       while (true)
+        //       {
+        //           if (inputStream.read(bytes) <= 0)
+        //           {
+        //               break;
+        //           }
+        //           //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
+        //           String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+        //           stringBuffer.append(tempStr);
+        //           if (inputStream.available() == 0)
+        //           {
+        //               info = stringBuffer.toString();
+        //               m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
+        //               stringBuffer.delete(0, stringBuffer.length() - 1);
+        //               break;
+        //           }
+        //       }
         return info;
     }
 

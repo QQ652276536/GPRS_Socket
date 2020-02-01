@@ -1,5 +1,6 @@
 package com.zistone.gprs;
 
+import com.zistone.gprs.file_listener.FileContentEvent_YX;
 import com.zistone.gprs.socket.Server_GPRS;
 import com.zistone.gprs.socket.Server_MO;
 import com.zistone.gprs.socket.Server_Set;
@@ -23,12 +24,7 @@ public class Main
             server_setParam.MyStart();
 
             //监听模拟工具生成的文本的方式来获取数据server_mo.MyStart();
-            //            FileData fileData = new FileData();
-            //            fileData.setM_path("C:\\demo\\sm_info.txt");
-            //            fileData.setM_path("C:\\Users\\zistone\\Desktop\\gprs_info.txt");
-            //            fileData.setM_time(5 * 1000 * 60);
-            //            fileData.setM_encode("UTF-8");
-            //            new FileContentEvent_YX(fileData);
+            new FileContentEvent_YX();
         }
         catch (Exception e)
         {

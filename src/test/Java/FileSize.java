@@ -21,8 +21,8 @@ public class FileSize
             System.out.println("16进制:" + subStr + "\t10进制:" + num);
             sum += num;
         }
-        //        BASE64Encoder encoder = new BASE64Encoder();
-        //        String base64Str = encoder.encode(data);
+        //       BASE64Encoder encoder = new BASE64Encoder();
+        //       String base64Str = encoder.encode(data);
         System.out.println(sum);
     }
 

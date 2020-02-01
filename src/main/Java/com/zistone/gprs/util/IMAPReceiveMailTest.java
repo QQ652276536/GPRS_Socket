@@ -1,5 +1,8 @@
 package com.zistone.gprs.util;
 
+import com.sun.mail.imap.IMAPFolder;
+import com.sun.mail.imap.IMAPStore;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -11,9 +14,9 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * 使用POP3协议接收邮件
+ * 使用IMAP协议接收邮件
  */
-public class POP3ReceiveMailTest
+public class IMAPReceiveMailTest
 {
 
     public static void main(String[] args) throws Exception
@@ -28,42 +31,39 @@ public class POP3ReceiveMailTest
     {
         //准备连接服务器的会话信息
         Properties props = new Properties();
-        props.setProperty("mail.store.protocol", "pop3");
-        props.setProperty("mail.pop3.port", "110");
-        props.setProperty("mail.pop3.host", "pop3.163.com");
+        props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.setProperty("mail.imap.socketFactory.port", "110");
+        props.setProperty("mail.store.protocol", "imap");
+        props.setProperty("mail.imap.host", "imap.163.com");
+        props.setProperty("mail.imap.port", "993");
+        props.setProperty("mail.imap.auth.login.disable", "true");
 
         //创建Session实例对象
         Session session = Session.getInstance(props);
-        Store store = session.getStore("pop3");
-        //store.connect("qq652276536@163.com", "123456a");
-        store.connect("zstwx9xx@163.com", "zistone123456");
+        IMAPStore imapStore = (IMAPStore) session.getStore("imap");
+        imapStore.connect("zstwx9xx@163.com", "zistone123456");
 
         //获得收件箱
-        Folder folder = store.getFolder("INBOX");
-
+        IMAPFolder imapFolder = (IMAPFolder) imapStore.getFolder("INBOX");
+        //打开收件箱
         /**
          * Folder.READ_ONLY:只读权限
          * Folder.READ_WRITE:可读可写（可以修改邮件的状态）
          */
-        folder.open(Folder.READ_ONLY);    //打开收件箱
+        imapFolder.open(Folder.READ_ONLY);
 
-        //由于POP3协议无法获知邮件的状态,所以getUnreadMessageCount得到的是收件箱的邮件总数
-        System.out.println("未读邮件数:" + folder.getUnreadMessageCount());
-
-        //由于POP3协议无法获知邮件的状态,所以下面得到的结果始终都是为0
-        System.out.println("删除邮件数:" + folder.getDeletedMessageCount());
-        System.out.println("新邮件:" + folder.getNewMessageCount());
-
-        //获得收件箱中的邮件总数
-        System.out.println("邮件总数:" + folder.getMessageCount() + "\n");
+        System.out.println("邮件总数:" + imapFolder.getMessageCount());
+        System.out.println("新邮件:" + imapFolder.getNewMessageCount());
+        System.out.println("未读邮件数:" + imapFolder.getUnreadMessageCount());
+        System.out.println("删除邮件数:" + imapFolder.getDeletedMessageCount() + "\n");
 
         //得到收件箱中的所有邮件,并解析
-        Message[] messages = folder.getMessages();
+        Message[] messages = imapFolder.getMessages();
         ParseMessage(messages);
 
         //释放资源
-        folder.close(true);
-        store.close();
+        imapFolder.close(true);
+        imapStore.close();
     }
 
     /**

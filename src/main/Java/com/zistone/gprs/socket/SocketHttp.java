@@ -73,15 +73,15 @@ public class SocketHttp
                 }
             }
 
-            //            Stream<String> streams = m_bufferedReader.lines();
-            //            Object[] array = streams.toArray();
-            //            int lineCount = array.length;
-            //            for (int i = 0; i < lineCount; i++)
-            //            {
-            //                line = array[i].toString();
-            //                m_logger.debug(line);
-            //                result += line;
-            //            }
+            //           Stream<String> streams = m_bufferedReader.lines();
+            //           Object[] array = streams.toArray();
+            //           int lineCount = array.length;
+            //           for (int i = 0; i < lineCount; i++)
+            //           {
+            //               line = array[i].toString();
+            //               m_logger.debug(line);
+            //               result += line;
+            //           }
             return result;
         }
         catch (Exception e)
