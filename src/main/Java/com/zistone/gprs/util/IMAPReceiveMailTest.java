@@ -31,11 +31,9 @@ public class IMAPReceiveMailTest
     {
         //准备连接服务器的会话信息
         Properties props = new Properties();
-        props.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-        props.setProperty("mail.imap.socketFactory.port", "110");
         props.setProperty("mail.store.protocol", "imap");
         props.setProperty("mail.imap.host", "imap.163.com");
-        props.setProperty("mail.imap.port", "993");
+        props.setProperty("mail.imap.port", "143");
         props.setProperty("mail.imap.auth.login.disable", "true");
 
         //创建Session实例对象
@@ -50,15 +48,25 @@ public class IMAPReceiveMailTest
          * Folder.READ_ONLY:只读权限
          * Folder.READ_WRITE:可读可写（可以修改邮件的状态）
          */
-        imapFolder.open(Folder.READ_ONLY);
+        imapFolder.open(Folder.READ_WRITE);
 
-        System.out.println("邮件总数:" + imapFolder.getMessageCount());
-        System.out.println("新邮件:" + imapFolder.getNewMessageCount());
-        System.out.println("未读邮件数:" + imapFolder.getUnreadMessageCount());
-        System.out.println("删除邮件数:" + imapFolder.getDeletedMessageCount() + "\n");
+        //邮件总数
+        int totalCount = imapFolder.getMessageCount();
+        //新邮件
+        int newCount = imapFolder.getNewMessageCount();
+        //未读邮件数
+        int unReadCount = imapFolder.getUnreadMessageCount();
+        //删除邮件数
+        int delCount = imapFolder.getDeletedMessageCount();
+        System.out.println("邮件总数:" + totalCount);
+        System.out.println("新邮件:" + newCount);
+        System.out.println("未读邮件数:" + unReadCount);
+        System.out.println("删除邮件数:" + delCount + "\n");
 
-        //得到收件箱中的所有邮件,并解析
-        Message[] messages = imapFolder.getMessages();
+        //        //得到收件箱中的所有邮件,并解析
+        //        Message[] messages = imapFolder.getMessages();
+        //得到收件箱中的所有未读邮件,并解析
+        Message[] messages = imapFolder.getMessages(totalCount - unReadCount + 1, totalCount);
         ParseMessage(messages);
 
         //释放资源
@@ -83,6 +91,8 @@ public class IMAPReceiveMailTest
             try
             {
                 MimeMessage msg = (MimeMessage) messages[i];
+                //设置已读标志
+                msg.setFlag(Flags.Flag.SEEN, true);
                 //只解析铱星网关发过来的邮件
                 if (GetFrom(msg).equals("<sbdservice@sbd.iridium.com>"))
                 {
@@ -107,6 +117,10 @@ public class IMAPReceiveMailTest
                     GetMailTextContent(msg, content);
                     System.out.println("邮件正文:" + (content.length() > 500 ? content.substring(0, 500) + "..." : content));
                     System.out.println("-----------------第" + msg.getMessageNumber() + "封铱星的邮件解析结束-----------------\n");
+                }
+                else
+                {
+                    System.out.println("该邮件不是铱星网关的,已设为已读但不解析!");
                 }
             }
             catch (Exception e)
