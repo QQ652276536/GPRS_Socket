@@ -3,104 +3,97 @@ package com.zistone.gprs.bean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class LocationInfo
-{
+public class LocationInfo {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public String toString()
-    {
-        return "LocationInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", " + "m_height=" + m_height + ", m_createTime='" + SIMPLEDATEFORMAT
-                .format(m_createTime) + '\'' + '}';
+    public String toString() {
+        return "LocationInfo{" +
+                "id=" + id +
+                ", deviceId='" + deviceId + '\'' +
+                ", lat=" + lat +
+                ", lot=" + lot +
+                ", height=" + height +
+                ", createTime=" + (createTime != null ? SIMPLEDATEFORMAT.format(createTime) : null) +
+                '}';
     }
 
     /**
      * 自增主键(由数据库生成)
      */
-    private int m_id;
+    private int id;
 
     /**
      * 设备编号,设备自带
      */
-    private String m_deviceId;
+    private String deviceId;
 
     /**
      * 纬度
      */
-    private double m_lat;
+    private double lat;
 
     /**
      * 经度
      */
-    private double m_lot;
+    private double lot;
 
     /**
      * 海拔
      */
-    private int m_height;
+    private int height;
 
     /**
-     * 创建时间
+     * 创建时间(由前端上传)
      */
-    private Date m_createTime;
+    private Date createTime;
 
-    public int getM_id()
-    {
-        return m_id;
+    public int getId() {
+        return id;
     }
 
-    public void setM_id(int m_id)
-    {
-        this.m_id = m_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getM_deviceId()
-    {
-        return m_deviceId;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setM_deviceId(String m_deviceId)
-    {
-        this.m_deviceId = m_deviceId;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
-    public double getM_lat()
-    {
-        return m_lat;
+    public double getLat() {
+        return lat;
     }
 
-    public void setM_lat(double m_lat)
-    {
-        this.m_lat = m_lat;
+    public void setLat(double lat) {
+        this.lat = lat;
     }
 
-    public double getM_lot()
-    {
-        return m_lot;
+    public double getLot() {
+        return lot;
     }
 
-    public void setM_lot(double m_lot)
-    {
-        this.m_lot = m_lot;
+    public void setLot(double lot) {
+        this.lot = lot;
     }
 
-    public Date getM_createTime()
-    {
-        return m_createTime;
+    public int getHeight() {
+        return height;
     }
 
-    public void setM_createTime(Date m_createTime)
-    {
-        this.m_createTime = m_createTime;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
-    public int getM_height()
-    {
-        return m_height;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setM_height(int m_height)
-    {
-        this.m_height = m_height;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
+
 }

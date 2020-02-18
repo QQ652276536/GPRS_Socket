@@ -12,19 +12,19 @@ import java.time.LocalTime;
 
 public class SendParamSetting
 {
-    private Socket m_socket;
-    private Logger m_logger = Logger.getLogger(SendParamSetting.class);
-    private String m_clientIdentity;
-    private String m_data;
+    private Logger _logger = Logger.getLogger(SendParamSetting.class);
+    private Socket _socket;
+    private String _clientIdentity;
+    private String _data;
 
     public SendParamSetting(Socket socket, String data)
     {
-        m_socket = socket;
-        m_data = data;
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) m_socket.getRemoteSocketAddress();
+        _socket = socket;
+        _data = data;
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) _socket.getRemoteSocketAddress();
         String clientIP = inetSocketAddress.getAddress().getHostAddress();
         int clientPort = inetSocketAddress.getPort();
-        m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
+        _clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
     /**
@@ -36,17 +36,17 @@ public class SendParamSetting
      */
     public String SendToGPRS(String detail) throws Exception
     {
-        if (m_data == null || m_data.trim().equals(""))
+        if (_data == null || _data.trim().equals(""))
         {
             throw new Exception("GPRS设置参数不能为空");
         }
-        String[] strArray = m_data.split(",");
+        String[] strArray = _data.split(",");
         String imeiStr;
         String setParamStr;
         if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
-            m_logger.debug(String.format(">>>(%s)IMEI是:%s,消息流水是:%s", m_clientIdentity, imeiStr, detail));
+            _logger.debug(String.format(">>>(%s)IMEI是:%s,消息流水是:%s", _clientIdentity, imeiStr, detail));
             setParamStr = strArray[2];
         }
         else
@@ -72,14 +72,14 @@ public class SendParamSetting
         hexStr += checkCode;
         //标志
         hexStr += "7E";
-        m_logger.debug(String.format(">>>(%s)发送GPRS设置参数:%s\r\n", m_clientIdentity, hexStr));
+        _logger.debug(String.format(">>>(%s)发送GPRS设置参数:%s\r\n", _clientIdentity, hexStr));
         byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
-        OutputStream outputStream = m_socket.getOutputStream();
+        OutputStream outputStream = _socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
         //发送参数设置后会收到终端的通用应答,这里就不再接收了
         String info = "";
-        //       InputStream inputStream = m_socket.getInputStream();
+        //       InputStream inputStream = _socket.getInputStream();
         //       byte[] bytes = new byte[1];
         //       StringBuffer stringBuffer = new StringBuffer();
         //       while (true)
@@ -94,7 +94,7 @@ public class SendParamSetting
         //           if (inputStream.available() == 0)
         //           {
         //               info = stringBuffer.toString();
-        //               m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", m_clientIdentity, info));
+        //               _logger.debug(String.format(">>>(%s)执行参数设置后,收到来自GPRS的信息:%s\r\n", _clientIdentity, info));
         //               stringBuffer.delete(0, stringBuffer.length() - 1);
         //               break;
         //           }
@@ -110,17 +110,17 @@ public class SendParamSetting
      */
     public String SendToMT(String detail) throws Exception
     {
-        if (m_data == null || m_data.trim().equals(""))
+        if (_data == null || _data.trim().equals(""))
         {
             throw new Exception("铱星设置参数不能为空");
         }
-        String[] strArray = m_data.split(",");
+        String[] strArray = _data.split(",");
         String imeiStr;
         String setParamStr;
         if (strArray.length >= 3)
         {
             imeiStr = strArray[1];
-            m_logger.debug(String.format(">>>(%s)IMEI是:%s", m_clientIdentity, imeiStr));
+            _logger.debug(String.format(">>>(%s)IMEI是:%s", _clientIdentity, imeiStr));
             setParamStr = strArray[2];
         }
         else
@@ -155,7 +155,7 @@ public class SendParamSetting
             }
             timeHexStr = stringBuffer.toString();
         }
-        m_logger.debug(String.format(">>>生成的消息ID:%s", timeHexStr));
+        _logger.debug(String.format(">>>生成的消息ID:%s", timeHexStr));
         hexStr += timeHexStr;
         //IMEI,15位
         StringBuffer imeiBuffer = new StringBuffer();
@@ -191,12 +191,12 @@ public class SendParamSetting
         hexStr += checkCode;
         //标志
         hexStr += "7E";
-        m_logger.debug(String.format(">>>(%s)发送铱星设置参数:%s\r\n", m_clientIdentity, hexStr));
+        _logger.debug(String.format(">>>(%s)发送铱星设置参数:%s\r\n", _clientIdentity, hexStr));
         byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
-        OutputStream outputStream = m_socket.getOutputStream();
+        OutputStream outputStream = _socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
-        InputStream inputStream = m_socket.getInputStream();
+        InputStream inputStream = _socket.getInputStream();
         byte[] bytes = new byte[1];
         String info = "";
         StringBuffer stringBuffer = new StringBuffer();
@@ -211,7 +211,7 @@ public class SendParamSetting
             if (inputStream.available() == 0)
             {
                 info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s\r\n", m_clientIdentity, info));
+                _logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s\r\n", _clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 break;
             }

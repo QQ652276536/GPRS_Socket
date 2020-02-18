@@ -1,75 +1,78 @@
 package com.zistone.gprs.bean;
 
-/**
- * 《中华人民共和国行政区划代码》的区域级代码
- */
 public class GB_T_2260_AreaCode
 {
     @Override
     public String toString()
     {
-        return "GB_T_2260_AreaCode{" + "m_id=" + m_id + ", m_code=" + m_code + ", m_name='" + m_name + '\'' + ", m_parentCityId=" + m_parentCityId + '}';
+        return "GBT2260AreaCode{" +
+                "id=" + id +
+                ", code=" + code +
+                ", name='" + name + '\'' +
+                ", parentCityId=" + parentCityId +
+                '}';
     }
 
     /**
      * 区域编号(手动生成)
      */
-    private int m_id;
+    private int id;
 
     /**
      * 区域编码
      */
-    private int m_code;
+    private int code;
 
     /**
      * 区域名称
      *
      * @return
      */
-    private String m_name;
+    private String name;
 
     /**
      * 所属市
      */
-    private int m_parentCityId;
+    private int parentCityId;
 
-    public int getM_id()
+    public int getId()
     {
-        return m_id;
+        return id;
     }
 
-    public void setM_id(int m_id)
+    public void setId(int id)
     {
-        this.m_id = m_id;
+        this.id = id;
     }
 
-    public int getM_code()
+    public int getCode()
     {
-        return m_code;
+        return code;
     }
 
-    public void setM_code(int m_code)
+    public void setCode(int code)
     {
-        this.m_code = m_code;
+        this.code = code;
     }
 
-    public String getM_name()
+    public String getName()
     {
-        return m_name;
+        return name;
     }
 
-    public void setM_name(String m_name)
+    public void setName(String name)
     {
-        this.m_name = m_name;
+        this.name = name;
     }
 
-    public int getM_parentCityId()
+    public int getParentCityId()
     {
-        return m_parentCityId;
+        return parentCityId;
     }
 
-    public void setM_parentCityId(int m_parentCityId)
+    public void setParentCityId(int parentCityId)
     {
-        this.m_parentCityId = m_parentCityId;
+        this.parentCityId = parentCityId;
     }
+
 }

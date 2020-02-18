@@ -33,7 +33,7 @@ public class MessageType
     public static final int SEARCHCLIENTPARM = 0x8104;
 
     //查询终端参数应答
-    public static final int SEARCHCLIENTPARM_RESPONSE = 0x0104;
+    public static final int SEARCHCLIENTPAR_RESPONSE = 0x0104;
 
     //终端控制
     public static final int CLIENTCONTROL = 0x8105;

@@ -18,28 +18,28 @@ public class Server_Set
         PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET3"));
     }
 
-    private ServerSocket m_serverSocket;
-    private Logger m_logger = Logger.getLogger(Server_Set.class);
+    private ServerSocket _serverSocket;
+    private Logger _logger = Logger.getLogger(Server_Set.class);
     //该线程是否正在运行
-    private boolean m_isRuning = false;
-    private Thread m_thread;
+    private boolean _isRuning = false;
+    private Thread _thread;
     private Server_GPRS server_gprs;
     private Server_MO server_mo;
 
     public Server_Set(Server_GPRS server_gprs, Server_MO server_mo) throws IOException
     {
-        m_serverSocket = new ServerSocket(PORT_SOCKET);
+        _serverSocket = new ServerSocket(PORT_SOCKET);
         this.server_gprs = server_gprs;
         this.server_mo = server_mo;
     }
 
     public void MyRun()
     {
-        while (m_isRuning)
+        while (_isRuning)
         {
             try
             {
-                Socket socket = m_serverSocket.accept();
+                Socket socket = _serverSocket.accept();
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 String data = dataInputStream.readUTF();
@@ -48,12 +48,12 @@ public class Server_Set
                 switch (deviceType)
                 {
                     case "GPRS":
-                        server_gprs.m_setData = data;
-                        m_logger.debug(String.format(">>>收到来自Android端设置GPRS的参数:%s\r\n", data));
+                        server_gprs._setData = data;
+                        _logger.debug(String.format(">>>收到来自Android端设置GPRS的参数:%s\r\n", data));
                         break;
                     case "YX":
-                        server_mo.m_setData = data;
-                        m_logger.debug(String.format(">>>收到来自Android端设置铱星的参数:%s\r\n", data));
+                        server_mo._setData = data;
+                        _logger.debug(String.format(">>>收到来自Android端设置铱星的参数:%s\r\n", data));
                         break;
                 }
                 dataOutputStream.writeUTF("OK");
@@ -65,25 +65,25 @@ public class Server_Set
             catch (Exception e)
             {
                 e.printStackTrace();
-                m_logger.error(String.format(">>>Set服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
+                _logger.error(String.format(">>>Set服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
             }
         }
-        m_isRuning = false;
+        _isRuning = false;
     }
 
     public void MyStart()
     {
-        if (m_isRuning)
+        if (_isRuning)
         {
-            m_logger.error(">>>Set服务启动失败,该服务正在运行!");
+            _logger.error(">>>Set服务启动失败,该服务正在运行!");
         }
         else
         {
-            m_isRuning = true;
-            m_thread = new Thread(this::MyRun);
-            m_thread.setDaemon(true);
-            m_thread.start();
-            m_logger.debug(String.format(">>>Set服务的线程%d启动...\r\n", m_thread.getId()));
+            _isRuning = true;
+            _thread = new Thread(this::MyRun);
+            _thread.setDaemon(true);
+            _thread.start();
+            _logger.debug(String.format(">>>Set服务的线程%d启动...\r\n", _thread.getId()));
         }
     }
 
@@ -91,9 +91,9 @@ public class Server_Set
     {
         try
         {
-            if (m_thread != null)
+            if (_thread != null)
             {
-                m_thread.join();
+                _thread.join();
             }
         }
         catch (InterruptedException e)
@@ -104,7 +104,7 @@ public class Server_Set
 
     public void Stop()
     {
-        m_isRuning = false;
+        _isRuning = false;
     }
 
 }

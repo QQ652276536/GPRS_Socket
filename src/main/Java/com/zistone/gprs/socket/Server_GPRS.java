@@ -11,7 +11,7 @@ public class Server_GPRS
 {
     private static final int HEARTTIMEOUT_SOCKET;
     private static final int PORT_SOCKET;
-    private static int m_detail = 6550;
+    private static int _detail = 6550;
 
     static
     {
@@ -19,56 +19,56 @@ public class Server_GPRS
         HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
     }
 
-    private ServerSocket m_serverSocket;
-    private Logger m_logger = Logger.getLogger(Server_GPRS.class);
+    private Logger _logger = Logger.getLogger(Server_GPRS.class);
+    private ServerSocket _serverSocket;
     //该线程是否正在运行
-    private boolean m_isRuning = false;
-    private Thread m_thread;
-    public String m_setData = "";
+    private boolean _isRuning = false;
+    private Thread _thread;
+    public String _setData = "";
 
     public Server_GPRS() throws IOException
     {
-        m_serverSocket = new ServerSocket(PORT_SOCKET);
+        _serverSocket = new ServerSocket(PORT_SOCKET);
     }
 
     public void MyRun()
     {
-        while (m_isRuning)
+        while (_isRuning)
         {
             try
             {
-                Socket socket = m_serverSocket.accept();
+                Socket socket = _serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 //在下发参数设置前有一次设备鉴权后的通用应答
-                m_detail += 2;
-                Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket, m_detail, m_setData);
+                _detail += 2;
+                Server_GPRS_Worker server_gprs_woker = new Server_GPRS_Worker(socket, _detail, _setData);
                 Thread thread = new Thread(server_gprs_woker);
                 thread.setDaemon(true);
                 thread.start();
-                m_logger.debug(">>>----------Server_GPRS_Worker线程启动----------");
+                _logger.debug(">>>----------Server_GPRS_Worker线程启动----------");
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                m_logger.error(String.format(">>>GPRS服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
+                _logger.error(String.format(">>>GPRS服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
             }
         }
-        m_isRuning = false;
+        _isRuning = false;
     }
 
     public void MyStart()
     {
-        if (m_isRuning)
+        if (_isRuning)
         {
-            m_logger.error(">>>GPRS服务启动失败,该服务正在运行!");
+            _logger.error(">>>GPRS服务启动失败,该服务正在运行!");
         }
         else
         {
-            m_isRuning = true;
-            m_thread = new Thread(this::MyRun);
-            m_thread.setDaemon(true);
-            m_thread.start();
-            m_logger.debug(String.format(">>>GPRS服务的线程%d启动...", m_thread.getId()));
+            _isRuning = true;
+            _thread = new Thread(this::MyRun);
+            _thread.setDaemon(true);
+            _thread.start();
+            _logger.debug(String.format(">>>GPRS服务的线程%d启动...", _thread.getId()));
         }
     }
 
@@ -76,9 +76,9 @@ public class Server_GPRS
     {
         try
         {
-            if (m_thread != null)
+            if (_thread != null)
             {
-                m_thread.join();
+                _thread.join();
             }
         }
         catch (InterruptedException e)
@@ -89,7 +89,7 @@ public class Server_GPRS
 
     public void Stop()
     {
-        m_isRuning = false;
+        _isRuning = false;
     }
 
 }

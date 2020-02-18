@@ -17,16 +17,16 @@ import java.util.List;
 public class MessageReceive_MO
 {
     private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static String IP_WEB;
-    private static int PORT_WEB;
+    private static String _webIP;
+    private static int _webPort;
 
     static
     {
-        IP_WEB = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        PORT_WEB = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
 
-    private Logger m_logger = Logger.getLogger(MessageReceive_MO.class);
+    private Logger _logger = Logger.getLogger(MessageReceive_MO.class);
 
     /**
      * 位置信息汇报
@@ -46,42 +46,42 @@ public class MessageReceive_MO
     {
         if (lat == 0 || lot == 0)
         {
-            m_logger.error(String.format(">>>数据解析有误,停止注册/更新/汇报铱星设备%s的位置!", tempIdStr));
+            _logger.error(String.format(">>>数据解析有误,停止注册/更新/汇报铱星设备%s的位置!", tempIdStr));
             return "Error...";
         }
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceId(tempIdStr);
-        deviceInfo.setM_lat(lat);
-        deviceInfo.setM_lot(lot);
-        deviceInfo.setM_height(height);
-        deviceInfo.setM_createTime(dateTime);
-        deviceInfo.setM_updateTime(dateTime);
-        deviceInfo.setM_state(1);
-        deviceInfo.setM_type(typeStr);
-        deviceInfo.setM_comment("我是Socket模拟的Http请求");
-        deviceInfo.setM_temperature(temperature);
-        deviceInfo.setM_electricity(electricity);
+        deviceInfo.setDeviceId(tempIdStr);
+        deviceInfo.setLat(lat);
+        deviceInfo.setLot(lot);
+        deviceInfo.setHeight(height);
+        deviceInfo.setCreateTime(dateTime);
+        deviceInfo.setUpdateTime(dateTime);
+        deviceInfo.setState(1);
+        deviceInfo.setType(typeStr);
+        deviceInfo.setComment("我是Socket模拟的Http请求");
+        deviceInfo.setTemperature(temperature);
+        deviceInfo.setElectricity(electricity);
         String deviceJsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
-        String deviceResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
+        String deviceResult = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/DeviceInfo/InsertByDeviceId", deviceJsonStr);
         int beginIndex = deviceResult.indexOf("{");
         int endIndex = deviceResult.lastIndexOf("}");
         deviceResult = deviceResult.substring(beginIndex, endIndex + 1);
-        m_logger.debug(String.format(">>>注册/更新铱星设备%s,返回:%s", tempIdStr, deviceResult));
+        _logger.debug(String.format(">>>注册/更新铱星设备%s,返回:%s", tempIdStr, deviceResult));
         deviceInfo = JSON.parseObject(deviceResult, DeviceInfo.class);
         //同时在历史轨迹里新增一条记录
         LocationInfo locationInfo = new LocationInfo();
-        locationInfo.setM_deviceId(tempIdStr);
-        locationInfo.setM_lat(lat);
-        locationInfo.setM_lot(lot);
-        locationInfo.setM_createTime(dateTime);
+        locationInfo.setDeviceId(tempIdStr);
+        locationInfo.setLat(lat);
+        locationInfo.setLot(lot);
+        locationInfo.setCreateTime(dateTime);
         String locationStr = JSON.toJSONString(locationInfo);
         //由Web服务处理位置汇报
-        String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo/Insert", locationStr);
+        String locationResult = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/LocationInfo/Insert", locationStr);
         int beginIndex2 = locationResult.indexOf("{");
         int endIndex2 = locationResult.lastIndexOf("}");
         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-        m_logger.debug(String.format(">>>汇报铱星设备轨迹位置,返回:%s", locationResult));
+        _logger.debug(String.format(">>>汇报铱星设备轨迹位置,返回:%s", locationResult));
         locationInfo = JSON.parseObject(locationResult, LocationInfo.class);
         return deviceResult + "&" + locationResult;
     }
@@ -124,7 +124,7 @@ public class MessageReceive_MO
                 {
                 }
                 String str = ConvertUtil.HexStrToStr(Arrays.toString(strArray));
-                m_logger.debug(String.format("\n\n\n>>>消息版本不为01(未知协议),尝试解析该内容:%s\n\n\n", str));
+                _logger.debug(String.format("\n\n\n>>>消息版本不为01(未知协议),尝试解析该内容:%s\n\n\n", str));
 
                 //应用服务器发送MT给铱星网关确认收到MO的数据
                 //01,版本
@@ -198,7 +198,7 @@ public class MessageReceive_MO
             String cepStr = strArray[44] + strArray[45] + strArray[46] + strArray[47];
             if (strArray.length < 64)
             {
-                m_logger.debug(String.format(">>>该消息为[通用应答],终端手机号或终端ID:%s,状态信息:%s,EPOCH时间:%s", imeiStr, sessionState, timeStr));
+                _logger.debug(String.format(">>>该消息为[通用应答],终端手机号或终端ID:%s,状态信息:%s,EPOCH时间:%s", imeiStr, sessionState, timeStr));
                 //应用服务器发送MT给铱星网关确认收到MO的数据
                 //01,版本
                 //0004,总长度
@@ -253,7 +253,7 @@ public class MessageReceive_MO
                     Long longDeviceTime = Long.parseLong(deviceTime, 16) * 1000;
                     Date dateTime = new Date(longDeviceTime);
                     String deviceTimeStr = SIMPLEDATEFORMAT.format(dateTime);
-                    m_logger.debug(String
+                    _logger.debug(String
                             .format(">>>该消息为[位置信息汇报],消息长度:%d,终端手机号或终端ID:%s,状态信息:%s,纬度:%s,经度:%s,海拔:%d," + "温度:%d,电量:%d,终端时间:%s", length,
                                     imeiStr, sessionState, latNum, lotNum, heightNum, temperatureNum, electricityNum, deviceTimeStr));
                     String result = Location(latNum, lotNum, heightNum, imeiStr, "铱星设备", dateTime, temperatureNum, electricityNum);
@@ -274,19 +274,19 @@ public class MessageReceive_MO
                     //采样时间间隔,分钟
                     String collectTimeStr = simpleStrArray[11] + simpleStrArray[12];
                     int collectTime = Integer.parseInt(collectTimeStr, 16);
-                    m_logger.debug(String
+                    _logger.debug(String
                             .format(">>>该消息为[通用应答],消息长度:%d,终端手机号或终端ID:%s,状态信息:%s,终端时间:%s,上报时间间隔:%d分钟," + "采样时间间隔:%d分钟", length, imeiStr,
                                     sessionState, timeStr, upTime, collectTime));
                     break;
                 case "8103":
-                    m_logger.debug(">>>怎么会收到8103的参数ID???");
+                    _logger.debug(">>>怎么会收到8103的参数ID???");
                     break;
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            m_logger.error(String.format(">>>解析内容时发生异常:%s", e.getMessage()));
+            _logger.error(String.format(">>>解析内容时发生异常:%s", e.getMessage()));
         }
         finally
         {

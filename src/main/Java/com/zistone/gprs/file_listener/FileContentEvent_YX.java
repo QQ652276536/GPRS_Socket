@@ -14,24 +14,25 @@ import java.util.stream.Stream;
 
 public class FileContentEvent_YX
 {
-    private static int LINECOUNT;
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static String IP_WEB;
-    private static int PORT_WEB;
-    private Logger m_logger = Logger.getLogger(FileContentEvent_YX.class);
-    private Timer m_timer = new Timer();
+    private static int _lineCount;
+    private static int _webPort;
+    private static String _webIP;
 
     static
     {
-        IP_WEB = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        PORT_WEB = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
+
+    private Logger _logger = Logger.getLogger(FileContentEvent_YX.class);
+    private Timer _timer = new Timer();
 
     public FileContentEvent_YX()
     {
         ReadFileThread readFileThread = new ReadFileThread();
         //readFileThread.start();
-        m_logger.info(">>>线程" + readFileThread.getId() + "执行");
+        _logger.info(">>>线程" + readFileThread.getId() + "执行");
 
         ReadFromEamilFile("C:\\Users\\zistone\\Desktop\\YX_Email\\300234067349750_001276.sbd");
     }
@@ -87,27 +88,27 @@ public class FileContentEvent_YX
             if (lat != 0.0 && lot != 0.0)
             {
                 LocationInfo locationInfo = new LocationInfo();
-                locationInfo.setM_deviceId(deviceId);
-                locationInfo.setM_lat(lat);
-                locationInfo.setM_lot(lot);
-                locationInfo.setM_createTime(date1);
-                m_logger.debug(String.format(">>>将本次数据%s更新至MySQL数据库", locationInfo.toString()));
+                locationInfo.setDeviceId(deviceId);
+                locationInfo.setLat(lat);
+                locationInfo.setLot(lot);
+                locationInfo.setCreateTime(date1);
+                _logger.debug(String.format(">>>将本次数据%s更新至MySQL数据库", locationInfo.toString()));
                 String locationStr = JSON.toJSONString(locationInfo);
                 //由Web服务处理位置汇报
-                String locationResult = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo/InsertList", locationStr);
+                String locationResult = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/LocationInfo/InsertList", locationStr);
                 int beginIndex2 = locationResult.indexOf("{");
                 int endIndex2 = locationResult.lastIndexOf("}");
                 locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-                m_logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
+                _logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
             }
             else
             {
-                m_logger.error(">>>本次数据有错误,禁止更新至数据库");
+                _logger.error(">>>本次数据有错误,禁止更新至数据库");
             }
         }
         catch (Exception e)
         {
-            m_logger.error(e.getMessage());
+            _logger.error(e.getMessage());
             e.printStackTrace();
         }
         finally
@@ -150,8 +151,8 @@ public class FileContentEvent_YX
                     //ReadAllFile();
                 }
             };
-            m_timer.schedule(timerTask, 0, 30 * 60 * 1000);
-            m_logger.info(">>>定时读取文本内容的任务执行");
+            _timer.schedule(timerTask, 0, 30 * 60 * 1000);
+            _logger.info(">>>定时读取文本内容的任务执行");
         }
 
         private void ReadFile(String path)
@@ -170,9 +171,9 @@ public class FileContentEvent_YX
                 Stream<String> streams = bufferedReader.lines().filter(p -> p != null && !"".equals(p) && p.contains("L"));
                 Object[] array = streams.toArray();
                 lineCount = array.length;
-                m_logger.info(">>>本次共读取(过滤了空行):" + lineCount);
+                _logger.info(">>>本次共读取(过滤了空行):" + lineCount);
                 //文件内容有变动
-                if (lineCount != LINECOUNT)
+                if (lineCount != _lineCount)
                 {
                     //最新的一条数据
                     String line = String.valueOf(Stream.of(array).filter(p -> p.equals("让过滤器的结果为false,执行返回最后一个元素")).findFirst()
@@ -195,30 +196,30 @@ public class FileContentEvent_YX
                     if (lat != 0.0 && lot != 0.0)
                     {
                         LocationInfo locationInfo = new LocationInfo();
-                        locationInfo.setM_deviceId(deviceId);
-                        locationInfo.setM_lat(lat);
-                        locationInfo.setM_lot(lot);
-                        locationInfo.setM_createTime(date1);
-                        m_logger.debug(String.format(">>>将本次数据%s更新至MySQL数据库", locationInfo.toString()));
+                        locationInfo.setDeviceId(deviceId);
+                        locationInfo.setLat(lat);
+                        locationInfo.setLot(lot);
+                        locationInfo.setCreateTime(date1);
+                        _logger.debug(String.format(">>>将本次数据%s更新至MySQL数据库", locationInfo.toString()));
                         String locationStr = JSON.toJSONString(locationInfo);
                         //由Web服务处理位置汇报
                         String locationResult = new SocketHttp()
-                                .SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo/InsertList", locationStr);
+                                .SendPost(_webIP, _webPort, "/GPRS_Web/LocationInfo/InsertList", locationStr);
                         int beginIndex2 = locationResult.indexOf("{");
                         int endIndex2 = locationResult.lastIndexOf("}");
                         locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-                        m_logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
+                        _logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
                     }
                     else
                     {
-                        m_logger.error(">>>本次数据有错误,禁止更新至数据库");
+                        _logger.error(">>>本次数据有错误,禁止更新至数据库");
                     }
-                    LINECOUNT = lineCount;
+                    _lineCount = lineCount;
                 }
             }
             catch (Exception e)
             {
-                m_logger.error(e.getMessage());
+                _logger.error(e.getMessage());
                 e.printStackTrace();
             }
             finally
@@ -279,10 +280,10 @@ public class FileContentEvent_YX
                         if (lat != 0.0 && lot != 0.0)
                         {
                             LocationInfo locationInfo = new LocationInfo();
-                            locationInfo.setM_deviceId(deviceId);
-                            locationInfo.setM_lat(lat);
-                            locationInfo.setM_lot(lot);
-                            locationInfo.setM_createTime(date1);
+                            locationInfo.setDeviceId(deviceId);
+                            locationInfo.setLat(lat);
+                            locationInfo.setLot(lot);
+                            locationInfo.setCreateTime(date1);
                             locationInfoList.add(locationInfo);
                         }
                     }
@@ -294,15 +295,15 @@ public class FileContentEvent_YX
                 }
                 if (locationInfoList.size() > 0)
                 {
-                    m_logger.debug(String.format(">>>本次共读取(过滤了空行):%d条数据,新增%d条正确数据", lineCount, locationInfoList.size()));
+                    _logger.debug(String.format(">>>本次共读取(过滤了空行):%d条数据,新增%d条正确数据", lineCount, locationInfoList.size()));
                     String locationStr = JSON.toJSONString(locationInfoList);
                     //由Web服务处理位置汇报
                     String locationResult = new SocketHttp()
-                            .SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/LocationInfo" + "/InsertList", locationStr);
+                            .SendPost(_webIP, _webPort, "/GPRS_Web/LocationInfo" + "/InsertList", locationStr);
                     int beginIndex2 = locationResult.indexOf("{");
                     int endIndex2 = locationResult.lastIndexOf("}");
                     locationResult = locationResult.substring(beginIndex2, endIndex2 + 1);
-                    m_logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
+                    _logger.debug(String.format(">>>汇报铱星设备位置,返回:%s", locationResult));
                 }
             }
             catch (Exception e)

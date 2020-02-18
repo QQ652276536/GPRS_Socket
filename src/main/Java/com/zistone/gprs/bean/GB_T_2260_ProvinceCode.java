@@ -1,60 +1,58 @@
 package com.zistone.gprs.bean;
 
-/**
- * 《中华人民共和国行政区划代码》的省级代码
- */
 public class GB_T_2260_ProvinceCode
 {
     @Override
     public String toString()
     {
-        return "GB_T_2260_ProvinceCode{" + "m_id=" + m_id + ", m_code=" + m_code + ", m_name='" + m_name + '\'' + '}';
+        return "GBT2260ProvinceCode{" + "id=" + id + ", code=" + code + ", name='" + name + '\'' + '}';
     }
 
     /**
      * 省会编号(手动生成)
      */
-    private int m_id;
+    private int id;
 
     /**
      * 省会编码
      */
-    private int m_code;
+    private int code;
 
     /**
      * 省会名称
      *
      * @return
      */
-    private String m_name;
+    private String name;
 
-    public int getM_id()
+    public int getId()
     {
-        return m_id;
+        return id;
     }
 
-    public void setM_id(int m_id)
+    public void setId(int id)
     {
-        this.m_id = m_id;
+        this.id = id;
     }
 
-    public int getM_code()
+    public int getCode()
     {
-        return m_code;
+        return code;
     }
 
-    public void setM_code(int m_code)
+    public void setCode(int code)
     {
-        this.m_code = m_code;
+        this.code = code;
     }
 
-    public String getM_name()
+    public String getName()
     {
-        return m_name;
+        return name;
     }
 
-    public void setM_name(String m_name)
+    public void setName(String name)
     {
-        this.m_name = m_name;
+        this.name = name;
     }
+
 }

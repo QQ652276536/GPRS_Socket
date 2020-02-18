@@ -3,239 +3,223 @@ package com.zistone.gprs.bean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class DeviceInfo
-{
+public class DeviceInfo {
     private static final SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
-    public String toString()
-    {
-        return "DeviceInfo{" + "m_id=" + m_id + ", m_deviceId='" + m_deviceId + '\'' + ", m_sim=" + m_sim + ", m_name='" + m_name + '\'' + ", m_type='" + m_type + '\'' + ", m_state=" + m_state + ", m_lat=" + m_lat + ", m_lot=" + m_lot + ", m_height=" + m_height + ", m_createTime=" + SIMPLEDATEFORMAT
-                .format(m_createTime) + ", m_updateTime=" + SIMPLEDATEFORMAT
-                .format(m_updateTime) + ", m_comment='" + m_comment + '\'' + ", m_akCode='" + m_akCode + '\'' + ", m_temperature=" + m_temperature + ", m_electricity=" + m_electricity + '}';
+    public String toString() {
+        return "DeviceInfo{" +
+                "id=" + id +
+                ", deviceId='" + deviceId + '\'' +
+                ", sim='" + sim + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", state=" + state +
+                ", lat=" + lat +
+                ", lot=" + lot +
+                ", height=" + height +
+                ", createTime=" + (createTime != null ? SIMPLEDATEFORMAT.format(createTime) : null) +
+                ", updateTime=" + (updateTime != null ? SIMPLEDATEFORMAT.format(updateTime) : null) +
+                ", comment='" + comment + '\'' +
+                ", akCode='" + akCode + '\'' +
+                ", temperature=" + temperature +
+                ", electricity=" + electricity +
+                '}';
     }
 
     /**
      * 自增主键(由数据库生成)
      */
-    private int m_id;
+    private int id;
 
     /**
      * 设备编号,设备自带
      */
-    private String m_deviceId;
+    private String deviceId;
 
     /**
      * SIM卡号
      */
-    private String m_sim;
+    private String sim;
 
     /**
      * 设备名
      */
-    private String m_name;
+    private String name;
 
     /**
      * 设备类型
      */
-    public String m_type;
+    public String type;
 
     /**
-     * 设备状态:0离线1在线
+     * 设备状态
      */
-    private int m_state;
+    private int state;
 
     /**
      * 纬度
      */
-    private double m_lat;
+    private double lat;
 
     /**
      * 经度
      */
-    private double m_lot;
+    private double lot;
+
     /**
      * 海拔
      */
-    private int m_height;
+    private int height;
 
     /**
      * 创建时间
      */
-    private Date m_createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
-    private Date m_updateTime;
+    private Date updateTime;
 
     /**
      * 备注
      */
-    private String m_comment;
+    private String comment;
 
     /**
-     * 鉴权码,注册成功后才有,由Web服务随机生成
+     * 鉴权码
      */
-    private String m_akCode;
+    private String akCode;
 
     /**
      * 温度
      */
-    private int m_temperature;
+    private int temperature;
 
     /**
      * 剩余电量
      */
-    private int m_electricity;
+    private int electricity;
 
-    public int getM_id()
-    {
-        return m_id;
+    public int getId() {
+        return id;
     }
 
-    public void setM_id(int m_id)
-    {
-        this.m_id = m_id;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getM_deviceId()
-    {
-        return m_deviceId;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setM_deviceId(String m_deviceId)
-    {
-        this.m_deviceId = m_deviceId;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
-    public String getM_sim()
-    {
-        return m_sim;
+    public String getSim() {
+        return sim;
     }
 
-    public void setM_sim(String m_sim)
-    {
-        this.m_sim = m_sim;
+    public void setSim(String sim) {
+        this.sim = sim;
     }
 
-    public String getM_name()
-    {
-        return m_name;
+    public String getName() {
+        return name;
     }
 
-    public void setM_name(String m_name)
-    {
-        this.m_name = m_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getM_type()
-    {
-        return m_type;
+    public String getType() {
+        return type;
     }
 
-    public void setM_type(String m_type)
-    {
-        this.m_type = m_type;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public int getM_state()
-    {
-        return m_state;
+    public int getState() {
+        return state;
     }
 
-    public void setM_state(int m_state)
-    {
-        this.m_state = m_state;
+    public void setState(int state) {
+        this.state = state;
     }
 
-    public double getM_lat()
-    {
-        return m_lat;
+    public double getLat() {
+        return lat;
     }
 
-    public void setM_lat(double m_lat)
-    {
-        this.m_lat = m_lat;
+    public void setLat(double lat) {
+        this.lat = lat;
     }
 
-    public double getM_lot()
-    {
-        return m_lot;
+    public double getLot() {
+        return lot;
     }
 
-    public void setM_lot(double m_lot)
-    {
-        this.m_lot = m_lot;
+    public void setLot(double lot) {
+        this.lot = lot;
     }
 
-    public int getM_height()
-    {
-        return m_height;
+    public int getHeight() {
+        return height;
     }
 
-    public void setM_height(int m_height)
-    {
-        this.m_height = m_height;
+    public void setHeight(int height) {
+        this.height = height;
     }
 
-    public Date getM_createTime()
-    {
-        return m_createTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setM_createTime(Date m_createTime)
-    {
-        this.m_createTime = m_createTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public Date getM_updateTime()
-    {
-        return m_updateTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setM_updateTime(Date m_updateTime)
-    {
-        this.m_updateTime = m_updateTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
-    public String getM_comment()
-    {
-        return m_comment;
+    public String getComment() {
+        return comment;
     }
 
-    public void setM_comment(String m_comment)
-    {
-        this.m_comment = m_comment;
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
-    public String getM_akCode()
-    {
-        return m_akCode;
+    public String getAkCode() {
+        return akCode;
     }
 
-    public void setM_akCode(String m_akCode)
-    {
-        this.m_akCode = m_akCode;
+    public void setAkCode(String akCode) {
+        this.akCode = akCode;
     }
 
-    public int getM_temperature()
-    {
-        return m_temperature;
+    public int getTemperature() {
+        return temperature;
     }
 
-    public void setM_temperature(int m_temperature)
-    {
-        this.m_temperature = m_temperature;
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
     }
 
-    public int getM_electricity()
-    {
-        return m_electricity;
+    public int getElectricity() {
+        return electricity;
     }
 
-    public void setM_electricity(int m_electricity)
-    {
-        this.m_electricity = m_electricity;
+    public void setElectricity(int electricity) {
+        this.electricity = electricity;
     }
+
 }

@@ -17,18 +17,18 @@ import java.util.List;
 public class MessageReceive_GPRS
 {
     private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static String IP_WEB;
-    private static int PORT_WEB;
-    public boolean m_isRunFlag = false;
+    private static String _webIP;
+    private static int _webPort;
 
     static
     {
-        IP_WEB = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        PORT_WEB = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
 
-    private Logger m_logger = Logger.getLogger(MessageReceive_GPRS.class);
-    private DeviceInfo m_deviceInfo;
+    private Logger _logger = Logger.getLogger(MessageReceive_GPRS.class);
+    private DeviceInfo _deviceInfo;
+    public boolean _isRunFlag = false;
 
     /**
      * 终端注册
@@ -47,22 +47,22 @@ public class MessageReceive_GPRS
                             int electricity)
     {
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_createTime(new Date());
-        deviceInfo.setM_updateTime(new Date());
-        deviceInfo.setM_state(1);
-        deviceInfo.setM_deviceId(tempIdStr);
-        deviceInfo.setM_type(typeStr);
-        deviceInfo.setM_comment("我是Socket模拟的Http请求");
-        deviceInfo.setM_temperature(temperature);
-        deviceInfo.setM_electricity(electricity);
+        deviceInfo.setCreateTime(new Date());
+        deviceInfo.setUpdateTime(new Date());
+        deviceInfo.setState(1);
+        deviceInfo.setDeviceId(tempIdStr);
+        deviceInfo.setType(typeStr);
+        deviceInfo.setComment("我是Socket模拟的Http请求");
+        deviceInfo.setTemperature(temperature);
+        deviceInfo.setElectricity(electricity);
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端注册
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/DeviceInfo/InsertByDeviceId", jsonStr);
+        String result = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/DeviceInfo/InsertByDeviceId", jsonStr);
         int beginIndex = result.indexOf("{");
         int endIndex = result.lastIndexOf("}");
         result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(String.format(">>>终端注册返回:%s", result));
-        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+        _logger.debug(String.format(">>>终端注册返回:%s", result));
+        _deviceInfo = JSON.parseObject(result, DeviceInfo.class);
         //终端注册应答（0x8100）
         String responseStr = "7E";
         //应答ID,对应终端消息的ID
@@ -72,26 +72,26 @@ public class MessageReceive_GPRS
         responseStr += detailStr;
         responseStr += detailStr;
         String akCode = "";
-        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+        if (null != _deviceInfo && _deviceInfo.getId() != 0)
         {
-            akCode = m_deviceInfo.getM_akCode();
-            m_logger.debug(String.format(">>>服务端生成的鉴权码:%s", akCode));
+            akCode = _deviceInfo.getAkCode();
+            _logger.debug(String.format(">>>服务端生成的鉴权码:%s", akCode));
             //结果,0:成功1:车辆已被注册2:数据库中无该车辆3:终端已被注册4:数据库中无该终端
             if (null != akCode && !"".equals(akCode))
             {
-                m_logger.debug(">>>终端注册成功");
+                _logger.debug(">>>终端注册成功");
                 responseStr += "00";
-                m_isRunFlag = true;
+                _isRunFlag = true;
             }
             else
             {
-                m_logger.debug(">>>终端注册失败");
+                _logger.debug(">>>终端注册失败");
                 responseStr += "03";
             }
         }
         else
         {
-            m_logger.debug(">>>终端注册失败");
+            _logger.debug(">>>终端注册失败");
             responseStr += "03";
         }
         //鉴权码
@@ -115,16 +115,16 @@ public class MessageReceive_GPRS
                                String idStr) throws Exception
     {
         DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setM_deviceId(phoneStr);
-        deviceInfo.setM_akCode(akCode);
+        deviceInfo.setDeviceId(phoneStr);
+        deviceInfo.setAkCode(akCode);
         String jsonStr = JSON.toJSONString(deviceInfo);
         //由Web服务处理终端鉴权
-        String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/DeviceInfo/FindByAKCode", jsonStr);
+        String result = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/DeviceInfo/FindByAKCode", jsonStr);
         int beginIndex = result.indexOf("{");
         int endIndex = result.lastIndexOf("}");
         result = result.substring(beginIndex, endIndex + 1);
-        m_logger.debug(String.format(">>>终端鉴权返回:%s", result));
-        m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+        _logger.debug(String.format(">>>终端鉴权返回:%s", result));
+        _deviceInfo = JSON.parseObject(result, DeviceInfo.class);
         String hexStr = "7E";
         //平台通用应答(0x8001)
         String payloadHexStr = "8001";
@@ -148,14 +148,14 @@ public class MessageReceive_GPRS
         payloadHexStr += idStr;
         //payloadHexStr += "0005055103006334199723040102";
         //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-        if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+        if (null != _deviceInfo && _deviceInfo.getId() != 0)
         {
-            m_logger.debug(String.format(">>>存在该鉴权码:%s", akCode));
+            _logger.debug(String.format(">>>存在该鉴权码:%s", akCode));
             payloadHexStr += "00";
         }
         else
         {
-            m_logger.error(String.format(">>>不存在该鉴权码:%s", akCode));
+            _logger.error(String.format(">>>不存在该鉴权码:%s", akCode));
             payloadHexStr += "01";
         }
         hexStr += payloadHexStr;
@@ -187,7 +187,7 @@ public class MessageReceive_GPRS
     {
         if (lat == 0 || lot == 0)
         {
-            m_logger.error(String.format(">>>数据解析有误,停止注册/更新/汇报GPRS设备%s的位置!", phoneStr));
+            _logger.error(String.format(">>>数据解析有误,停止注册/更新/汇报GPRS设备%s的位置!", phoneStr));
             return "Error...";
         }
         //平台通用应答(0x8001)
@@ -198,38 +198,38 @@ public class MessageReceive_GPRS
         responseStr += detailStr;
         responseStr += detailStr;
         responseStr += idStr;
-        if (m_deviceInfo != null && m_deviceInfo.getM_id() != 0)
+        if (_deviceInfo != null && _deviceInfo.getId() != 0)
         {
-            m_deviceInfo.setM_lat(lat);
-            m_deviceInfo.setM_lot(lot);
-            m_deviceInfo.setM_height(height);
-            m_deviceInfo.setM_temperature(temperature);
-            m_deviceInfo.setM_electricity(electricity);
-            String jsonStr = JSON.toJSONString(m_deviceInfo);
+            _deviceInfo.setLat(lat);
+            _deviceInfo.setLot(lot);
+            _deviceInfo.setHeight(height);
+            _deviceInfo.setTemperature(temperature);
+            _deviceInfo.setElectricity(electricity);
+            String jsonStr = JSON.toJSONString(_deviceInfo);
             //由Web服务处理位置汇报
-            String result = new SocketHttp().SendPost(IP_WEB, PORT_WEB, "/GPRS_Web/DeviceInfo/Update", jsonStr);
+            String result = new SocketHttp().SendPost(_webIP, _webPort, "/GPRS_Web/DeviceInfo/Update", jsonStr);
             int beginIndex = result.indexOf("{");
             int endIndex = result.lastIndexOf("}");
             result = result.substring(beginIndex, endIndex + 1);
-            m_logger.debug(String.format(">>>GPRS设备%s汇报位置后返回:%s", m_deviceInfo.getM_deviceId(), result));
-            m_deviceInfo = JSON.parseObject(result, DeviceInfo.class);
+            _logger.debug(String.format(">>>GPRS设备%s汇报位置后返回:%s", _deviceInfo.getDeviceId(), result));
+            _deviceInfo = JSON.parseObject(result, DeviceInfo.class);
             //判断设备信息是否更新成功
             //结果,0:成功1:失败2:2消息有误3:不支持4:报警处理确认
-            if (null != m_deviceInfo && m_deviceInfo.getM_id() != 0)
+            if (null != _deviceInfo && _deviceInfo.getId() != 0)
             {
-                m_logger.debug(String.format(">>>设备%s的位置信息汇报成功", m_deviceInfo.getM_deviceId()));
+                _logger.debug(String.format(">>>设备%s的位置信息汇报成功", _deviceInfo.getDeviceId()));
                 responseStr += "00";
             }
             else
             {
-                m_logger.debug(String.format(">>>设备%s的位置信息汇报失败", phoneStr));
+                _logger.debug(String.format(">>>设备%s的位置信息汇报失败", phoneStr));
                 responseStr += "01";
             }
         }
         else
         {
             responseStr += "01";
-            m_logger.error(String.format(">>>设备%s的位置信息汇报失败,需要先鉴权!\r\n", phoneStr));
+            _logger.error(String.format(">>>设备%s的位置信息汇报失败,需要先鉴权!\r\n", phoneStr));
         }
         responseStr += "A4";
         responseStr += "7E";
@@ -278,7 +278,7 @@ public class MessageReceive_GPRS
             String detailStr = strArray[11] + strArray[12];
             //消息包封装项
             String[] bodyArray = Arrays.copyOfRange(strArray, 13, strArray.length - 2);
-            m_logger.debug(String.format(">>>消息ID:%s,消息体属性:%s,终端手机号或终端ID:%s,消息流水:%s,校验码:%s", idStr, bodyPropertyStr,
+            _logger.debug(String.format(">>>消息ID:%s,消息体属性:%s,终端手机号或终端ID:%s,消息流水:%s,校验码:%s", idStr, bodyPropertyStr,
                     phoneStr, detailStr, checkCode));
             //根据消息ID判断消息类型
             switch (idValue)
@@ -313,7 +313,7 @@ public class MessageReceive_GPRS
                     String carFlag1Str = bodyArray[38] + bodyArray[39];
                     String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
                     String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
-                    m_logger.debug(String.format(">>>该消息为[终端注册],省域代码:%s,市县代码:%s," +
+                    _logger.debug(String.format(">>>该消息为[终端注册],省域代码:%s,市县代码:%s," +
                                     "制造商:%s,终端型号:%s,终端ID:%s,车牌颜色:%s,车牌号:%s", provinceStr, cityStr, manufactureStr,
                             typeStr,
                             tempIdStr, carColorStr, carFlag2Str));
@@ -326,7 +326,7 @@ public class MessageReceive_GPRS
                     String hexAkCode =
                             bodyArray[0] + bodyArray[1] + bodyArray[2] + bodyArray[3] + bodyArray[4] + bodyArray[5];
                     String akCode = ConvertUtil.HexStrToStr(hexAkCode);
-                    m_logger.debug(String.format(">>>该消息为[终端鉴权],鉴权码:%s(16进制:%s)", akCode, hexAkCode));
+                    _logger.debug(String.format(">>>该消息为[终端鉴权],鉴权码:%s(16进制:%s)", akCode, hexAkCode));
                     return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr) + ",SETPARAM";
                 }
                 //位置信息汇报
@@ -367,7 +367,7 @@ public class MessageReceive_GPRS
                     int temperatureNum = 0;
                     //电量
                     int electricityNum = 0;
-                    m_logger.debug(String.format(">>>该消息为[位置信息汇报],报警标志:%s,状态:%s,纬度:%s,经度:%s,海拨:%d,温度:%d,电量:%d,速度:%s," +
+                    _logger.debug(String.format(">>>该消息为[位置信息汇报],报警标志:%s,状态:%s,纬度:%s,经度:%s,海拨:%d,温度:%d,电量:%d,速度:%s," +
                                     "方向:%d,汇报时间:%s", warningStr, stateStr, latNum, lotNum, heightNum, temperatureNum,
                             electricityNum,
                             speedNum, dirNum, timeStr));
@@ -377,13 +377,13 @@ public class MessageReceive_GPRS
                 //定位数据批量上传
                 case MessageType.LOCATIONBATCHUP:
                 {
-                    m_logger.debug(">>>该消息为[定位数据批量上传],暂未支持该消息的解析...");
+                    _logger.debug(">>>该消息为[定位数据批量上传],暂未支持该消息的解析...");
                     break;
                 }
                 //终端心跳,消息体为空
                 case MessageType.CLIENTHEARTBEAT:
                 {
-                    m_logger.debug(">>>该消息为[终端心跳]");
+                    _logger.debug(">>>该消息为[终端心跳]");
                     //收到终端的心跳消息后发送平台通用应答消息
                     String responseStr = "7E8001";
                     responseStr += ++idValue;
@@ -393,18 +393,18 @@ public class MessageReceive_GPRS
                 //终端通用应答
                 case MessageType.CLIENTRESPONSE:
                 {
-                    m_logger.debug(">>>该消息为[终端通用应答]");
+                    _logger.debug(">>>该消息为[终端通用应答]");
                     break;
                 }
                 default:
-                    m_logger.debug(">>>该消息无法解析");
+                    _logger.debug(">>>该消息无法解析");
                     break;
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            m_logger.error(String.format(">>>解析内容时发生异常:", e.getMessage()));
+            _logger.error(String.format(">>>解析内容时发生异常:", e.getMessage()));
         }
         return "";
     }

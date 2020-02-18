@@ -12,28 +12,28 @@ import java.net.Socket;
 
 public class Server_GPRS_Worker implements Runnable
 {
-    private Socket m_socket;
-    private Logger m_logger = Logger.getLogger(Server_GPRS_Worker.class);
-    private String m_clientIdentity;
-    private int m_detail;
-    private String m_setData;
+    private Logger _logger = Logger.getLogger(Server_GPRS_Worker.class);
+    private Socket _socket;
+    private String _clientIdentity;
+    private String _setData;
+    private int _detail;
 
     public Server_GPRS_Worker(Socket socket, int detail, String setData)
     {
-        m_socket = socket;
-        m_detail = detail;
-        m_setData = setData;
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) m_socket.getRemoteSocketAddress();
+        _socket = socket;
+        _detail = detail;
+        _setData = setData;
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) _socket.getRemoteSocketAddress();
         String clientIP = inetSocketAddress.getAddress().getHostAddress();
         int clientPort = inetSocketAddress.getPort();
-        m_clientIdentity = String.format("%s:%d", clientIP, clientPort);
+        _clientIdentity = String.format("%s:%d", clientIP, clientPort);
     }
 
     public void Worker() throws Exception
     {
         MessageReceive_GPRS messageReceive_gprs = new MessageReceive_GPRS();
-        InputStream inputStream = m_socket.getInputStream();
-        OutputStream outputStream = m_socket.getOutputStream();
+        InputStream inputStream = _socket.getInputStream();
+        OutputStream outputStream = _socket.getOutputStream();
         byte[] bytes = new byte[1];
         StringBuffer stringBuffer = new StringBuffer();
         while (true)
@@ -48,7 +48,7 @@ public class Server_GPRS_Worker implements Runnable
             if (inputStream.available() == 0)
             {
                 String info = stringBuffer.toString();
-                m_logger.debug(String.format(">>>GPRS服务(%s)收到:%s", m_clientIdentity, info));
+                _logger.debug(String.format(">>>GPRS服务(%s)收到:%s", _clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 //解析收到的内容并响应
                 String responseStr = messageReceive_gprs.RecevieHexStr(info);
@@ -66,16 +66,16 @@ public class Server_GPRS_Worker implements Runnable
                 byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
                 outputStream.write(byteArray);
                 outputStream.flush();
-                m_logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", m_clientIdentity, responseStr));
+                _logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", _clientIdentity, responseStr));
                 //鉴权完毕后发送参数设置
                 if (tempFlag)
                 {
                     //延时发送
                     Thread.sleep(100);
-                    if (m_setData != null && !m_setData.equals(""))
+                    if (_setData != null && !_setData.equals(""))
                     {
-                        String hexDetail = ConvertUtil.IntToHexStr(m_detail);
-                        new SendParamSetting(m_socket, m_setData).SendToGPRS(hexDetail);
+                        String hexDetail = ConvertUtil.IntToHexStr(_detail);
+                        new SendParamSetting(_socket, _setData).SendToGPRS(hexDetail);
                     }
                 }
             }
@@ -92,18 +92,18 @@ public class Server_GPRS_Worker implements Runnable
         catch (Exception e)
         {
             e.printStackTrace();
-            m_logger.error(String.format(">>>连接GPRS服务(%s)的客户端断开:%s", m_clientIdentity, e.getMessage()));
+            _logger.error(String.format(">>>连接GPRS服务(%s)的客户端断开:%s", _clientIdentity, e.getMessage()));
         }
         finally
         {
             try
             {
-                m_socket.close();
+                _socket.close();
             }
             catch (IOException e)
             {
                 e.printStackTrace();
-                m_logger.error(String.format(">>>MO服务(%s)关闭Socket时发生异常:%s", m_clientIdentity, e.getMessage()));
+                _logger.error(String.format(">>>MO服务(%s)关闭Socket时发生异常:%s", _clientIdentity, e.getMessage()));
             }
         }
     }

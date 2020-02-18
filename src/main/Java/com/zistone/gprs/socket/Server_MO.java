@@ -11,45 +11,45 @@ public class Server_MO
 {
     private static final int HEARTTIMEOUT_SOCKET;
     private static final int PORT_SOCKET_MO;
-    private static String YXGATEWAY_IP;
-    private static int PORT_SOCKET_MT;
-    private static int m_detail = 6550;
+    private static String _yxIP;
+    private static int _mtPort;
+    private static int _detail = 6550;
 
     static
     {
         HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
-        YXGATEWAY_IP = PropertiesUtil.GetValueProperties().getProperty("YXGATEWAY_IP");
+        _yxIP = PropertiesUtil.GetValueProperties().getProperty("IP_YX");
         PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
-        PORT_SOCKET_MT = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
+        _mtPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
     }
 
-    private ServerSocket m_serverSocket;
-    private Logger m_logger = Logger.getLogger(Server_MO.class);
+    private Logger _logger = Logger.getLogger(Server_MO.class);
+    private ServerSocket _serverSocket;
     //该线程是否正在运行
-    private boolean m_isRuning = false;
-    private Thread m_thread;
-    public String m_setData = "";
+    private boolean _isRuning = false;
+    private Thread _thread;
+    public String _setData = "";
 
     public Server_MO() throws IOException
     {
-        m_serverSocket = new ServerSocket(PORT_SOCKET_MO);
+        _serverSocket = new ServerSocket(PORT_SOCKET_MO);
     }
 
     public void MyRun()
     {
-        while (m_isRuning)
+        while (_isRuning)
         {
             try
             {
-                Socket socket = m_serverSocket.accept();
+                Socket socket = _serverSocket.accept();
                 socket.setSoTimeout(HEARTTIMEOUT_SOCKET);
                 //先发送MT,再接收数据
-                if (m_setData != null && !m_setData.equals(""))
+                if (_setData != null && !_setData.equals(""))
                 {
-                    Socket tempSocket = new Socket(YXGATEWAY_IP, PORT_SOCKET_MT);
-                    m_detail += 1;
-                    String hexDetail = ConvertUtil.IntToHexStr(m_detail);
-                    new SendParamSetting(tempSocket, m_setData).SendToMT(hexDetail);
+                    Socket tempSocket = new Socket(_yxIP, _mtPort);
+                    _detail += 1;
+                    String hexDetail = ConvertUtil.IntToHexStr(_detail);
+                    new SendParamSetting(tempSocket, _setData).SendToMT(hexDetail);
                     tempSocket.close();
                     Thread.sleep(100);
                 }
@@ -57,30 +57,30 @@ public class Server_MO
                 Thread thread = new Thread(server_mo_woker);
                 thread.setDaemon(true);
                 thread.start();
-                m_logger.debug(">>>----------Server_MO_Worker线程启动----------");
+                _logger.debug(">>>----------Server_MO_Worker线程启动----------");
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                m_logger.error(String.format(">>>MO服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
+                _logger.error(String.format(">>>MO服务开启接收数据的线程时,发生异常:%s", e.getMessage()));
             }
         }
-        m_isRuning = false;
+        _isRuning = false;
     }
 
     public void MyStart()
     {
-        if (m_isRuning)
+        if (_isRuning)
         {
-            m_logger.error(">>>MO服务启动失败,该服务正在运行!");
+            _logger.error(">>>MO服务启动失败,该服务正在运行!");
         }
         else
         {
-            m_isRuning = true;
-            m_thread = new Thread(this::MyRun);
-            m_thread.setDaemon(true);
-            m_thread.start();
-            m_logger.debug(String.format(">>>MO服务的线程%d启动...", m_thread.getId()));
+            _isRuning = true;
+            _thread = new Thread(this::MyRun);
+            _thread.setDaemon(true);
+            _thread.start();
+            _logger.debug(String.format(">>>MO服务的线程%d启动...", _thread.getId()));
         }
     }
 
@@ -88,9 +88,9 @@ public class Server_MO
     {
         try
         {
-            if (m_thread != null)
+            if (_thread != null)
             {
-                m_thread.join();
+                _thread.join();
             }
         }
         catch (InterruptedException e)
@@ -101,7 +101,7 @@ public class Server_MO
 
     public void Stop()
     {
-        m_isRuning = false;
+        _isRuning = false;
     }
 
 }
