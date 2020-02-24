@@ -1,12 +1,7 @@
 package com.zistone.gprs.util;
 
-public class ASCIIUtil
+public class MyASCIIUtil
 {
-    public static void main(String[] args)
-    {
-        System.out.println(ParseASCII(""));
-    }
-
     private static String ToHexUtil(int number)
     {
         String str = "";

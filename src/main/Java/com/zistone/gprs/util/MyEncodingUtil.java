@@ -2,14 +2,8 @@ package com.zistone.gprs.util;
 
 import java.io.UnsupportedEncodingException;
 
-public class EncodingUtil
+public class MyEncodingUtil
 {
-    public static void main(String[] args)
-    {
-        System.out.println("GBK转Unicode:" + GBKToUnicode("B2E2CAD4"));
-        System.out.println("Unicode转GBK:" + UnicodeToGBK("测试"));
-    }
-
     /**
      * GBK转Unicode
      *
