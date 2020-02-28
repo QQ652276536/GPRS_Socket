@@ -1,4 +1,4 @@
-import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.MyConvertUtil;
 
 import java.io.*;
 import java.net.Socket;
@@ -23,7 +23,7 @@ public class SocketClient_MO
                 {
                     return;
                 }
-                byte[] byteArray = ConvertUtil.HexStrToByteArray(data);
+                byte[] byteArray = MyConvertUtil.HexStrToByteArray(data);
                 outputStream.write(byteArray);
                 //刷新缓冲
                 outputStream.flush();
@@ -35,8 +35,8 @@ public class SocketClient_MO
                 while (inputStream.available() > 0)
                 {
                     inputStream.read(bytes);
-                    String hexStr = ConvertUtil.ByteArrayToHexStr(bytes);
-                    info += ConvertUtil.HexStrToStr(hexStr);
+                    String hexStr = MyConvertUtil.ByteArrayToHexStr(bytes);
+                    info += MyConvertUtil.HexStrToStr(hexStr);
                     if (inputStream.available() == 0)
                     {
                         System.out.println("收到来自服务端的信息:" + info);

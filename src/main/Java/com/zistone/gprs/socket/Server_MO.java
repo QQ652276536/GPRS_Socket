@@ -1,7 +1,7 @@
 package com.zistone.gprs.socket;
 
-import com.zistone.gprs.util.ConvertUtil;
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyConvertUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -17,10 +17,10 @@ public class Server_MO
 
     static
     {
-        HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
-        _yxIP = PropertiesUtil.GetValueProperties().getProperty("IP_YX");
-        PORT_SOCKET_MO = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
-        _mtPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
+        HEARTTIMEOUT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+        _yxIP = MyPropertiesUtil.GetValueProperties().getProperty("IP_YX");
+        PORT_SOCKET_MO = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET2"));
+        _mtPort = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET4"));
     }
 
     private Logger _logger = Logger.getLogger(Server_MO.class);
@@ -48,7 +48,7 @@ public class Server_MO
                 {
                     Socket tempSocket = new Socket(_yxIP, _mtPort);
                     _detail += 1;
-                    String hexDetail = ConvertUtil.IntToHexStr(_detail);
+                    String hexDetail = MyConvertUtil.IntToHexStr(_detail);
                     new SendParamSetting(tempSocket, _setData).SendToMT(hexDetail);
                     tempSocket.close();
                     Thread.sleep(100);

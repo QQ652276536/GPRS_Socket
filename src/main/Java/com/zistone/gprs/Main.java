@@ -1,6 +1,5 @@
 package com.zistone.gprs;
 
-import com.zistone.gprs.file_listener.FileContentEvent_YX;
 import com.zistone.gprs.socket.Server_GPRS;
 import com.zistone.gprs.socket.Server_MO;
 import com.zistone.gprs.socket.Server_Set;
@@ -24,7 +23,7 @@ public class Main
             server_setParam.MyStart();
 
             //监听模拟工具生成的文本的方式来获取数据server_mo.MyStart();
-            new FileContentEvent_YX();
+            //new FileContentEvent_YX();
         }
         catch (Exception e)
         {

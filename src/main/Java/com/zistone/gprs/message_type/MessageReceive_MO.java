@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.bean.DeviceInfo;
 import com.zistone.gprs.bean.LocationInfo;
 import com.zistone.gprs.socket.SocketHttp;
-import com.zistone.gprs.util.ConvertUtil;
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyConvertUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -22,8 +22,8 @@ public class MessageReceive_MO
 
     static
     {
-        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = MyPropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
 
     private Logger _logger = Logger.getLogger(MessageReceive_MO.class);
@@ -123,7 +123,7 @@ public class MessageReceive_MO
                 if (length > 0)
                 {
                 }
-                String str = ConvertUtil.HexStrToStr(Arrays.toString(strArray));
+                String str = MyConvertUtil.HexStrToStr(Arrays.toString(strArray));
                 _logger.debug(String.format("\n\n\n>>>消息版本不为01(未知协议),尝试解析该内容:%s\n\n\n", str));
 
                 //应用服务器发送MT给铱星网关确认收到MO的数据

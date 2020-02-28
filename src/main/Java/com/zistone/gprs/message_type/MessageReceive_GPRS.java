@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.bean.DeviceInfo;
 import com.zistone.gprs.bean.MessageType;
 import com.zistone.gprs.socket.SocketHttp;
-import com.zistone.gprs.util.ConvertUtil;
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyConvertUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -22,8 +22,8 @@ public class MessageReceive_GPRS
 
     static
     {
-        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = MyPropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
 
     private Logger _logger = Logger.getLogger(MessageReceive_GPRS.class);
@@ -95,7 +95,7 @@ public class MessageReceive_GPRS
             responseStr += "03";
         }
         //鉴权码
-        responseStr += ConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
+        responseStr += MyConvertUtil.StrToHexStr(akCode).replaceAll("0[x|X]|,", "");
         responseStr += "A4";
         responseStr += "7E";
         return responseStr;
@@ -129,7 +129,7 @@ public class MessageReceive_GPRS
         //平台通用应答(0x8001)
         String payloadHexStr = "8001";
         int bodyProperty = Integer.parseInt(bodyPropertyStr, 16);
-        bodyPropertyStr = ConvertUtil.IntToHexStr(++bodyProperty);
+        bodyPropertyStr = MyConvertUtil.IntToHexStr(++bodyProperty);
         //补齐4位
         if (bodyPropertyStr.length() < 4)
         {
@@ -160,8 +160,8 @@ public class MessageReceive_GPRS
         }
         hexStr += payloadHexStr;
         //校验码
-        String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
-        String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
+        String tempPayload = MyConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String checkCode = MyConvertUtil.CreateCheckCode(tempPayload);
         hexStr += checkCode;
         hexStr += "7E";
         return hexStr;
@@ -303,7 +303,7 @@ public class MessageReceive_GPRS
                             typeStr += tempStr;
                         }
                     }
-                    typeStr = ConvertUtil.HexStrToStr(typeStr);
+                    typeStr = MyConvertUtil.HexStrToStr(typeStr);
                     //终端ID
                     String tempIdStr =
                             bodyArray[29] + bodyArray[30] + bodyArray[31] + bodyArray[32] + bodyArray[33] + bodyArray[34] + bodyArray[35];
@@ -312,7 +312,7 @@ public class MessageReceive_GPRS
                     //车辆标识(前两位为车牌归属地,后面为车牌号)
                     String carFlag1Str = bodyArray[38] + bodyArray[39];
                     String[] carFlag2 = Arrays.copyOfRange(bodyArray, 39, bodyArray.length);
-                    String carFlag2Str = ConvertUtil.StrArrayToStr(carFlag2);
+                    String carFlag2Str = MyConvertUtil.StrArrayToStr(carFlag2);
                     _logger.debug(String.format(">>>该消息为[终端注册],省域代码:%s,市县代码:%s," +
                                     "制造商:%s,终端型号:%s,终端ID:%s,车牌颜色:%s,车牌号:%s", provinceStr, cityStr, manufactureStr,
                             typeStr,
@@ -325,7 +325,7 @@ public class MessageReceive_GPRS
                     //服务端生成的鉴权码为6位,所以这里取6位的长度
                     String hexAkCode =
                             bodyArray[0] + bodyArray[1] + bodyArray[2] + bodyArray[3] + bodyArray[4] + bodyArray[5];
-                    String akCode = ConvertUtil.HexStrToStr(hexAkCode);
+                    String akCode = MyConvertUtil.HexStrToStr(hexAkCode);
                     _logger.debug(String.format(">>>该消息为[终端鉴权],鉴权码:%s(16进制:%s)", akCode, hexAkCode));
                     return Authoration(akCode, bodyPropertyStr, phoneStr, detailStr, idStr) + ",SETPARAM";
                 }
@@ -344,16 +344,16 @@ public class MessageReceive_GPRS
                     double lotNum = Double.valueOf(Integer.valueOf(lotStr, 16)) / 1000000;
                     //海拔
                     String heightStr = bodyArray[16] + bodyArray[17];
-                    byte[] heightBytes = ConvertUtil.HexStrToByteArray(heightStr);
-                    int heightNum = ConvertUtil.ByteArray2ToInt(heightBytes);
+                    byte[] heightBytes = MyConvertUtil.HexStrToByteArray(heightStr);
+                    int heightNum = MyConvertUtil.ByteArray2ToInt(heightBytes);
                     //速度
                     String speedStr = bodyArray[18] + bodyArray[19];
-                    byte[] speedBytes = ConvertUtil.HexStrToByteArray(speedStr);
-                    double speedNum = ConvertUtil.ByteArray2ToInt(speedBytes);
+                    byte[] speedBytes = MyConvertUtil.HexStrToByteArray(speedStr);
+                    double speedNum = MyConvertUtil.ByteArray2ToInt(speedBytes);
                     //方向
                     String dirStr = bodyArray[20] + bodyArray[21];
-                    byte[] dirBytes = ConvertUtil.HexStrToByteArray(dirStr);
-                    int dirNum = ConvertUtil.ByteArray2ToInt(dirBytes);
+                    byte[] dirBytes = MyConvertUtil.HexStrToByteArray(dirStr);
+                    int dirNum = MyConvertUtil.ByteArray2ToInt(dirBytes);
                     //时间
                     String year = bodyArray[22].equals("00") ? "0000" : "20" + bodyArray[22];
                     String month = bodyArray[23];

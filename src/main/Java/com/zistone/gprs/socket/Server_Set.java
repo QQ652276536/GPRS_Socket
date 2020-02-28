@@ -1,6 +1,6 @@
 package com.zistone.gprs.socket;
 
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.DataInputStream;
@@ -15,7 +15,7 @@ public class Server_Set
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET3"));
+        PORT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET3"));
     }
 
     private ServerSocket _serverSocket;

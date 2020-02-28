@@ -1,6 +1,6 @@
 package com.zistone.gprs.socket;
 
-import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.MyConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.InputStream;
@@ -67,13 +67,13 @@ public class SendParamSetting
         payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
-        String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
-        String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
+        String tempPayload = MyConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String checkCode = MyConvertUtil.CreateCheckCode(tempPayload);
         hexStr += checkCode;
         //标志
         hexStr += "7E";
         _logger.debug(String.format(">>>(%s)发送GPRS设置参数:%s\r\n", _clientIdentity, hexStr));
-        byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
+        byte[] byteArray = MyConvertUtil.HexStrToByteArray(hexStr);
         OutputStream outputStream = _socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
@@ -89,7 +89,7 @@ public class SendParamSetting
         //               break;
         //           }
         //           //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
-        //           String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+        //           String tempStr = MyConvertUtil.ByteArrayToHexStr(bytes) + ",";
         //           stringBuffer.append(tempStr);
         //           if (inputStream.available() == 0)
         //           {
@@ -143,7 +143,7 @@ public class SendParamSetting
         String second = String.valueOf(LocalTime.now().getSecond());
         String timeStr = dayOfYear + hour + minute + second;
         int timeNum = Integer.valueOf(timeStr);
-        String timeHexStr = ConvertUtil.IntToHexStr(timeNum);
+        String timeHexStr = MyConvertUtil.IntToHexStr(timeNum);
         //补齐4位
         if (timeHexStr.length() < 8)
         {
@@ -186,13 +186,13 @@ public class SendParamSetting
         payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
-        String tempPayload = ConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
-        String checkCode = ConvertUtil.CreateCheckCode(tempPayload);
+        String tempPayload = MyConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String checkCode = MyConvertUtil.CreateCheckCode(tempPayload);
         hexStr += checkCode;
         //标志
         hexStr += "7E";
         _logger.debug(String.format(">>>(%s)发送铱星设置参数:%s\r\n", _clientIdentity, hexStr));
-        byte[] byteArray = ConvertUtil.HexStrToByteArray(hexStr);
+        byte[] byteArray = MyConvertUtil.HexStrToByteArray(hexStr);
         OutputStream outputStream = _socket.getOutputStream();
         outputStream.write(byteArray);
         outputStream.flush();
@@ -206,7 +206,7 @@ public class SendParamSetting
             {
                 break;
             }
-            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+            String tempStr = MyConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
             if (inputStream.available() == 0)
             {

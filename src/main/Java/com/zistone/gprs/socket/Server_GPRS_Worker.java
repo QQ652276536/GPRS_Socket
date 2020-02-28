@@ -1,7 +1,7 @@
 package com.zistone.gprs.socket;
 
 import com.zistone.gprs.message_type.MessageReceive_GPRS;
-import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.MyConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class Server_GPRS_Worker implements Runnable
             {
                 break;
             }
-            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+            String tempStr = MyConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
             //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
             if (inputStream.available() == 0)
@@ -63,7 +63,7 @@ public class Server_GPRS_Worker implements Runnable
                         tempFlag = true;
                     }
                 }
-                byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
+                byte[] byteArray = MyConvertUtil.HexStrToByteArray(responseStr);
                 outputStream.write(byteArray);
                 outputStream.flush();
                 _logger.debug(String.format(">>>GPRS服务(%s)生成的响应内容:%s\r\n", _clientIdentity, responseStr));
@@ -74,7 +74,7 @@ public class Server_GPRS_Worker implements Runnable
                     Thread.sleep(100);
                     if (_setData != null && !_setData.equals(""))
                     {
-                        String hexDetail = ConvertUtil.IntToHexStr(_detail);
+                        String hexDetail = MyConvertUtil.IntToHexStr(_detail);
                         new SendParamSetting(_socket, _setData).SendToGPRS(hexDetail);
                     }
                 }

@@ -3,8 +3,8 @@ package com.zistone.gprs.file_listener;
 import com.alibaba.fastjson.JSON;
 import com.zistone.gprs.bean.LocationInfo;
 import com.zistone.gprs.socket.SocketHttp;
-import com.zistone.gprs.util.ConvertUtil;
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyConvertUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -21,8 +21,8 @@ public class FileContentEvent_YX
 
     static
     {
-        _webIP = PropertiesUtil.GetValueProperties().getProperty("IP_WEB");
-        _webPort = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
+        _webIP = MyPropertiesUtil.GetValueProperties().getProperty("IP_WEB");
+        _webPort = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_WEB"));
     }
 
     private Logger _logger = Logger.getLogger(FileContentEvent_YX.class);
@@ -52,11 +52,11 @@ public class FileContentEvent_YX
             while (inputStream.available() > 0)
             {
                 inputStream.read(bytes);
-                hexStr += ConvertUtil.ByteArrayToHexStr(bytes);
-                str += ConvertUtil.HexStrToStr(hexStr);
+                hexStr += MyConvertUtil.ByteArrayToHexStr(bytes);
+                str += MyConvertUtil.HexStrToStr(hexStr);
             }
             System.out.println(">>>文件内容(HX):" + hexStr);
-            String strss = ConvertUtil.HexStrAddCharacter(hexStr, ",");
+            String strss = MyConvertUtil.HexStrAddCharacter(hexStr, ",");
             String[] strArray = strss.split(",");
             //纬度,例如:167D12
             String lat1Str = String.valueOf(Integer.parseInt(strArray[13], 16));

@@ -1,7 +1,7 @@
 package com.zistone.gprs.socket;
 
 import com.zistone.gprs.message_type.MessageReceive_MO;
-import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.MyConvertUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class Server_MO_Worker implements Runnable
             {
                 break;
             }
-            String tempStr = ConvertUtil.ByteArrayToHexStr(bytes) + ",";
+            String tempStr = MyConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
             //返回下次调用可以不受阻塞地从此流读取或跳过的估计字节数,如果等于0则表示已经读完
             if (inputStream.available() == 0)
@@ -47,7 +47,7 @@ public class Server_MO_Worker implements Runnable
                 stringBuffer.delete(0, stringBuffer.length() - 1);
                 //解析收到的内容并响应
                 String responseStr = messageReceive_mo.RecevieHexStr(info);
-                byte[] byteArray = ConvertUtil.HexStrToByteArray(responseStr);
+                byte[] byteArray = MyConvertUtil.HexStrToByteArray(responseStr);
                 outputStream.write(byteArray);
                 outputStream.flush();
                 _logger.debug(String.format(">>>MO服务(%s)生成的响应内容:%s\r\n", _clientIdentity, responseStr));

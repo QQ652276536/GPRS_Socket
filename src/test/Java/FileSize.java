@@ -1,4 +1,4 @@
-import com.zistone.gprs.util.ConvertUtil;
+import com.zistone.gprs.util.MyConvertUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,7 @@ public class FileSize
         byte[] data = new byte[fileInputStream.available()];
         fileInputStream.read(data);
         int sum = 0;
-        String hexStr = ConvertUtil.ByteArrayToHexStr(data);
+        String hexStr = MyConvertUtil.ByteArrayToHexStr(data);
         double length = hexStr.length() / 2;
         for (int i = 0; i < length; i++)
         {

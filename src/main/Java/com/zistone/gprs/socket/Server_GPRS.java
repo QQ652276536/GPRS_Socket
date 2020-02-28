@@ -1,6 +1,6 @@
 package com.zistone.gprs.socket;
 
-import com.zistone.gprs.util.PropertiesUtil;
+import com.zistone.gprs.util.MyPropertiesUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -15,8 +15,8 @@ public class Server_GPRS
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
-        HEARTTIMEOUT_SOCKET = Integer.valueOf(PropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+        PORT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
+        HEARTTIMEOUT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
     }
 
     private Logger _logger = Logger.getLogger(Server_GPRS.class);
