@@ -13,22 +13,55 @@ public class MyConvertUtil {
 
     public static void main(String[] args) throws Exception {
 
-        System.out.println("生成的检验码为:" + CreateCheckCode("AA 31 1B 00 03 31 39 30 32 41 51 36 38 30 30 30 30 30 32 35 34 32 00 01" +
-                "00 01 05 98 25"));
-        System.out.println("CRC_16_CCITT_FALSE生成的校验码:" + CRC_16_CCITT_FALSE(new byte[]{(byte) 0xAA, 0x31, 0x1B, 0x00, 0x03, 0x31, 0x39, 0x30, 0x32, 0x41, 0x51, 0x36, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x32, 0x35, 0x34, 0x32, 0x00, 0x01, 0x00, 0x01, 0x05}, 27));
+        String strs = "01 34 2D 01 00 FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF " +
+                "FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF 00 00 00 00 AA AA 55 55 00 " +
+                "00 00 00 00 40 00 01 B0 07 00 00 FF FF 03 00 16 A1 8F E6 DE DC F3 67 1B " +
+                "98 71 15 C7 ED 2A D8 49 DB BB 9A 50 76 DE 81 A5 37 0E 02 D1 A8 26 7F 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 87 F4 85 B4 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 " +
+                "00 00 00 00 00 00 00 B8 4A";
+        System.out.println("____________________________________________________________________");
+        String[] strsArray = strs.split(" ");
+        System.out.println("该字符串的长度:" + strsArray.length + "," + strs.replaceAll(" ","").length()/2);
+        strs="A4907C5039C16CCDCBDA33D54C61F64D5D52EBB078A79B3758D7F5C3BDCB02D64F123A2757C" +
+                "CD826C52E5A651E5AEC17965B1DA08EA45BECB237FEF71A0C8A4FD8E96AC42FFB8EF60FDC5394" +
+                "3C2A7315829C52CC60055B7094440BA3CD0DE7DE83296BBFB13014B8F215296BE66A3CC55AC1E" +
+                "768C15B3EFEBB21869FACD6912B917C451919DB5FEEFD215D934495B2607FD7129BAF576A20A0" +
+                "11F2DFC572D4D10CB32573C1C5100BC36222A814EE889E3797A2CC37551B9BC15B4DAFE186233" +
+                "CFE1690A5D1D54C7F5F22F1A66B21B67193B1ABE5A6333AA5257BC321DA985368A28ECF4DC12D" +
+                "7B407D5ED7F2A85E310014C00F80EB4B9A645BDDB099B89551B9";
+        System.out.println("该字符串的长度:"+strs.length()/2);
         System.out.println("____________________________________________________________________");
 
-        System.out.println("byte转bit:" + ByteToBit((byte) 0x01) + ByteToBit((byte) 0x05));
-        System.out.println("bit添加空格:" + MyConvertUtil.StrAddCharacter(ByteToBit((byte) 0x05) + ByteToBit((byte) 0x01), " "));
+        System.out.println("生成的检验码为:" + CreateCheckCode("AA 31 1B 00 03 31 39 30 32 41 51 36 38 30 30 30 30 30 32 35 34 32 00 01" + "00 01 05 98 25"));
+        System.out.println("CRC_16_CCITT_FALSE生成的校验码:" + CRC_16_CCITT_FALSE(new byte[]{(byte) 0xAA, 0x31, 0x1B, 0x00, 0x03, 0x31, 0x39, 0x30, 0x32,
+                0x41, 0x51, 0x36, 0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x32,
+                0x35, 0x34, 0x32, 0x00, 0x01, 0x00, 0x01, 0x05}, 27));
+        byte[] reverseArray = ReverseByteArray(new byte[]{(byte) 0xAA, 0x31, 0x1B, 0x00, 0x03, 0x31, 0x39, 0x30, 0x32, 0x41, 0x51, 0x36,
+                0x38, 0x30, 0x30, 0x30, 0x30, 0x30, 0x32, 0x35, 0x34, 0x32, 0x00, 0x01, 0x00,
+                0x01, 0x05});
+        System.out.println("反转byte[]:");
+        for (byte b : reverseArray) {
+            System.out.print(ByteToHexStr(b) + " ");
+        }
+        System.out.println();
+        System.out.println("____________________________________________________________________");
+
+        System.out.println("byte转bit加空格:" + MyConvertUtil.StrAddCharacter(ByteToBit((byte) 0x40) + ByteToBit((byte) 0x00), " "));
         System.out.println("byte转16进制的Str:" + ByteToHexStr((byte) 0xAA));
-        System.out.println("byte转int:" + MyConvertUtil.ByteArray1ToInt((byte) 0x03));
-        System.out.println("byte[2]转int:" + ByteArray2ToInt(new byte[]{0x01, 0x2D}));
+        System.out.println("byte转int:" + MyConvertUtil.ByteToInt((byte) 0x03));
+        System.out.println("byte[2]转int:" + ByteArray2ToInt(new byte[]{0x1, 0x26}));
         System.out.println("byte[]转16进制的Str:" + MyConvertUtil.ByteArrayToHexStr(new byte[]{(byte) 0x98, 0x25}));
         System.out.println("byte[]转16进制的Str:" + ByteArrayToHexStr(new byte[]{(byte) 2, (byte) 97, (byte) 51, (byte) 52}));
         System.out.println((double) ByteArray4ToLong(new byte[]{(byte) 6, (byte) -18, (byte) -9, (byte) -15}) / 1000000);
         System.out.println("____________________________________________________________________");
-        //测试通过
-        System.out.println("普通Str转16进制Str:" + StrToHexStr("rD9TcH"));
+        System.out.println("普通Str转16进制Str:" + StrToHexStr("12345678"));
 
         int aaa = Integer.parseInt("1997", 16);
         System.out.println("Byte[]转int:" + Integer.parseInt("1B00", 16));
@@ -40,13 +73,13 @@ public class MyConvertUtil {
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("674E5C0F4F1F"));
         System.out.println("16进制的Str转成Unicode编码的中文:" + EnUnicode("004C0069005700650069"));
         System.out.println("____________________________________________________________________");
-//        TestBinaryStrToInt();
+                TestBinaryStrToInt();
     }
 
     private static void TestBinaryStrToInt() {
         System.out.println("____________________________________________________________________");
         String bitStr1 = "11111111";
-        String bitStr2 = "00000000";
+        String bitStr2 = "01000000";
         String bitStr3 = "11000011";
         String bitStr4 = "01111110";
         String bitStr5 = "00111100";
@@ -68,6 +101,22 @@ public class MyConvertUtil {
         System.out.println(bitStr10 + "\t二进制Str转十进制Int:" + Integer.parseInt(bitStr10, 2) + "\t\t" + "十进制Int转十六进制Int" + ":" + Integer.toHexString(Integer.parseInt(bitStr10, 2)));
         System.out.println(bitStr11 + "\t二进制Str转十进制Int:" + Integer.parseInt(bitStr11, 2) + "\t\t" + "十进制Int转十六进制Int" + ":" + Integer.toHexString(Integer.parseInt(bitStr11, 2)));
         System.out.println("____________________________________________________________________");
+    }
+
+    /**
+     * 反转byte[]
+     *
+     * @param byteArray
+     * @return
+     */
+    public static byte[] ReverseByteArray(byte[] byteArray) {
+        byte tempByte;
+        for (int start = 0, end = byteArray.length - 1; start < end; start++, end--) {
+            tempByte = byteArray[end];
+            byteArray[end] = byteArray[start];
+            byteArray[start] = tempByte;
+        }
+        return byteArray;
     }
 
     /**
@@ -420,7 +469,7 @@ public class MyConvertUtil {
      * @param b
      * @return
      */
-    public static int ByteArray1ToInt(byte b) {
+    public static int ByteToInt(byte b) {
         return (int) b & 0xFF;
     }
 
@@ -445,9 +494,6 @@ public class MyConvertUtil {
      * @param b
      */
     public static String ByteToHexStr(byte b) {
-        if (b == 0) {
-            return null;
-        }
         char[] hexArray = HEXSTRING.toCharArray();
         char[] hexChars = new char[2];
         int temp = b & 0xFF;
