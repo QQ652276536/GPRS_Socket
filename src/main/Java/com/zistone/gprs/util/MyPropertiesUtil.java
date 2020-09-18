@@ -4,18 +4,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class MyPropertiesUtil
-{
-    public static Properties GetValueProperties()
-    {
+public final class MyPropertiesUtil {
+    /**
+     * （禁止外部实例化）
+     */
+    private MyPropertiesUtil() {
+    }
+
+    public static Properties GetValueProperties() {
         Properties properties = new Properties();
         InputStream inputStream = Object.class.getResourceAsStream("/config.properties");
-        try
-        {
+        try {
             properties.load(inputStream);
-        }
-        catch(IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return properties;

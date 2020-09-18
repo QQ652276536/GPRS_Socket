@@ -15,8 +15,8 @@ public class Server_GPRS
 
     static
     {
-        PORT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
-        HEARTTIMEOUT_SOCKET = Integer.valueOf(MyPropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
+        PORT_SOCKET = Integer.parseInt(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
+        HEARTTIMEOUT_SOCKET = Integer.parseInt(MyPropertiesUtil.GetValueProperties().getProperty("HEARTTIMEOUT_SOCKET"));
     }
 
     private Logger _logger = Logger.getLogger(Server_GPRS.class);

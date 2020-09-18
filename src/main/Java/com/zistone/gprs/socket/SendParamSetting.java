@@ -10,15 +10,13 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class SendParamSetting
-{
+public class SendParamSetting {
     private Logger _logger = Logger.getLogger(SendParamSetting.class);
     private Socket _socket;
     private String _clientIdentity;
     private String _data;
 
-    public SendParamSetting(Socket socket, String data)
-    {
+    public SendParamSetting(Socket socket, String data) {
         _socket = socket;
         _data = data;
         InetSocketAddress inetSocketAddress = (InetSocketAddress) _socket.getRemoteSocketAddress();
@@ -34,23 +32,18 @@ public class SendParamSetting
      * @return
      * @throws Exception
      */
-    public String SendToGPRS(String detail) throws Exception
-    {
-        if (_data == null || _data.trim().equals(""))
-        {
+    public String SendToGPRS(String detail) throws Exception {
+        if (_data == null || _data.trim().equals("")) {
             throw new Exception("GPRS设置参数不能为空");
         }
         String[] strArray = _data.split(",");
         String imeiStr;
         String setParamStr;
-        if (strArray.length >= 3)
-        {
+        if (strArray.length >= 3) {
             imeiStr = strArray[1];
             _logger.debug(String.format(">>>(%s)IMEI是:%s,消息流水是:%s", _clientIdentity, imeiStr, detail));
             setParamStr = strArray[2];
-        }
-        else
-        {
+        } else {
             return "Error";
         }
         //标志
@@ -67,7 +60,7 @@ public class SendParamSetting
         payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
-        String tempPayload = MyConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String tempPayload = MyConvertUtil.StrAddCharacter(payloadHexStr, 2, " ");
         String checkCode = MyConvertUtil.CreateCheckCode(tempPayload);
         hexStr += checkCode;
         //标志
@@ -108,23 +101,18 @@ public class SendParamSetting
      *
      * @return
      */
-    public String SendToMT(String detail) throws Exception
-    {
-        if (_data == null || _data.trim().equals(""))
-        {
+    public String SendToMT(String detail) throws Exception {
+        if (_data == null || _data.trim().equals("")) {
             throw new Exception("铱星设置参数不能为空");
         }
         String[] strArray = _data.split(",");
         String imeiStr;
         String setParamStr;
-        if (strArray.length >= 3)
-        {
+        if (strArray.length >= 3) {
             imeiStr = strArray[1];
             _logger.debug(String.format(">>>(%s)IMEI是:%s", _clientIdentity, imeiStr));
             setParamStr = strArray[2];
-        }
-        else
-        {
+        } else {
             return "Error";
         }
         //以下为MT数据构建
@@ -145,12 +133,10 @@ public class SendParamSetting
         int timeNum = Integer.valueOf(timeStr);
         String timeHexStr = MyConvertUtil.IntToHexStr(timeNum);
         //补齐4位
-        if (timeHexStr.length() < 8)
-        {
+        if (timeHexStr.length() < 8) {
             int i = 8 - timeHexStr.length();
             StringBuffer stringBuffer = new StringBuffer(timeHexStr);
-            for (; i > 0; i--)
-            {
+            for (; i > 0; i--) {
                 stringBuffer.insert(0, "0");
             }
             timeHexStr = stringBuffer.toString();
@@ -159,8 +145,7 @@ public class SendParamSetting
         hexStr += timeHexStr;
         //IMEI,15位
         StringBuffer imeiBuffer = new StringBuffer();
-        for (int i = 0; i < imeiStr.length(); i++)
-        {
+        for (int i = 0; i < imeiStr.length(); i++) {
             imeiBuffer.append("3");
             imeiBuffer.append(imeiStr.charAt(i));
         }
@@ -186,7 +171,7 @@ public class SendParamSetting
         payloadHexStr += setParamStr;
         hexStr += payloadHexStr;
         //校验码
-        String tempPayload = MyConvertUtil.HexStrAddCharacter(payloadHexStr, " ");
+        String tempPayload = MyConvertUtil.StrAddCharacter(payloadHexStr, 2, " ");
         String checkCode = MyConvertUtil.CreateCheckCode(tempPayload);
         hexStr += checkCode;
         //标志
@@ -200,16 +185,13 @@ public class SendParamSetting
         byte[] bytes = new byte[1];
         String info = "";
         StringBuffer stringBuffer = new StringBuffer();
-        while (true)
-        {
-            if (inputStream.read(bytes) <= 0)
-            {
+        while (true) {
+            if (inputStream.read(bytes) <= 0) {
                 break;
             }
             String tempStr = MyConvertUtil.ByteArrayToHexStr(bytes) + ",";
             stringBuffer.append(tempStr);
-            if (inputStream.available() == 0)
-            {
+            if (inputStream.available() == 0) {
                 info = stringBuffer.toString();
                 _logger.debug(String.format(">>>(%s)执行参数设置后,收到来自铱星网关的信息:%s\r\n", _clientIdentity, info));
                 stringBuffer.delete(0, stringBuffer.length() - 1);
