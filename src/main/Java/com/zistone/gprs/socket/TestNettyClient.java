@@ -25,6 +25,7 @@ public class TestNettyClient {
 
     private final String HOST;
     private final int PORT;
+    private final ChannelFuture channelFuture = null;
 
     class EchoClientHandler extends SimpleChannelInboundHandler {
 
@@ -50,7 +51,7 @@ public class TestNettyClient {
 
         @Override
         protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-            LOGGER.info(channelHandlerContext.channel().remoteAddress());
+//            LOGGER.info(channelHandlerContext.channel().remoteAddress());
             String str = (String) o;
             LOGGER.info("收到：" + str);
         }
@@ -80,9 +81,9 @@ public class TestNettyClient {
         });
         //异步连接服务端
         ChannelFuture channelFuture = bootstrap.connect().sync();
-        //异步等待关闭通道
+        //异步关闭通道
         channelFuture.channel().closeFuture().sync();
-        LOGGER.info("通道已关闭");
+        //释放线程资源
         eventLoopGroup.shutdownGracefully().sync();
     }
 

@@ -35,13 +35,11 @@ public class TestNettyServer {
 
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-            LOGGER.info("通道" + ctx.channel().localAddress() + "不活跃");
+            LOGGER.info("通道" + ctx.channel().localAddress() + "关闭");
         }
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-//            ByteBuf byteBuf = (ByteBuf) msg;
-//            String str = GetMessage(byteBuf);
             String str = (String) msg;
             LOGGER.info("收到：" + str);
         }
