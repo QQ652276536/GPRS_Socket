@@ -3,16 +3,14 @@ package com.zistone.gprs;
 import com.zistone.gprs.socket.Server_GPRS;
 import com.zistone.gprs.socket.Server_MO;
 import com.zistone.gprs.socket.Server_Set;
+import com.zistone.gprs.socket.TestNettyServer;
 
-public class Main
-{
-    public static void main(String[] args)
-    {
+public class Main {
+    public static void main(String[] args) {
         Server_GPRS server_gprs;
         Server_MO server_mo;
         Server_Set server_setParam;
-        try
-        {
+        try {
             server_gprs = new Server_GPRS();
             server_gprs.MyStart();
 
@@ -24,9 +22,7 @@ public class Main
 
             //监听模拟工具生成的文本的方式来获取数据server_mo.MyStart();
             //new FileContentEvent_YX();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }

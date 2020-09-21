@@ -8,10 +8,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
+import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
-import io.netty.util.concurrent.EventExecutorGroup;
 import org.apache.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
@@ -27,7 +26,7 @@ public class TestNettyServer {
         PORT = Integer.parseInt(MyPropertiesUtil.GetValueProperties().getProperty("PORT_SOCKET1"));
     }
 
-    class TestNettyServerHandler extends ChannelInboundHandlerAdapter {
+    class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -41,15 +40,20 @@ public class TestNettyServer {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            ByteBuf byteBuf = (ByteBuf) msg;
-            String str = GetMessage(byteBuf);
+//            ByteBuf byteBuf = (ByteBuf) msg;
+//            String str = GetMessage(byteBuf);
+            String str = (String) msg;
             LOGGER.info("收到：" + str);
         }
 
         @Override
         public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
             LOGGER.info("数据接收完毕");
-            ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+            //刷新写出区域，完成后关闭通道连接
+//            ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+            LOGGER.info("已发送数据至客户端");
+            String sendInfo = "~！@#￥%……&**（）-+深圳123北ABC站\n";
+            ctx.writeAndFlush(Unpooled.copiedBuffer(sendInfo, CharsetUtil.UTF_8));
         }
 
         @Override
@@ -69,6 +73,7 @@ public class TestNettyServer {
         EventLoopGroup eventLoopGroup1 = new NioEventLoopGroup();
         EventLoopGroup eventLoopGroup2 = new NioEventLoopGroup();
         ServerBootstrap serverBootstrap = new ServerBootstrap();
+        //最大连接数
         serverBootstrap.option(ChannelOption.SO_BACKLOG, 1024);
         //绑定线程池
         serverBootstrap.group(eventLoopGroup2, eventLoopGroup1);
@@ -81,16 +86,27 @@ public class TestNettyServer {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
                 InetSocketAddress address = socketChannel.localAddress();
-                int port = address.getPort();
-                LOGGER.info("客户端" + address + " " + port + "连接");
+                LOGGER.info("客户端" + address + "连接");
+                socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("UTF-8")));
                 socketChannel.pipeline().addLast(new StringEncoder(Charset.forName("UTF-8")));
-                socketChannel.pipeline().addLast(new TestNettyServerHandler());
-                socketChannel.pipeline().addLast(new ByteArrayEncoder());
+                socketChannel.pipeline().addLast(new NettyServerHandler());
             }
         });
         //异步绑定端口
         ChannelFuture channelFuture = serverBootstrap.bind().sync();
-        LOGGER.info("正在监听" + channelFuture.channel().localAddress());
+        //关闭服务端通道
+//        channelFuture.channel().closeFuture().sync();
+//        LOGGER.info("通道已关闭");
+//        eventLoopGroup1.shutdownGracefully().sync();
+//        eventLoopGroup2.shutdownGracefully().sync();
+    }
+
+    public static void main(String[] args) {
+        try {
+            new TestNettyServer().Start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
